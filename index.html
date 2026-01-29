@@ -279,6 +279,15 @@
             <a href="#ex13_merge" class="nav-link">ex13_merge_std.py</a>
             <a href="#ex14_export" class="nav-link">ex14_export_gpkg.py</a>
         </div>
+
+        <div class="nav-group">
+            <div class="nav-group-title">Bloc Processing i Risc</div>
+            <a href="#ex15_alerta" class="nav-link">ex15_dies_alerta_thresholds.py</a>
+            <a href="#ex16_episodis" class="nav-link">ex16_episodis_alerta.py</a>
+            <a href="#ex17_resum" class="nav-link">ex17_resum_episodis.py</a>
+            <a href="#ex18_hotspots" class="nav-link">ex18_hotspots_heatmap.py</a>
+            <a href="#ex19_risc_export" class="nav-link">ex19_export_risc_gpkg.py</a>
+        </div>
     </nav>
 
     <!-- Main Content -->
@@ -294,6 +303,8 @@
                 <p>Benvingut/da! En aquesta pàgina tens els scripts del curs ordenats per fases. L’objectiu no és “memoritzar Python”, sinó aprendre a <strong>llegir dades reals</strong>, <strong>netejar-les</strong> i <strong>estandarditzar-les</strong> perquè després les puguem fer servir a QGIS sense sorpreses.</p>
                 <p>Si és el teu primer contacte amb Python, no pateixis: cada exercici introdueix una idea nova i la repetirem amb exemples. L’ordre importa: primer entenem el CSV, després netegem números i dates, i finalment fem la part “SIG” (coordenades, CRS i exportació).</p>
                 <p><strong>Consell:</strong> executa els scripts en ordre i mira sempre el fitxer de sortida a la carpeta de resultats. El millor indicador que ho estàs fent bé és veure com el CSV va millorant a cada pas.</p>
+                
+                <p><strong>Com s’executen els scripts:</strong> els pots executar des de VS Code amb la task del curs o des de terminal amb el teu <code class="inline">qgis_env.bat</code>. Veuràs que gairebé tots els scripts comencen afegint l’arrel del projecte a <code class="inline">sys.path</code>: això permet que els imports (<code class="inline">from utils...</code>) funcionin sempre, encara que executis el fitxer des d’una subcarpeta.</p>
             </div>
         </div>
 
@@ -307,6 +318,10 @@
                 <p>Treballarem amb dues fonts diferents de precipitació (Meteocat i AEMET). Tot i que parlen del mateix fenomen, <strong>no tenen el mateix format</strong>: canvia la manera d’escriure la data, el sistema de coordenades i fins i tot les unitats de precipitació.</p>
                 <p>La nostra feina serà crear un <strong>dataset estàndard</strong> (mateixes columnes, mateix format i mateix CRS) per poder unir-ho tot i portar-ho a QGIS. Aquest tipus de “traducció” entre formats és el dia a dia quan treballem amb dades geogràfiques reals.</p>
                 
+                <p><strong>El patró del curs:</strong> tots els blocs segueixen la mateixa lògica: primer explorem les dades, després les netegem i validem, després les estandarditzem a un mateix format i finalment les unim i visualitzem. Aquest patró és reutilitzable en qualsevol projecte real de dades geogràfiques.</p>
+
+                <p><strong>Nota del curs:</strong> veuràs imports com <code class="inline">from utils.parse_utils...</code> o <code class="inline">from utils.csv_utils...</code>. Són “peces LEGO” reutilitzables: en lloc de repetir el mateix codi a cada fitxer, el centralitzem en utilitats i així els exercicis són més curts i més clars.</p>
+
                 <div class="data-files-list">
                     <strong>📂 Descàrrega de Dades d'Entrada:</strong>
                     <ul>
@@ -322,6 +337,8 @@
                         </li>
                     </ul>
                 </div>
+
+                <p><strong>Nou bloc (Processing i Risc):</strong> a partir d’aquí ja no “netegem dades”, sinó que fem anàlisi orientada a risc: definim llindars, identifiquem episodis, generem hotspots i empaquetem un GeoPackage final com a entregable.</p>
             </div>
         </div>
         
@@ -362,9 +379,9 @@ print("GPKG_OUT:", config.GPKG_OUT)
 print("OK -> Configuració carregada correctament.")</code></pre>
             <div class="explanation">
                 <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Per què hi ha <code class="inline">sys.path</code>?</strong> Perquè Python pugui trobar la carpeta <code class="inline">utils</code> del projecte. Això evita errors del tipus “No module named utils” quan executes el script des d’una subcarpeta.</p>
                 <p><strong>Imports:</strong> <code class="inline">os</code> ens ajuda a construir rutes sense escriure-les “a mà”, i <code class="inline">sys</code> ens permet dir-li a Python on ha de buscar els mòduls del projecte.</p>
                 <p><strong>Pas clau:</strong> afegim l’arrel del projecte a <code class="inline">sys.path</code> perquè els imports com <code class="inline">from utils import config</code> funcionin encara que executem el script des de diferents carpetes.</p>
-                <p>Aquest script és fonamental perquè Python sàpiga on buscar els mòduls del projecte. L'ús de <code>os.path.dirname(__file__)</code> ens permet obtenir la ruta del fitxer actual i pujar nivells fins a l'arrel.</p>
             </div>
         </div>
 
@@ -403,7 +420,7 @@ print("build_date(2024, 2, 30) ->", build_date(2024, 2, 30))
 print("OK -> Funcions de parseig provades.")</code></pre>
             <div class="explanation">
                 <h4>🔍 Anàlisi Tècnica</h4>
-                <p><strong>Per què fem aquest test?</strong> Abans de processar tot un CSV, comprovem amb exemples petits que les funcions es comporten com esperem (ex: “3,5” → 3.5 i dates en formats diferents).</p>
+                <p><strong>Per què fem proves abans?</strong> Perquè una funció com <code class="inline">to_float</code> o <code class="inline">parse_date</code> és la base de tots els passos següents. Si aquí funciona amb exemples, després podem processar CSV grans amb confiança.</p>
                 <p><strong>Imports:</strong> aquí importem funcions pròpies del projecte. És una manera d’evitar repetir el mateix codi a cada exercici.</p>
                 <p>Abans de processar milers de línies, verifiquem que la funció <code>to_float</code> gestioni bé la coma decimal (estàndard europeu) i que <code>parse_date</code> entengui els diferents formats d'entrada.</p>
             </div>
@@ -434,6 +451,7 @@ preview_csv(AEMET_INPUT, max_rows=5, title="Preview AEMET")
 print("OK -> Previews mostrats.")</code></pre>
             <div class="explanation">
                 <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Idea clau:</strong> abans de transformar res, mirem la forma del CSV (capçaleres i 5 files). Aquesta inspecció evita supòsits equivocats sobre noms de columnes o formats.</p>
                 <p><strong>Idea principal:</strong> abans de “netejar”, primer mirem el fitxer. Previsualitzar és com obrir el CSV i entendre quines columnes hi ha i com estan escrites.</p>
                 <p><strong>Per què no llegim tot?</strong> un CSV pot ser gran. Mostrar només 5 files és ràpid i suficient per detectar formats (dates, separadors, valors buits).</p>
                 <p>La funció <code>preview_csv</code> utilitza <code>csv.DictReader</code> per mostrar només les primeres línies, evitant carregar tot el fitxer a memòria. És essencial per a l'exploració ràpida.</p>
@@ -470,9 +488,8 @@ print("WGS84:", lon, lat)
 print("OK -> Transformació feta.")</code></pre>
             <div class="explanation">
                 <h4>🔍 Anàlisi Tècnica</h4>
-                <p><strong>Imports PyQGIS:</strong> aquí entrem al món SIG. Una transformació de CRS és una “traducció” entre sistemes de coordenades (metres UTM → graus lon/lat).</p>
-                <p><strong>Per què testejem amb valors d’exemple?</strong> si aquest test falla, la resta d’exercicis espacials també fallaran. És el nostre “semàfor verd” abans de transformar milers de punts.</p>
-                <p>Verifiquem que la llibreria de projeccions (<code>qgis.core</code>) estigui ben configurada per passar d'EPSG:25831 (Metres) a EPSG:4326 (Graus).</p>
+                <p><strong>Què comprovem exactament?</strong> Que el transformador CRS (UTM31 → WGS84) està ben configurat i retorna una lon/lat plausible. És un test petit per detectar problemes d’entorn abans de transformar milers de punts.</p>
+                <p>Aquí verifiquem que les utilitats basades en <strong>PyQGIS</strong> funcionin correctament per passar d’EPSG:25831 (UTM, metres) a EPSG:4326 (WGS84, graus). Si aquest test falla, la resta d’exercicis espacials també fallaran.</p>
             </div>
         </div>
 
@@ -499,6 +516,7 @@ preview_csv(METEOCAT_INPUT, max_rows=5, title="Preview del CSV METEOCAT")
 print("OK -> Mostrades capçaleres i 5 files del CSV.")</code></pre>
             <div class="explanation">
                 <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Per què fem un “peek”?</strong> Per identificar les columnes clau (EMA, DATA, X, Y, PPT) i veure exemples reals de valors. És la manera més ràpida d’entendre un dataset nou.</p>
                 <p><strong>Objectiu d’aprenentatge:</strong> entendre què hi ha dins el CSV abans de tocar res. Identifiquem columnes com <code class="inline">EMA</code>, <code class="inline">DATA</code>, <code class="inline">X</code>, <code class="inline">Y</code> i <code class="inline">PPT</code>.</p>
                 <p><strong>Pas important:</strong> aquesta exploració evita errors típics com “la columna no existeix” o “la data té un format diferent del que pensàvem”.</p>
                 <p>Primer contacte amb les dades reals de Meteocat per identificar les columnes clau (X, Y, PPT, EMA).</p>
@@ -541,7 +559,7 @@ print(f"OK -> creat {PAS1_OUT}")
 print(f"Files processades: {files}")</code></pre>
             <div class="explanation">
                 <h4>🔍 Anàlisi Tècnica</h4>
-                <p><strong>Què fem aquí?</strong> Creem un primer “CSV net” quedant-nos només amb les columnes que ens interessen. Això simplifica la resta del curs.</p>
+                <p>Aquí creem un nou CSV quedant-nos només amb les columnes importants (<code class="inline">EMA</code>, <code class="inline">DATA</code>, <code class="inline">X</code>, <code class="inline">Y</code>, <code class="inline">PPT</code>). Ho fem per simplificar els següents passos: com menys soroll, més fàcil és detectar errors i entendre què està passant.</p>
                 <p><strong>Per què crear un fitxer nou?</strong> Treballar per fases ens permet tornar enrere si alguna cosa surt malament i comparar el resultat pas a pas.</p>
                 <p>Utilitzem una <em>dictionary comprehension</em> per crear un nou diccionari només amb les claus que ens interessen, descartant la resta d'informació.</p>
             </div>
@@ -596,6 +614,7 @@ preview_csv(PAS2A_OUT, max_rows=5, title="Preview meteocat_pas2a.csv")
 print(f"OK -> creat {PAS2A_OUT}")</code></pre>
             <div class="explanation">
                 <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Pas important:</strong> aquí convertim X/Y/PPT a número (float), però encara no descartem files. Separem “convertir” de “validar” perquè el procés sigui més fàcil d’entendre i depurar.</p>
                 <p><strong>Imports i funcions:</strong> usem <code class="inline">to_float</code> perquè molts números venen com a text (i amb coma). Convertir-ho a <em>float</em> és imprescindible per fer càlculs després.</p>
                 <p><strong>Idea clau:</strong> si una coordenada o un valor no es pot convertir, no parem el programa: el marquem com a buit o el descartem segons el criteri de l’exercici.</p>
                 <p>Convertim strings a floats. Això és crucial perquè "10,5" no es pot operar matemàticament, però 10.5 sí. La funció <code>to_float</code> s'encarrega de reemplaçar la coma per punt.</p>
@@ -647,6 +666,7 @@ preview_csv(PAS2B_OUT, max_rows=5, title="Preview meteocat_pas2b.csv")
 print(f"Files saltades (X o Y buits): {files_saltades}")</code></pre>
             <div class="explanation">
                 <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Per què aquest pas existeix?</strong> Un punt sense X o Y no es pot mapar. Per això descartem files amb coordenades buides abans d’intentar transformacions CRS.</p>
                 <p><strong>Control de qualitat:</strong> un punt sense X o Y no es pot dibuixar en un mapa. Per això “saltem” aquestes files amb <code class="inline">continue</code>.</p>
                 <p><strong>Per què fer-ho ara?</strong> si filtrem aviat, evitem errors quan fem la transformació de CRS (que necessita coordenades vàlides).</p>
                 <p>Eliminem registres que no es podrien dibuixar en un mapa. Si <code>x</code> o <code>y</code> són <code>None</code> (fruit de la neteja anterior) o buits, saltem la iteració amb <code>continue</code>.</p>
@@ -700,6 +720,7 @@ preview_csv(PAS3_OUT, max_rows=5, title="Preview meteocat_pas3.csv")
 print(f"Files saltades (data invàlida): {files_saltades}")</code></pre>
             <div class="explanation">
                 <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Què estandarditzem?</strong> Convertim la data a format ISO (YYYY-MM-DD). Això fa que ordenar i unir sèries temporals sigui consistent entre fonts.</p>
                 <p><strong>Objectiu:</strong> convertir totes les dates al mateix format (<code class="inline">YYYY-MM-DD</code>). Això permet ordenar, filtrar i unir dades de fonts diferents sense confusions.</p>
                 <p><strong>Per què ISO?</strong> perquè és un estàndard internacional i, a més, ordena bé alfabèticament (text) i cronològicament (temps).</p>
                 <p>Convertim qualsevol format de data d'entrada (DD/MM/YYYY) a l'estàndard ISO 8601 (YYYY-MM-DD). Això permet ordenar cronològicament les dades com a text simple.</p>
@@ -762,6 +783,7 @@ preview_csv(PAS4_OUT, max_rows=5, title="Preview meteocat_pas4.csv")
 print(f"OK -> creat {PAS4_OUT}")</code></pre>
             <div class="explanation">
                 <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Entrant al SIG:</strong> ara sí, fem la reprojecció amb PyQGIS i afegim <code class="inline">lon</code> i <code class="inline">lat</code>. Aquestes dues columnes permeten carregar el CSV com a punts a QGIS.</p>
                 <p><strong>Imports PyQGIS:</strong> utilitzem QGIS per transformar coordenades d’UTM (metres) a WGS84 (graus). Això ens dona <code class="inline">lon</code> i <code class="inline">lat</code> per poder carregar el CSV com a punts.</p>
                 <p><strong>Pas clau:</strong> la transformació només té sentit si <code class="inline">X</code> i <code class="inline">Y</code> són números vàlids. Per això hem netejat i filtrat abans.</p>
                 <p>Afegim les columnes <code>lon</code> i <code>lat</code>. Utilitzem un bloc <code>try/except</code> per assegurar que si una coordinada concreta és corrupta, no aturi tot el procés.</p>
@@ -1114,6 +1136,7 @@ preview_csv(AEMET_PAS4_OUT, max_rows=5, title="Preview aemet_pas4_coords.csv")
 print(f"OK -> creat {AEMET_PAS4_OUT}")</code></pre>
             <div class="explanation">
                 <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Atenció important:</strong> tot i que les columnes originals d’AEMET s’anomenen <code class="inline">LONGITUD</code> i <code class="inline">LATITUD</code>, <u>NO estan en graus</u>. Contenen coordenades UTM (metres). Si les carreguéssim directament com lon/lat, els punts apareixerien en llocs incorrectes del mapa.</p>
                 <p><strong>Pas espacial:</strong> transformem coordenades perquè totes les fonts acabin amb <code class="inline">lon</code>/<code class="inline">lat</code> en EPSG:4326.</p>
                 <p><strong>Nota didàctica:</strong> encara que una columna es digui “LONGITUD”, no sempre vol dir graus decimals. Sempre cal validar el format abans.</p>
                 <p>Encara que les columnes originals es diuen "LONGITUD" i "LATITUD", en realitat contenen coordenades UTM (metres). Les transformem a WGS84 real.</p>
@@ -1237,6 +1260,7 @@ preview_csv(MERGED_STD_OUT, max_rows=5, title="Preview precipitacio_olot_estanda
 print(f"OK -> creat {MERGED_STD_OUT}")</code></pre>
             <div class="explanation">
                 <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Exercici de síntesi:</strong> aquí no transformem dades noves, sinó que confiem que METEOCAT i AEMET ja tenen exactament el mateix esquema. Això demostra per què l’estandardització prèvia era tan important.</p>
                 <p><strong>Què fem?</strong> ajuntem (concatenem) els dos fitxers estandarditzats en un de sol i els ordenem per data.</p>
                 <p><strong>Per què ordenar?</strong> perquè és més fàcil revisar la sèrie temporal i detectar buits o inconsistències quan les files estan en ordre cronològic.</p>
                 <p>Llegim tots dos fitxers a memòria, els afegim a una única llista i utilitzem <code>list.sort</code> amb una funció lambda per ordenar per data.</p>
@@ -1286,9 +1310,643 @@ else:
     print("OK -> Capa afegida al projecte QGIS.")</code></pre>
             <div class="explanation">
                 <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Del CSV al SIG:</strong> aquest és el pas final del projecte. Convertim dades tabulars en una capa espacial real, la visualitzem directament a QGIS i la desem en un format professional (GeoPackage).</p>
+                <p><strong>Idea clau:</strong> tot el que has fet fins ara (neteja, dates, CRS, estandardització) té sentit perquè ara la capa es comporta correctament dins d’un SIG.</p>
                 <p><strong>Últim pas SIG:</strong> convertim el CSV a un GeoPackage (format espacial estàndard) perquè QGIS i altres SIG el puguin llegir com una capa vectorial real.</p>
                 <p><strong>Idea clau:</strong> un CSV és text; un GPKG és una base de dades espacial. Aquest canvi fa que el dataset sigui més robust i reutilitzable.</p>
                 <p>Utilitza l'API de QGIS per convertir el CSV en text pla a una base de dades espacial GeoPackage real, a punt per ser utilitzada en qualsevol SIG.</p>
+            </div>
+        </div>
+
+        <!-- EX 15 ALERTA -->
+        <div id="ex15_alerta" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex15_dies_alerta_thresholds.py</h3>
+                    <a href="exercicis/ex15_dies_alerta_thresholds.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Processing (risc) — Dies d’alerta per llindars</div>
+            </div>
+
+            <pre><code class="language-python"># OBJECTIU:
+#   Crear capes de dies d’alerta per llindars de precipitació (20, 40, 80 mm).
+#
+# ENTRADA:
+#   resultats/precipitacio_olot_estandarditzada.gpkg (capa de punts) o CSV unificat.
+#
+# SORTIDA:
+#   resultats/risc_precipitacio_olot.gpkg amb capes:
+#   - dies_alerta_20mm
+#   - dies_alerta_40mm
+#   - dies_alerta_80mm
+#
+# QUÈ APRENEM:
+#   - Carregar capes i filtrar per expressió.
+#   - Generar capes de risc per llindars.
+#   - Exportar capes a GeoPackage.
+
+import os  # Per gestionar rutes
+import sys  # Per ajustar el path d'importació
+
+# Afegim la carpeta arrel del projecte al sys.path
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+# Imports de QGIS
+from qgis.core import QgsVectorLayer, QgsProject
+
+# Importem configuració i utilitats
+from utils.config import (
+    MERGED_STD_OUT, GPKG_OUT, GPKG_LAYER, RESULTATS_DIR,
+    RISC_GPKG_OUT, RISC_LAYER_ALERTA_20, RISC_LAYER_ALERTA_40, RISC_LAYER_ALERTA_80
+)
+from utils.csv_utils import ensure_dir
+from utils.qgis_utils import extract_by_expression, export_layer_to_gpkg
+
+# Assegurem la carpeta de resultats
+ensure_dir(RESULTATS_DIR)
+
+def load_base_points_layer():
+    """Carrega la capa base des del GPKG, o des del CSV si el GPKG no existeix."""
+    # 1) Intentem carregar des del GPKG (preferit)
+    uri_gpkg = f"{GPKG_OUT}|layername={GPKG_LAYER}"
+    layer = QgsVectorLayer(uri_gpkg, "precip_base", "ogr")
+    if layer.isValid():
+        return layer
+    
+    # 2) Si falla, intentem CSV
+    print("AVÍS -> No s'ha trobat la capa al GPKG. Intentant carregar CSV...")
+    uri_csv = f"file:///{MERGED_STD_OUT}?delimiter=,&xField=lon&yField=lat&crs=EPSG:4326"
+    layer = QgsVectorLayer(uri_csv, "precip_base", "delimitedtext")
+    if layer.isValid():
+            return layer
+
+    # Si no hem pogut carregar res, retornem None
+    return None
+
+# Carreguem la capa base
+base_layer = load_base_points_layer()
+if base_layer is None:
+    print("ERROR -> No s'ha trobat cap capa base (GPKG o CSV).")
+else:
+    # Afegim la capa base al projecte (opcional, per visualitzar-la)
+    QgsProject.instance().addMapLayer(base_layer)
+
+    # Llista de llindars i noms de capa
+    thresholds = [
+        (20, RISC_LAYER_ALERTA_20),
+        (40, RISC_LAYER_ALERTA_40),
+        (80, RISC_LAYER_ALERTA_80)
+    ]
+
+    # Comptadors
+    files_llegides = base_layer.featureCount()
+
+    for thresh, layer_name in thresholds:
+        # Definim l’expressió de filtre
+        expr = f"\"precip_mm\" >= {thresh}"
+
+        # Generem la capa filtrada amb Processing
+        alert_layer = extract_by_expression(base_layer, expr)
+
+        # Comptem files filtrades
+        files_filtrades = alert_layer.featureCount()
+
+        # Exportem la capa al GPKG de risc
+        export_layer_to_gpkg(alert_layer, RISC_GPKG_OUT, layer_name)
+
+        print(f"OK -> Capa '{layer_name}' creada amb {files_filtrades} punts (Llindar >= {thresh}mm).")
+
+    print(f"Procés complet. Capes guardades a: {RISC_GPKG_OUT}")</code></pre>
+
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Context de risc:</strong> en riscos naturals, un “llindar” és un valor a partir del qual la probabilitat d’impacte augmenta (p. ex. inundacions locals o esllavissades). Aquí definim llindars de <code class="inline">20</code>, <code class="inline">40</code> i <code class="inline">80</code> mm/24h per identificar dies potencialment problemàtics.</p>
+                <p><strong>Què fa Processing aquí?</strong> en lloc de “netejar dades”, ara fem anàlisi: filtrem la capa per una condició (expressió) i generem noves capes (punts) només amb els dies que compleixen el llindar. Això és el primer pas per passar de dades a “perill”.</p>
+                <p><strong>Per què exportem a GeoPackage?</strong> un GPKG és un contenidor robust: guarda capes vectorials (i pot conviure amb altres capes del projecte). Això converteix el resultat en un producte reutilitzable del projecte de risc (no només un CSV temporal).</p>
+                <p><strong>Com interpretar el resultat:</strong> cada capa (<em>dies_alerta_20mm</em>, <em>dies_alerta_40mm</em>, <em>dies_alerta_80mm</em>) és un “nivell d’alerta” que pots simbolitzar, comptar o creuar amb altres dades (població, equipaments, etc.).</p>
+            </div>
+        </div>
+
+        <!-- EX 16 EPISODIS -->
+        <div id="ex16_episodis" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex16_episodis_alerta.py</h3>
+                    <a href="exercicis/ex16_episodis_alerta.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Processing (risc) — Episodis (dies consecutius)</div>
+            </div>
+
+            <pre><code class="language-python"># OBJECTIU:
+#   Crear episodis d’alerta (dies consecutius) per a llindar 20 mm.
+#
+# ENTRADA:
+#   resultats/risc_precipitacio_olot.gpkg (capa dies_alerta_20mm)
+#   o capa base per generar-la si no existeix.
+#
+# SORTIDA:
+#   resultats/risc_precipitacio_olot.gpkg (capa episodis_alerta_20mm)
+#
+# QUÈ APRENEM:
+#   - Ordenar per data i detectar salts > 1 dia.
+#   - Crear un camp episode_id.
+#   - Exportar capes amb nou camp.
+
+import os  # Per gestionar rutes
+import sys  # Per ajustar el path d'importació
+from datetime import datetime  # Per treballar amb dates
+
+# Afegim la carpeta arrel del projecte al sys.path
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+# Imports de QGIS
+from qgis.core import (
+    QgsVectorLayer, QgsProject, QgsField, QgsFields, QgsFeature
+)
+from qgis.PyQt.QtCore import QVariant
+
+# Importem configuració i utilitats
+from utils.config import (
+    MERGED_STD_OUT, GPKG_OUT, GPKG_LAYER,
+    RISC_GPKG_OUT, RISC_LAYER_ALERTA_20, RISC_LAYER_EPISODIS_20
+)
+from utils.qgis_utils import export_layer_to_gpkg
+
+# Intentem carregar la capa d'alerta 20mm
+uri_layer = f"{RISC_GPKG_OUT}|layername={RISC_LAYER_ALERTA_20}"
+layer = QgsVectorLayer(uri_layer, "dies_alerta_20mm", "ogr")
+
+if not layer.isValid():
+    print("ERROR -> No s'ha trobat la capa de dies d'alerta > 20mm.")
+    print("SOLUCIÓ -> Executa primer l'exercici ex15.")
+else:
+    # Creem una capa en memòria per processar
+    out_layer = QgsVectorLayer("Point?crs=EPSG:4326", "episodis_temp", "memory")
+    out_dp = out_layer.dataProvider()
+
+    # Copiem els camps originals i afegim episode_id
+    base_fields = layer.fields()
+    out_dp.addAttributes(base_fields.toList())
+    out_dp.addAttributes([QgsField("episode_id", QVariant.Int)])
+    out_layer.updateFields()
+
+    # Obtenim totes les features i les ordenem per estació i data
+    # (Assumeix que 'date' està en format YYYY-MM-DD string ISO)
+    feats = []
+    for f in layer.getFeatures():
+        date_str = f["date"]
+        station = f["station_id"]
+        try:
+            date_obj = datetime.strptime(date_str, "%Y-%m-%d")
+            feats.append((station, date_obj, f))
+        except:
+            continue
+
+    # Ordenem: primer per estació, després per data
+    feats.sort(key=lambda x: (x[0], x[1]))
+
+    # Lògica d'episodis
+    episode_id = 0
+    last_date_by_station = {}
+    current_episode_by_station = {}
+    
+    # Per estadística
+    total_days = 0
+    first_date = None
+    last_date = None
+
+    out_layer.startEditing()
+    
+    for station_id, date_obj, feat in feats:
+        if station_id not in last_date_by_station:
+            episode_id += 1
+            current_episode_by_station[station_id] = episode_id
+        else:
+            gap = (date_obj - last_date_by_station[station_id]).days
+            if gap > 1:
+                episode_id += 1
+                current_episode_by_station[station_id] = episode_id
+
+        # Actualitzem la data anterior
+        last_date_by_station[station_id] = date_obj
+
+        # Actualitzem dates globals
+        first_date = date_obj if first_date is None else min(first_date, date_obj)
+        last_date = date_obj if last_date is None else max(last_date, date_obj)
+
+        # Creem la nova feature amb episode_id
+        new_feat = QgsFeature(out_layer.fields())
+        new_feat.setGeometry(feat.geometry())
+        attrs = feat.attributes() + [current_episode_by_station[station_id]]
+        new_feat.setAttributes(attrs)
+        out_layer.dataProvider().addFeature(new_feat)
+        total_days += 1
+
+    # Exportem la capa amb episodis
+    export_layer_to_gpkg(out_layer, RISC_GPKG_OUT, RISC_LAYER_EPISODIS_20)
+
+    # Afegim al projecte
+    QgsProject.instance().addMapLayer(out_layer)
+
+    print(f"OK -> Generats {episode_id} episodis a partir de {total_days} dies d'alerta.")
+    if first_date and last_date:
+        print(f"Període analitzat: {first_date.date()} - {last_date.date()}")</code></pre>
+
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Concepte clau en risc:</strong> un episodi no és un dia aïllat. Sovint el risc creix quan hi ha <strong>dies consecutius</strong> amb pluja significativa (saturació del sòl, resposta hidrològica acumulada, etc.). Per això transformem “dies d’alerta” en <strong>episodis</strong>.</p>
+                <p><strong>Què fa l’script?</strong> ordena els registres per data i assigna un camp <code class="inline">episode_id</code>. Quan detecta un salt de més d’1 dia entre dates, crea un nou episodi. El resultat és una capa amb el mateix conjunt de punts, però ara cada punt sap a quin episodi pertany.</p>
+                <p><strong>Important (interpretació):</strong> si el codi calcula episodis <em>per estació</em>, això vol dir que cada estació pot tenir els seus episodis (perquè la pluja pot variar espacialment). Això és útil en risc local, però cal recordar que no és “un únic episodi global” per tota la zona.</p>
+                <p><strong>Per què és útil?</strong> amb <code class="inline">episode_id</code> ja podem resumir durada, màxim i acumulat per episodi (pas següent). Això és el que ens apropa a indicadors de perill i severitat.</p>
+            </div>
+        </div>
+
+        <!-- EX 17 RESUM -->
+        <div id="ex17_resum" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex17_resum_episodis.py</h3>
+                    <a href="exercicis/ex17_resum_episodis.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Processing (risc) — Resum per episodi (durada i severitat)</div>
+            </div>
+
+            <pre><code class="language-python"># OBJECTIU:
+#   Crear un resum per episode_id (inici, final, durada, màxim, suma, nombre de dies).
+#
+# ENTRADA:
+#   resultats/risc_precipitacio_olot.gpkg (capa episodis_alerta_20mm)
+#
+# SORTIDA:
+#   resultats/risc_precipitacio_olot.gpkg (taula episodis_resum_20mm)
+#
+# QUÈ APRENEM:
+#   - Agregar estadístiques per grup.
+#   - Crear una taula sense geometria.
+#   - Fer un preview de resultats a consola.
+
+import os  # Per gestionar rutes
+import sys  # Per ajustar el path d'importació
+from datetime import datetime  # Per dates
+
+# Afegim la carpeta arrel del projecte al sys.path
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+# Imports de QGIS
+from qgis.core import QgsVectorLayer, QgsField, QgsFeature, QgsFields, QgsProject
+from qgis.PyQt.QtCore import QVariant
+
+# Importem configuració i utilitats
+from utils.config import RISC_GPKG_OUT, RISC_LAYER_EPISODIS_20, RISC_LAYER_RESUM_20, RESULTATS_DIR
+from utils.csv_utils import ensure_dir
+from utils.qgis_utils import export_layer_to_gpkg
+
+# Carreguem capa d'episodis
+uri = f"{RISC_GPKG_OUT}|layername={RISC_LAYER_EPISODIS_20}"
+layer = QgsVectorLayer(uri, "episodis_raw", "ogr")
+
+if not layer.isValid():
+    print("ERROR -> No s'ha trobat la capa d'episodis.")
+    print("SOLUCIÓ -> Executa primer ex16.")
+else:
+    # Estructura per guardar estadístiques {episode_id: {start, end, max, sum, count}}
+    stats = {}
+
+    for f in layer.getFeatures():
+        ep_id = f["episode_id"]
+        date_str = f["date"]
+        precip = f["precip_mm"]
+
+        try:
+            date_obj = datetime.strptime(date_str, "%Y-%m-%d")
+        except:
+            continue
+
+        if ep_id not in stats:
+            stats[ep_id] = {
+                "start": date_obj,
+                "end": date_obj,
+                "max": precip,
+                "sum": precip,
+                "n": 1
+            }
+        else:
+            s = stats[ep_id]
+            s["start"] = min(s["start"], date_obj)
+            s["end"] = max(s["end"], date_obj)
+            s["max"] = max(s["max"], precip)
+            s["sum"] += precip
+            s["n"] += 1
+
+    # Creem taula de sortida (sense geometria)
+    out_layer = QgsVectorLayer("None", "episodis_resum", "memory")
+    pr = out_layer.dataProvider()
+
+    # Definim camps
+    fields = QgsFields()
+    fields.append(QgsField("episode_id", QVariant.Int))
+    fields.append(QgsField("start_date", QVariant.String))
+    fields.append(QgsField("end_date", QVariant.String))
+    fields.append(QgsField("duration_days", QVariant.Int))
+    fields.append(QgsField("max_precip", QVariant.Double))
+    fields.append(QgsField("total_precip", QVariant.Double))
+    fields.append(QgsField("n_days", QVariant.Int))
+    
+    pr.addAttributes(fields)
+    out_layer.updateFields()
+
+    # Afegim features de resum
+    for episode_id in sorted(stats.keys()):
+        s = stats[episode_id]
+        duration = (s["end"] - s["start"]).days + 1
+
+        feat = QgsFeature(out_layer.fields())
+        feat.setAttributes([
+            episode_id,
+            s["start"].isoformat(),
+            s["end"].isoformat(),
+            duration,
+            s["max"],
+            s["sum"],
+            s["n"]
+        ])
+        out_layer.dataProvider().addFeature(feat)
+
+    # Exportem la taula al GeoPackage
+    export_layer_to_gpkg(out_layer, RISC_GPKG_OUT, RISC_LAYER_RESUM_20)
+
+    # Afegim la taula al projecte (si QGIS ho permet)
+    QgsProject.instance().addMapLayer(out_layer)
+
+    # Preview per consola (primeres 10 files)
+    print("Preview episodis_resum_20mm (primeres 10 files):")
+    count = 0
+    for episode_id in sorted(stats.keys()):
+        s = stats[episode_id]
+        duration = (s["end"] - s["start"]).days + 1
+        print({
+            "episode_id": episode_id,
+            "start_date": s["start"].isoformat(),
+            "max": s["max"],
+            "total": round(s["sum"], 1),
+            "days": duration
+        })
+        count += 1
+        if count >= 10: break
+
+    print(f"OK -> Resum generat: {len(stats)} episodis únics.")</code></pre>
+
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Objectiu:</strong> passar de punts individuals a <strong>indicadors per episodi</strong>. En riscos naturals, els episodis interessen perquè concentren el perill en una finestra temporal concreta.</p>
+                <p><strong>Què fem tècnicament?</strong> agrupem per <code class="inline">episode_id</code> i calculem: data d’inici, data final, durada (dies), màxim de precipitació, suma acumulada i nombre de registres. Això és una “agregació per categories”: moltes files → una fila resum.</p>
+                <p><strong>Com llegir aquests indicadors?</strong> el <em>màxim</em> s’associa a intensitat (episodis curts però intensos), i la <em>suma</em> i la <em>durada</em> a acumulació (molt rellevant per lliscaments i resposta de conques).</p>
+                <p><strong>Nota de qualitat:</strong> si hi hagués valors buits, la suma i el màxim només tenen sentit per valors vàlids. El recompte (<code class="inline">n_days</code>) s’ha d’interpretar com “nombre de registres” de l’episodi.</p>
+            </div>
+        </div>
+
+        <!-- EX 18 HOTSPOTS -->
+        <div id="ex18_hotspots" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex18_hotspots_heatmap.py</h3>
+                    <a href="exercicis/ex18_hotspots_heatmap.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Processing (risc) — Hotspots / Heatmap de recurrència</div>
+            </div>
+
+            <pre><code class="language-python"># OBJECTIU:
+#   Generar un heatmap de dies d’alerta >= 40 mm i afegir-lo al projecte.
+#
+# ENTRADA:
+#   resultats/risc_precipitacio_olot.gpkg (capa dies_alerta_40mm)
+#
+# SORTIDA:
+#   resultats/hotspots_heatmap_40mm.tif (raster) o capa vectorial de grid com a alternativa.
+#
+# QUÈ APRENEM:
+#   - Fer un heatmap amb Processing.
+#   - Entendre hotspots com zones de recurrència de precipitació intensa.
+#   - Afegir raster o vector al projecte.
+
+import os  # Per gestionar rutes
+import sys  # Per ajustar el path d'importació
+
+# Afegim la carpeta arrel del projecte al sys.path
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+# Imports de QGIS
+from qgis.core import QgsVectorLayer, QgsProject, QgsRasterLayer
+
+# Importem configuració i utilitats
+from utils.config import (
+    MERGED_STD_OUT, GPKG_OUT, GPKG_LAYER, RESULTATS_DIR,
+    RISC_GPKG_OUT, RISC_LAYER_ALERTA_40, RISC_LAYER_HOTSPOTS_40, HEATMAP_OUT_TIF
+)
+from utils.qgis_utils import run_processing_algorithm, export_layer_to_gpkg
+
+# Carreguem capa d'alerta 40mm
+uri = f"{RISC_GPKG_OUT}|layername={RISC_LAYER_ALERTA_40}"
+alert_layer = QgsVectorLayer(uri, "alerta_40mm", "ogr")
+
+if not alert_layer.isValid():
+    print("ERROR -> No s'ha trobat la capa d'alerta 40mm.")
+else:
+    # Intentem crear un Heatmap (Kernel Density Estimation)
+    # Radi de cerca: depèn del CRS. Si és graus (EPSG:4326), 0.1 graus ~ 11km.
+    # Si és UTM, serien metres. Com que els nostres punts estan en EPSG:4326:
+    RADIUS = 0.05  # ~5 km
+    PIXEL_SIZE = 0.001 # ~100 m
+
+    print(f"Generant heatmap amb radi {RADIUS} (graus)...")
+    
+    try:
+        result = run_processing_algorithm(
+            "qgis:heatmapkerneldensityestimation",
+            {
+                "INPUT": alert_layer,
+                "RADIUS": RADIUS,
+                "RADIUS_FIELD": None,
+                "PIXEL_SIZE": PIXEL_SIZE,
+                "WEIGHT_FIELD": None,
+                "KERNEL": 0, # Quartic
+                "OUTPUT": HEATMAP_OUT_TIF
+            }
+        )
+        
+        # Carreguem el resultat al projecte
+        if os.path.exists(HEATMAP_OUT_TIF):
+            rlayer = QgsRasterLayer(HEATMAP_OUT_TIF, "heatmap_40mm")
+            if rlayer.isValid():
+                QgsProject.instance().addMapLayer(rlayer)
+                print(f"OK -> Heatmap creat a {HEATMAP_OUT_TIF}")
+            else:
+                print("AVÍS -> Raster creat però no s'ha pogut carregar al projecte.")
+
+    except Exception as exc:
+        # Alternativa: crear grid i comptar punts
+        print(f"AVÍS -> Heatmap raster no disponible ({exc}).")
+        print("Alternativa -> Creem un grid i comptem punts per cel·la.")
+
+        # Extensió de la capa
+        extent = alert_layer.extent()
+        extent_str = f"{extent.xMinimum()},{extent.xMaximum()},{extent.yMinimum()},{extent.yMaximum()}"
+
+        # Creem un grid
+        grid = run_processing_algorithm(
+            "native:creategrid",
+            {
+                "TYPE": 2,
+                "EXTENT": extent_str,
+                "HSPACING": 0.01,
+                "VSPACING": 0.01,
+                "HOVERLAY": 0,
+                "VOVERLAY": 0,
+                "CRS": alert_layer.crs(),
+                "OUTPUT": "memory:"
+            }
+        )["OUTPUT"]
+
+        # Comptem punts dins de cada cel·la
+        grid_count = run_processing_algorithm(
+            "native:countpointsinpolygon",
+            {
+                "POLYGONS": grid,
+                "POINTS": alert_layer,
+                "FIELD": "n_points",
+                "OUTPUT": "memory:"
+            }
+        )["OUTPUT"]
+
+        # Exportem la capa de hotspots vectorials al GPKG
+        export_layer_to_gpkg(grid_count, RISC_GPKG_OUT, RISC_LAYER_HOTSPOTS_40)
+        QgsProject.instance().addMapLayer(grid_count)
+        print(f"OK -> Hotspots vectorials creats (capa {RISC_LAYER_HOTSPOTS_40})")</code></pre>
+
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Context de risc:</strong> un “hotspot” és una zona on es concentren els casos (aquí: dies de pluja intensa). Un heatmap ens ajuda a visualitzar <strong>recurrència espacial</strong>: on “passen coses sovint”.</p>
+                <p><strong>Què fa l’eina?</strong> genera un raster de densitat (Kernel Density) a partir dels punts d’alerta (p. ex. >= 40 mm). Les zones més “calentes” indiquen més concentració o pes de punts.</p>
+                <p><strong>Nota important de CRS:</strong> si la capa està en EPSG:4326 (graus), els paràmetres <code class="inline">RADIUS</code> i <code class="inline">PIXEL_SIZE</code> estan en <strong>graus</strong>, no en metres. En projectes reals de risc és preferible reprojecció a un CRS en metres (p. ex. EPSG:25831) per definir radis i resolucions de forma intuïtiva.</p>
+                <p><strong>Resultat:</strong> el heatmap es guarda com a GeoTIFF i es pot superposar amb altres capes (rius, pendents, usos del sòl) per discutir hipòtesis de perill i vulnerabilitat.</p>
+            </div>
+        </div>
+
+        <!-- EX 19 EXPORT -->
+        <div id="ex19_risc_export" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex19_export_risc_gpkg.py</h3>
+                    <a href="exercicis/ex19_export_risc_gpkg.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Projecte final — GeoPackage de risc (entregable)</div>
+            </div>
+
+            <pre><code class="language-python"># OBJECTIU:
+#   Crear/actualitzar el GeoPackage final de risc amb totes les capes.
+#
+# ENTRADA:
+#   - resultats/precipitacio_olot_estandarditzada.gpkg (capa base)
+#   - capes de risc (si existeixen) al risc_precipitacio_olot.gpkg
+#
+# SORTIDA:
+#   resultats/risc_precipitacio_olot.gpkg amb totes les capes de risc.
+#
+# QUÈ APRENEM:
+#   - Consolidar capes en un sol GeoPackage.
+#   - Validar CRS i camps clau.
+#   - Generar un resum final del paquet.
+
+import os  # Per gestionar rutes
+import sys  # Per ajustar el path d'importació
+from datetime import datetime  # Per timestamps del resum
+
+# Afegim la carpeta arrel del projecte al sys.path
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path.append(ROOT_DIR):
+    sys.path.append(ROOT_DIR)
+
+# Imports de QGIS
+from qgis.core import QgsVectorLayer, QgsProject
+
+# Importem configuració i utilitats
+from utils.config import (
+    MERGED_STD_OUT, GPKG_OUT, GPKG_LAYER, RESULTATS_DIR,
+    RISC_GPKG_OUT, HEATMAP_OUT_TIF,
+    RISC_LAYER_POINTS, RISC_LAYER_ALERTA_20, RISC_LAYER_ALERTA_40, RISC_LAYER_ALERTA_80,
+    RISC_LAYER_EPISODIS_20, RISC_LAYER_RESUM_20
+)
+from utils.qgis_utils import export_layer_to_gpkg
+
+print("Iniciant consolidació del GeoPackage de risc...")
+
+# 1. Copiem la capa base de punts (si no existeix ja)
+uri_base = f"{GPKG_OUT}|layername={GPKG_LAYER}"
+base_layer = QgsVectorLayer(uri_base, "punts_base", "ogr")
+
+if base_layer.isValid():
+    export_layer_to_gpkg(base_layer, RISC_GPKG_OUT, RISC_LAYER_POINTS)
+    print(f"OK -> Capa base '{RISC_LAYER_POINTS}' afegida.")
+else:
+    print("AVÍS -> No s'ha trobat la capa base original.")
+
+# 2. Llista de capes a verificar/consolidar
+layers_exportades = []
+
+# Carreguem capes de dies d'alerta
+for layer_name in [RISC_LAYER_ALERTA_20, RISC_LAYER_ALERTA_40, RISC_LAYER_ALERTA_80]:
+    uri = f"{RISC_GPKG_OUT}|layername={layer_name}"
+    l = QgsVectorLayer(uri, layer_name, "ogr")
+    if l.isValid():
+        # Ja està dins el GPKG, però la re-afegim al projecte per visualitzar
+        QgsProject.instance().addMapLayer(l)
+        layers_exportades.append(layer_name)
+    else:
+        print(f"AVÍS -> No s'ha trobat {layer_name}. Executa ex15 si cal.")
+
+    # Carreguem episodis i resum
+    uri_episodis = f"{RISC_GPKG_OUT}|layername={RISC_LAYER_EPISODIS_20}"
+    episodis_layer = QgsVectorLayer(uri_episodis, "episodis_alerta_20mm", "ogr")
+    if episodis_layer.isValid():
+        export_layer_to_gpkg(episodis_layer, RISC_GPKG_OUT, RISC_LAYER_EPISODIS_20)
+        QgsProject.instance().addMapLayer(episodis_layer)
+        layers_exportades.append(RISC_LAYER_EPISODIS_20)
+    else:
+        print("AVÍS -> No s'ha trobat episodis_alerta_20mm. Executa ex16 si cal.")
+
+    # Carreguem resum d'episodis si existeix
+    uri_resum = f"{RISC_GPKG_OUT}|layername={RISC_LAYER_RESUM_20}"
+    resum_layer = QgsVectorLayer(uri_resum, "episodis_resum_20mm", "ogr")
+    if resum_layer.isValid():
+        export_layer_to_gpkg(resum_layer, RISC_GPKG_OUT, RISC_LAYER_RESUM_20)
+        QgsProject.instance().addMapLayer(resum_layer)
+        layers_exportades.append(RISC_LAYER_RESUM_20)
+    else:
+        print("AVÍS -> No s'ha trobat episodis_resum_20mm. Executa ex17 si cal.")
+
+    # Hotspots (raster extern)
+    if os.path.exists(HEATMAP_OUT_TIF):
+        print(f"OK -> Heatmap raster disponible a: {HEATMAP_OUT_TIF}")
+    
+    print("-" * 30)
+    print(f"RESUM FINAL: GeoPackage '{RISC_GPKG_OUT}' conté:")
+    for l in set(layers_exportades):
+        print(f" - {l}")
+    print("-" * 30)</code></pre>
+
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Exercici de síntesi:</strong> aquest script empaqueta tot el treball del bloc de risc en un únic GeoPackage final. És el “producte” que podríem entregar en un projecte real: dades + capes derivades + resultats.</p>
+                <p><strong>Què hi incloem?</strong> com a mínim: punts base estandarditzats, capes de dies d’alerta per llindar, capa d’episodis amb <code class="inline">episode_id</code> i el resum d’episodis. Si s’ha generat el heatmap, també queda com a resultat complementari (raster) del projecte.</p>
+                <p><strong>Per què és important en riscos naturals?</strong> perquè permet passar de dades crues a capes interpretables: alertes (perill), episodis (severitat temporal) i hotspots (patró espacial). Això facilita comunicar resultats i prendre decisions.</p>
             </div>
         </div>
 
