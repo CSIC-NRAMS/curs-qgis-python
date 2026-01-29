@@ -1,0 +1,1336 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercicis Resolts - Curs PyQGIS</title>
+    
+    <!-- Prism.js per ressaltat de sintaxi (Tema Tomorrow Night) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    
+    <style>
+        :root {
+            --primary: #2563eb;
+            --bg-light: #f8fafc;
+            --bg-white: #ffffff;
+            --text-main: #334155;
+            --border: #e2e8f0;
+            --sidebar-width: 300px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--bg-white);
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            flex-shrink: 0;
+            padding-bottom: 2rem;
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            background: var(--bg-white);
+            z-index: 10;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 0.5rem;
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .sidebar h2 { font-size: 1.2rem; color: #1e293b; }
+
+        .nav-group { margin-top: 1rem; }
+        .nav-group-title {
+            padding: 0.5rem 1.5rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            font-weight: 700;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 0.5rem 1.5rem;
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 0.9rem;
+            border-left: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover { background: #f1f5f9; color: var(--primary); }
+        .nav-link.active { 
+            background: #eff6ff; 
+            color: var(--primary); 
+            border-left-color: var(--primary);
+            font-weight: 600;
+        }
+
+        /* Main Content Area */
+        .content {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 2rem 4rem;
+            scroll-behavior: smooth;
+        }
+
+        .exercise-block {
+            background: var(--bg-white);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 3rem;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .exercise-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            background: #f8fafc;
+        }
+
+        /* Nous estils per a la capçalera amb botó de descàrrega */
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .exercise-title {
+            font-size: 1.4rem;
+            color: #0f172a;
+            margin: 0;
+        }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 0.8rem;
+            background-color: #fff;
+            color: #475569;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            white-space: nowrap;
+            transition: all 0.2s;
+            border: 1px solid #cbd5e1;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .download-btn:hover {
+            background-color: #f8fafc;
+            color: var(--primary);
+            border-color: var(--primary);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .exercise-meta {
+            font-size: 0.9rem;
+            color: #64748b;
+            font-family: monospace;
+        }
+
+        /* Code Block Styling */
+        pre[class*="language-"] {
+            margin: 0 !important;
+            border-radius: 0 !important;
+            max-height: 500px; /* Scrollable code if too long */
+        }
+
+        /* Explanation Section */
+        .explanation {
+            padding: 2rem;
+            background: #fff;
+            border-top: 1px solid var(--border);
+        }
+
+        .explanation h4 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .explanation ul {
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .explanation li { margin-bottom: 0.5rem; }
+
+        code.inline {
+            background: #f1f5f9;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-family: monospace;
+            color: #d63384;
+            font-size: 0.9em;
+        }
+        
+        /* Estils per a la llista de dades */
+        .data-files-list {
+            margin-top: 1.5rem; 
+            padding: 1rem; 
+            background: #f1f5f9; 
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+        .data-files-list ul {
+            list-style: none; 
+            margin-top: 0.5rem; 
+            padding-left: 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .data-file-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #334155;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .data-file-link:hover {
+            text-decoration: underline;
+            color: var(--primary);
+        }
+
+        @media (max-width: 1024px) {
+            .content { padding: 1.5rem; }
+            :root { --sidebar-width: 240px; }
+        }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; height: auto; overflow: auto; }
+            .sidebar { width: 100%; height: auto; overflow: visible; }
+            .content { padding: 1rem; }
+            .sidebar-header { position: relative; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <a href="index.html" class="back-link">← Tornar al Curs</a>
+            <h2>Índex de Scripts</h2>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-group-title">Configuració i Tests</div>
+            <a href="#ex00_config" class="nav-link">ex00_config.py</a>
+            <a href="#ex00_parse" class="nav-link">ex00_utils_parse.py</a>
+            <a href="#ex00_preview" class="nav-link">ex00_utils_preview.py</a>
+            <a href="#ex00_qgis" class="nav-link">ex00_utils_qgis.py</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-group-title">Bloc Meteocat</div>
+            <a href="#ex01_peek" class="nav-link">ex01_peek_meteocat.py</a>
+            <a href="#ex02_subselect" class="nav-link">ex02_subselect_pas1.py</a>
+            <a href="#ex03_neteja" class="nav-link">ex03_neteja_numeros_pas2.py</a>
+            <a href="#ex04_filtra" class="nav-link">ex04_filtra_coordenades_pas2b.py</a>
+            <a href="#ex04_dates" class="nav-link">ex04_dates_pas3.py</a>
+            <a href="#ex05_crs" class="nav-link">ex05_transformacio_crs_pas4.py</a>
+            <a href="#ex06_final" class="nav-link">ex06_final_estandarditzat.py</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-group-title">Bloc AEMET</div>
+            <a href="#ex07_peek" class="nav-link">ex07_peek_aemet.py</a>
+            <a href="#ex08_despivot" class="nav-link">ex08_aemet_despivot_pas1.py</a>
+            <a href="#ex09_dates" class="nav-link">ex09_aemet_dates_pas2.py</a>
+            <a href="#ex10_precip" class="nav-link">ex10_aemet_precip_pas3.py</a>
+            <a href="#ex11_coords" class="nav-link">ex11_aemet_coords_pas4.py</a>
+            <a href="#ex12_std" class="nav-link">ex12_aemet_estandarditza.py</a>
+        </div>
+
+        <div class="nav-group">
+            <div class="nav-group-title">Final</div>
+            <a href="#ex13_merge" class="nav-link">ex13_merge_std.py</a>
+            <a href="#ex14_export" class="nav-link">ex14_export_gpkg.py</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="content">
+
+        <!-- INTRODUCCIÓ -->
+        <div class="exercise-block">
+            <div class="exercise-header">
+                <h3 class="exercise-title">Benvinguda 👋</h3>
+                <div class="exercise-meta">Com treballarem aquests exercicis (pas a pas i sense pressa)</div>
+            </div>
+            <div class="explanation">
+                <p>Benvingut/da! En aquesta pàgina tens els scripts del curs ordenats per fases. L’objectiu no és “memoritzar Python”, sinó aprendre a <strong>llegir dades reals</strong>, <strong>netejar-les</strong> i <strong>estandarditzar-les</strong> perquè després les puguem fer servir a QGIS sense sorpreses.</p>
+                <p>Si és el teu primer contacte amb Python, no pateixis: cada exercici introdueix una idea nova i la repetirem amb exemples. L’ordre importa: primer entenem el CSV, després netegem números i dates, i finalment fem la part “SIG” (coordenades, CRS i exportació).</p>
+                <p><strong>Consell:</strong> executa els scripts en ordre i mira sempre el fitxer de sortida a la carpeta de resultats. El millor indicador que ho estàs fent bé és veure com el CSV va millorant a cada pas.</p>
+            </div>
+        </div>
+
+        <!-- CONTEXT GENERAL -->
+        <div class="exercise-block">
+            <div class="exercise-header">
+                <h3 class="exercise-title">Context del projecte</h3>
+                <div class="exercise-meta">Què estem estandarditzant i per què</div>
+            </div>
+            <div class="explanation">
+                <p>Treballarem amb dues fonts diferents de precipitació (Meteocat i AEMET). Tot i que parlen del mateix fenomen, <strong>no tenen el mateix format</strong>: canvia la manera d’escriure la data, el sistema de coordenades i fins i tot les unitats de precipitació.</p>
+                <p>La nostra feina serà crear un <strong>dataset estàndard</strong> (mateixes columnes, mateix format i mateix CRS) per poder unir-ho tot i portar-ho a QGIS. Aquest tipus de “traducció” entre formats és el dia a dia quan treballem amb dades geogràfiques reals.</p>
+                
+                <div class="data-files-list">
+                    <strong>📂 Descàrrega de Dades d'Entrada:</strong>
+                    <ul>
+                        <li>
+                            <a href="dades/entrada/Precipitació_Olot_METEOCAT.csv" download class="download-btn">
+                                ⬇️ Precipitació_Olot_METEOCAT.csv
+                            </a>
+                        </li>
+                        <li>
+                            <a href="dades/entrada/Precipitació_Olot_AEMET.csv" download class="download-btn">
+                                ⬇️ Precipitació_Olot_AEMET.csv
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- EX 00 CONFIG -->
+        <div id="ex00_config" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex00_config.py</h3>
+                    <a href="exercicis/ex00_config.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Objectiu: Verificar rutes i entorn</div>
+            </div>
+            <pre><code class="language-python">import os  # Per gestionar rutes
+import sys  # Per ajustar el path d'importació
+
+# Afegim la carpeta arrel del projecte al sys.path
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+# Importem configuració
+from utils import config  # Mòdul amb totes les rutes
+
+# Mostrem rutes clau
+print("RUTA ARREL:", config.ROOT_DIR)
+print("DADES_DIR:", config.DADES_DIR)
+print("RESULTATS_DIR:", config.RESULTATS_DIR)
+print("METEOCAT_INPUT:", config.METEOCAT_INPUT)
+print("AEMET_INPUT:", config.AEMET_INPUT)
+
+# Mostrem alguns outputs
+print("STD_OUT (METEOCAT):", config.STD_OUT)
+print("AEMET_STD_OUT:", config.AEMET_STD_OUT)
+print("MERGED_STD_OUT:", config.MERGED_STD_OUT)
+print("GPKG_OUT:", config.GPKG_OUT)
+
+# Missatge final
+print("OK -> Configuració carregada correctament.")</code></pre>
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Imports:</strong> <code class="inline">os</code> ens ajuda a construir rutes sense escriure-les “a mà”, i <code class="inline">sys</code> ens permet dir-li a Python on ha de buscar els mòduls del projecte.</p>
+                <p><strong>Pas clau:</strong> afegim l’arrel del projecte a <code class="inline">sys.path</code> perquè els imports com <code class="inline">from utils import config</code> funcionin encara que executem el script des de diferents carpetes.</p>
+                <p>Aquest script és fonamental perquè Python sàpiga on buscar els mòduls del projecte. L'ús de <code>os.path.dirname(__file__)</code> ens permet obtenir la ruta del fitxer actual i pujar nivells fins a l'arrel.</p>
+            </div>
+        </div>
+
+        <!-- EX 00 UTILS PARSE -->
+        <div id="ex00_parse" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex00_utils_parse.py</h3>
+                    <a href="exercicis/ex00_utils_parse.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Objectiu: Testejar funcions de neteja</div>
+            </div>
+            <pre><code class="language-python">import os
+import sys
+
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+from utils.parse_utils import to_float, parse_date, build_date
+
+# Exemples de números
+print("to_float('3,5') ->", to_float("3,5"))
+print("to_float('') ->", to_float(""))
+print("to_float('abc') ->", to_float("abc"))
+
+# Exemples de dates
+print("parse_date('31/12/2024') ->", parse_date("31/12/2024"))
+print("parse_date('2024-12-31') ->", parse_date("2024-12-31"))
+print("parse_date('31-12-2024') ->", parse_date("31-12-2024"))
+
+# Exemples de build_date
+print("build_date(2024, 2, 29) ->", build_date(2024, 2, 29))
+print("build_date(2024, 2, 30) ->", build_date(2024, 2, 30))
+
+print("OK -> Funcions de parseig provades.")</code></pre>
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Per què fem aquest test?</strong> Abans de processar tot un CSV, comprovem amb exemples petits que les funcions es comporten com esperem (ex: “3,5” → 3.5 i dates en formats diferents).</p>
+                <p><strong>Imports:</strong> aquí importem funcions pròpies del projecte. És una manera d’evitar repetir el mateix codi a cada exercici.</p>
+                <p>Abans de processar milers de línies, verifiquem que la funció <code>to_float</code> gestioni bé la coma decimal (estàndard europeu) i que <code>parse_date</code> entengui els diferents formats d'entrada.</p>
+            </div>
+        </div>
+
+        <!-- EX 00 UTILS PREVIEW -->
+        <div id="ex00_preview" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex00_utils_preview.py</h3>
+                    <a href="exercicis/ex00_utils_preview.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Objectiu: Testejar la previsualització CSV</div>
+            </div>
+            <pre><code class="language-python">import os
+import sys
+
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+from utils.config import METEOCAT_INPUT, AEMET_INPUT
+from utils.csv_utils import preview_csv
+
+preview_csv(METEOCAT_INPUT, max_rows=5, title="Preview METEOCAT")
+preview_csv(AEMET_INPUT, max_rows=5, title="Preview AEMET")
+
+print("OK -> Previews mostrats.")</code></pre>
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Idea principal:</strong> abans de “netejar”, primer mirem el fitxer. Previsualitzar és com obrir el CSV i entendre quines columnes hi ha i com estan escrites.</p>
+                <p><strong>Per què no llegim tot?</strong> un CSV pot ser gran. Mostrar només 5 files és ràpid i suficient per detectar formats (dates, separadors, valors buits).</p>
+                <p>La funció <code>preview_csv</code> utilitza <code>csv.DictReader</code> per mostrar només les primeres línies, evitant carregar tot el fitxer a memòria. És essencial per a l'exploració ràpida.</p>
+            </div>
+        </div>
+
+        <!-- EX 00 UTILS QGIS -->
+        <div id="ex00_qgis" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex00_utils_qgis.py</h3>
+                    <a href="exercicis/ex00_utils_qgis.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Objectiu: Testejar transformacions CRS</div>
+            </div>
+            <pre><code class="language-python">import os
+import sys
+
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+from utils.qgis_utils import get_utm31_to_wgs84_transformer, transform_utm_to_lonlat
+
+# Coordenades d'exemple (UTM 31N)
+x_utm = 228471
+y_utm = 421015
+
+xform = get_utm31_to_wgs84_transformer()
+lon, lat = transform_utm_to_lonlat(x_utm, y_utm, xform)
+
+print("UTM:", x_utm, y_utm)
+print("WGS84:", lon, lat)
+print("OK -> Transformació feta.")</code></pre>
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Imports PyQGIS:</strong> aquí entrem al món SIG. Una transformació de CRS és una “traducció” entre sistemes de coordenades (metres UTM → graus lon/lat).</p>
+                <p><strong>Per què testejem amb valors d’exemple?</strong> si aquest test falla, la resta d’exercicis espacials també fallaran. És el nostre “semàfor verd” abans de transformar milers de punts.</p>
+                <p>Verifiquem que la llibreria de projeccions (<code>qgis.core</code>) estigui ben configurada per passar d'EPSG:25831 (Metres) a EPSG:4326 (Graus).</p>
+            </div>
+        </div>
+
+        <!-- EX 01 PEEK METEOCAT -->
+        <div id="ex01_peek" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex01_peek_meteocat.py</h3>
+                    <a href="exercicis/ex01_peek_meteocat.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Exploració</div>
+            </div>
+            <pre><code class="language-python">import os
+import sys
+
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+from utils.config import METEOCAT_INPUT
+from utils.csv_utils import preview_csv
+
+preview_csv(METEOCAT_INPUT, max_rows=5, title="Preview del CSV METEOCAT")
+print("OK -> Mostrades capçaleres i 5 files del CSV.")</code></pre>
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Objectiu d’aprenentatge:</strong> entendre què hi ha dins el CSV abans de tocar res. Identifiquem columnes com <code class="inline">EMA</code>, <code class="inline">DATA</code>, <code class="inline">X</code>, <code class="inline">Y</code> i <code class="inline">PPT</code>.</p>
+                <p><strong>Pas important:</strong> aquesta exploració evita errors típics com “la columna no existeix” o “la data té un format diferent del que pensàvem”.</p>
+                <p>Primer contacte amb les dades reals de Meteocat per identificar les columnes clau (X, Y, PPT, EMA).</p>
+            </div>
+        </div>
+
+        <!-- EX 02 SUBSELECT -->
+        <div id="ex02_subselect" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex02_subselect_pas1.py</h3>
+                    <a href="exercicis/ex02_subselect_pas1.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Filtratge de columnes</div>
+            </div>
+            <pre><code class="language-python">import os
+import sys
+
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+from utils.config import METEOCAT_INPUT, PAS1_OUT, RESULTATS_DIR
+from utils.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
+
+ensure_dir(RESULTATS_DIR)
+columnes = ["EMA", "DATA", "X", "Y", "PPT"]
+files = 0
+
+with open_csv_reader(METEOCAT_INPUT) as lector, \
+     open_csv_writer(PAS1_OUT, fieldnames=columnes) as escriptor:
+
+    for fila in lector:
+        nova_fila = {col: fila.get(col, "") for col in columnes}
+        escriptor.writerow(nova_fila)
+        files += 1
+
+preview_csv(PAS1_OUT, max_rows=5, title="Preview meteocat_pas1.csv")
+print(f"OK -> creat {PAS1_OUT}")
+print(f"Files processades: {files}")</code></pre>
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Què fem aquí?</strong> Creem un primer “CSV net” quedant-nos només amb les columnes que ens interessen. Això simplifica la resta del curs.</p>
+                <p><strong>Per què crear un fitxer nou?</strong> Treballar per fases ens permet tornar enrere si alguna cosa surt malament i comparar el resultat pas a pas.</p>
+                <p>Utilitzem una <em>dictionary comprehension</em> per crear un nou diccionari només amb les claus que ens interessen, descartant la resta d'informació.</p>
+            </div>
+        </div>
+
+        <!-- EX 03 NETEJA -->
+        <div id="ex03_neteja" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex03_neteja_numeros_pas2.py</h3>
+                    <a href="exercicis/ex03_neteja_numeros_pas2.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Neteja de tipus de dades</div>
+            </div>
+            <pre><code class="language-python">import os
+import sys
+
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+from utils.config import PAS1_OUT, PAS2A_OUT, RESULTATS_DIR
+from utils.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
+from utils.parse_utils import to_float
+
+columnes = ["EMA", "DATA", "X", "Y", "PPT"]
+files_llegides = 0
+files_escrites = 0
+
+ensure_dir(RESULTATS_DIR)
+
+with open_csv_reader(PAS1_OUT, encoding="utf-8") as lector, \
+     open_csv_writer(PAS2A_OUT, fieldnames=columnes) as escriptor:
+
+    for fila in lector:
+        files_llegides += 1
+        x = to_float(fila.get("X"))
+        y = to_float(fila.get("Y"))
+        ppt = to_float(fila.get("PPT"))
+
+        nova_fila = {
+            "EMA": fila.get("EMA", ""),
+            "DATA": fila.get("DATA", ""),
+            "X": x,
+            "Y": y,
+            "PPT": ppt
+        }
+        escriptor.writerow(nova_fila)
+        files_escrites += 1
+
+preview_csv(PAS2A_OUT, max_rows=5, title="Preview meteocat_pas2a.csv")
+print(f"OK -> creat {PAS2A_OUT}")</code></pre>
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Imports i funcions:</strong> usem <code class="inline">to_float</code> perquè molts números venen com a text (i amb coma). Convertir-ho a <em>float</em> és imprescindible per fer càlculs després.</p>
+                <p><strong>Idea clau:</strong> si una coordenada o un valor no es pot convertir, no parem el programa: el marquem com a buit o el descartem segons el criteri de l’exercici.</p>
+                <p>Convertim strings a floats. Això és crucial perquè "10,5" no es pot operar matemàticament, però 10.5 sí. La funció <code>to_float</code> s'encarrega de reemplaçar la coma per punt.</p>
+            </div>
+        </div>
+
+        <!-- EX 04 FILTRA COORDENADES -->
+        <div id="ex04_filtra" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex04_filtra_coordenades_pas2b.py</h3>
+                    <a href="exercicis/ex04_filtra_coordenades_pas2b.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Control de qualitat espacial</div>
+            </div>
+            <pre><code class="language-python">import os
+import sys
+
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+from utils.config import PAS2A_OUT, PAS2B_OUT, RESULTATS_DIR
+from utils.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
+
+columnes = ["EMA", "DATA", "X", "Y", "PPT"]
+files_llegides = 0
+files_escrites = 0
+files_saltades = 0
+
+ensure_dir(RESULTATS_DIR)
+
+with open_csv_reader(PAS2A_OUT, encoding="utf-8") as lector, \
+     open_csv_writer(PAS2B_OUT, fieldnames=columnes) as escriptor:
+
+    for fila in lector:
+        files_llegides += 1
+        x = fila.get("X")
+        y = fila.get("Y")
+
+        if x in (None, "") or y in (None, ""):
+            files_saltades += 1
+            continue
+
+        escriptor.writerow(fila)
+        files_escrites += 1
+
+preview_csv(PAS2B_OUT, max_rows=5, title="Preview meteocat_pas2b.csv")
+print(f"Files saltades (X o Y buits): {files_saltades}")</code></pre>
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Control de qualitat:</strong> un punt sense X o Y no es pot dibuixar en un mapa. Per això “saltem” aquestes files amb <code class="inline">continue</code>.</p>
+                <p><strong>Per què fer-ho ara?</strong> si filtrem aviat, evitem errors quan fem la transformació de CRS (que necessita coordenades vàlides).</p>
+                <p>Eliminem registres que no es podrien dibuixar en un mapa. Si <code>x</code> o <code>y</code> són <code>None</code> (fruit de la neteja anterior) o buits, saltem la iteració amb <code>continue</code>.</p>
+            </div>
+        </div>
+
+        <!-- EX 04 DATES -->
+        <div id="ex04_dates" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex04_dates_pas3.py</h3>
+                    <a href="exercicis/ex04_dates_pas3.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Estandardització temporal</div>
+            </div>
+            <pre><code class="language-python">import os
+import sys
+
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+from utils.config import PAS2B_OUT, PAS3_OUT, RESULTATS_DIR
+from utils.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
+from utils.parse_utils import parse_date
+
+columnes = ["EMA", "DATA", "X", "Y", "PPT"]
+files_llegides = 0
+files_escrites = 0
+files_saltades = 0
+
+ensure_dir(RESULTATS_DIR)
+
+with open_csv_reader(PAS2B_OUT, encoding="utf-8") as lector, \
+     open_csv_writer(PAS3_OUT, fieldnames=columnes) as escriptor:
+
+    for fila in lector:
+        files_llegides += 1
+        data = parse_date(fila.get("DATA"))
+
+        if data is None:
+            files_saltades += 1
+            continue
+
+        nova_fila = dict(fila)
+        nova_fila["DATA"] = data.isoformat()
+        escriptor.writerow(nova_fila)
+        files_escrites += 1
+
+preview_csv(PAS3_OUT, max_rows=5, title="Preview meteocat_pas3.csv")
+print(f"Files saltades (data invàlida): {files_saltades}")</code></pre>
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Objectiu:</strong> convertir totes les dates al mateix format (<code class="inline">YYYY-MM-DD</code>). Això permet ordenar, filtrar i unir dades de fonts diferents sense confusions.</p>
+                <p><strong>Per què ISO?</strong> perquè és un estàndard internacional i, a més, ordena bé alfabèticament (text) i cronològicament (temps).</p>
+                <p>Convertim qualsevol format de data d'entrada (DD/MM/YYYY) a l'estàndard ISO 8601 (YYYY-MM-DD). Això permet ordenar cronològicament les dades com a text simple.</p>
+            </div>
+        </div>
+
+        <!-- EX 05 CRS -->
+        <div id="ex05_crs" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex05_transformacio_crs_pas4.py</h3>
+                    <a href="exercicis/ex05_transformacio_crs_pas4.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Reprojecció Geogràfica</div>
+            </div>
+            <pre><code class="language-python">import os
+import sys
+
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+from utils.config import PAS3_OUT, PAS4_OUT, RESULTATS_DIR
+from utils.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
+from utils.qgis_utils import get_utm31_to_wgs84_transformer, transform_utm_to_lonlat
+
+columnes = ["EMA", "DATA", "X", "Y", "PPT", "lon", "lat"]
+xform = get_utm31_to_wgs84_transformer()
+files_llegides = 0
+files_escrites = 0
+files_saltades = 0
+
+ensure_dir(RESULTATS_DIR)
+
+with open_csv_reader(PAS3_OUT, encoding="utf-8") as lector, \
+     open_csv_writer(PAS4_OUT, fieldnames=columnes) as escriptor:
+
+    for fila in lector:
+        files_llegides += 1
+        try:
+            x = float(fila.get("X"))
+            y = float(fila.get("Y"))
+        except:
+            files_saltades += 1
+            continue
+
+        try:
+            lon, lat = transform_utm_to_lonlat(x, y, xform)
+        except:
+            files_saltades += 1
+            continue
+
+        nova_fila = dict(fila)
+        nova_fila["lon"] = lon
+        nova_fila["lat"] = lat
+        escriptor.writerow(nova_fila)
+        files_escrites += 1
+
+preview_csv(PAS4_OUT, max_rows=5, title="Preview meteocat_pas4.csv")
+print(f"OK -> creat {PAS4_OUT}")</code></pre>
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Imports PyQGIS:</strong> utilitzem QGIS per transformar coordenades d’UTM (metres) a WGS84 (graus). Això ens dona <code class="inline">lon</code> i <code class="inline">lat</code> per poder carregar el CSV com a punts.</p>
+                <p><strong>Pas clau:</strong> la transformació només té sentit si <code class="inline">X</code> i <code class="inline">Y</code> són números vàlids. Per això hem netejat i filtrat abans.</p>
+                <p>Afegim les columnes <code>lon</code> i <code>lat</code>. Utilitzem un bloc <code>try/except</code> per assegurar que si una coordinada concreta és corrupta, no aturi tot el procés.</p>
+            </div>
+        </div>
+
+        <!-- EX 06 FINAL STD -->
+        <div id="ex06_final" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex06_final_estandarditzat.py</h3>
+                    <a href="exercicis/ex06_final_estandarditzat.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Mapeig final de camps</div>
+            </div>
+            <pre><code class="language-python">import os
+import sys
+
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+from utils.config import PAS4_OUT, STD_OUT, STD_FIELDS, RESULTATS_DIR
+from utils.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
+
+files_llegides = 0
+files_escrites = 0
+files_saltades = 0
+
+ensure_dir(RESULTATS_DIR)
+
+with open_csv_reader(PAS4_OUT, encoding="utf-8") as lector, \
+     open_csv_writer(STD_OUT, fieldnames=STD_FIELDS) as escriptor:
+
+    for fila in lector:
+        files_llegides += 1
+
+        ema = (fila.get("EMA") or "").strip()
+        data = (fila.get("DATA") or "").strip()
+        ppt = fila.get("PPT")
+        lon = fila.get("lon")
+        lat = fila.get("lat")
+        x_utm = fila.get("X")
+        y_utm = fila.get("Y")
+
+        if not (ema and data and lon and lat and x_utm and y_utm):
+            files_saltades += 1
+            continue
+
+        nova_fila = {
+            "source": "METEOCAT",
+            "station_id": ema,
+            "station_name": f"Olot (Meteocat EMA {ema})",
+            "date": data,
+            "precip_mm": ppt,
+            "lon": lon,
+            "lat": lat,
+            "x_utm": x_utm,
+            "y_utm": y_utm,
+            "alt_m": ""
+        }
+        escriptor.writerow(nova_fila)
+        files_escrites += 1
+
+preview_csv(STD_OUT, max_rows=5, title="Preview meteocat_std.csv")
+print(f"OK -> creat {STD_OUT}")</code></pre>
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Què vol dir “estandarditzar” aquí?</strong> Crear un fitxer final amb les mateixes columnes i el mateix significat, independentment de la font. Això és el que farà possible el “merge” final.</p>
+                <p><strong>Mapeig de camps:</strong> aquí reanomenem i reordenem camps (ex: <code class="inline">EMA</code> → <code class="inline">station_id</code>) i fixem <code class="inline">source</code> a “METEOCAT”.</p>
+                <p>Creem el fitxer final amb l'estructura definitiva (source, station_id, etc.). Aquí "hardcodegem" el valor de <code>source</code> a "METEOCAT".</p>
+            </div>
+        </div>
+
+        <!-- EX 07 PEEK AEMET -->
+        <div id="ex07_peek" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex07_peek_aemet.py</h3>
+                    <a href="exercicis/ex07_peek_aemet.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Exploració AEMET</div>
+            </div>
+            <pre><code class="language-python">import os
+import sys
+
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+from utils.config import AEMET_INPUT
+from utils.csv_utils import preview_csv
+
+preview_csv(AEMET_INPUT, max_rows=5, title="Preview AEMET")
+print("OK -> Previsualització AEMET feta.")</code></pre>
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Què observem?</strong> AEMET té una estructura diferent: sovint té un registre per mes i moltes columnes de dies (<code class="inline">P1</code>…<code class="inline">P31</code>). Això és el contrari del que volem.</p>
+                <p><strong>Objectiu:</strong> entendre la forma del fitxer abans de transformar-lo a format “una fila = un dia”.</p>
+                <p>Inspecció del fitxer d'AEMET. Observem que té una estructura molt diferent: columnes P1, P2... P31 per als dies del mes (format ample).</p>
+            </div>
+        </div>
+
+        <!-- EX 08 DESPIVOT -->
+        <div id="ex08_despivot" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex08_aemet_despivot_pas1.py</h3>
+                    <a href="exercicis/ex08_aemet_despivot_pas1.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Transformació Wide to Long</div>
+            </div>
+            <pre><code class="language-python">import os
+import sys
+
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+from utils.config import AEMET_INPUT, AEMET_PAS1_OUT, RESULTATS_DIR
+from utils.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
+
+columnes = [
+    "INDICATIVO", "NOMBRE", "ALTITUD", "LONGITUD", "LATITUD",
+    "AÑO", "MES", "DAY", "P_TENTHS"
+]
+files_llegides = 0
+files_escrites = 0
+
+ensure_dir(RESULTATS_DIR)
+
+with open_csv_reader(AEMET_INPUT) as lector, \
+     open_csv_writer(AEMET_PAS1_OUT, fieldnames=columnes) as escriptor:
+
+    p_cols = [c for c in lector.fieldnames if c.startswith("P") and c[1:].isdigit()]
+
+    for fila in lector:
+        files_llegides += 1
+        for col in p_cols:
+            val = fila.get(col)
+            if val is None or str(val).strip() == "":
+                continue
+
+            day_num = int(col.replace("P", ""))
+            
+            nova_fila = {
+                "INDICATIVO": fila.get("INDICATIVO", ""),
+                "NOMBRE": fila.get("NOMBRE", ""),
+                "ALTITUD": fila.get("ALTITUD", ""),
+                "LONGITUD": fila.get("LONGITUD", ""),
+                "LATITUD": fila.get("LATITUD", ""),
+                "AÑO": fila.get("AÑO", ""),
+                "MES": fila.get("MES", ""),
+                "DAY": day_num,
+                "P_TENTHS": val
+            }
+            escriptor.writerow(nova_fila)
+            files_escrites += 1
+
+preview_csv(AEMET_PAS1_OUT, max_rows=5, title="Preview aemet_pas1_long.csv")
+print(f"OK -> creat {AEMET_PAS1_OUT}")</code></pre>
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Concepte nou:</strong> “despivotar” (de <em>wide</em> a <em>long</em>). Passem de columnes P1…P31 a moltes files, una per dia.</p>
+                <p><strong>Per què és necessari?</strong> perquè el nostre estàndard final treballa amb una data per fila. Així podem ordenar i unir amb Meteocat.</p>
+                <p>Detectem dinàmicament les columnes P1...P31. Per a cada fila original (que representa un mes), generem múltiples files de sortida (una per a cada dia amb dades). Això es coneix com "despivotar" o "melt".</p>
+            </div>
+        </div>
+
+        <!-- EX 09 DATES AEMET -->
+        <div id="ex09_dates" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex09_aemet_dates_pas2.py</h3>
+                    <a href="exercicis/ex09_aemet_dates_pas2.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Reconstrucció de dates</div>
+            </div>
+            <pre><code class="language-python">import os
+import sys
+
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+from utils.config import AEMET_PAS1_OUT, AEMET_PAS2_OUT, RESULTATS_DIR
+from utils.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
+from utils.parse_utils import build_date
+
+columnes = [
+    "INDICATIVO", "NOMBRE", "ALTITUD", "LONGITUD", "LATITUD",
+    "AÑO", "MES", "DAY", "date", "P_TENTHS"
+]
+files_llegides = 0
+files_escrites = 0
+
+ensure_dir(RESULTATS_DIR)
+
+with open_csv_reader(AEMET_PAS1_OUT, encoding="utf-8") as lector, \
+     open_csv_writer(AEMET_PAS2_OUT, fieldnames=columnes) as escriptor:
+
+    for fila in lector:
+        files_llegides += 1
+        data = build_date(fila.get("AÑO"), fila.get("MES"), fila.get("DAY"))
+
+        if data is None:
+            continue
+
+        nova_fila = dict(fila)
+        nova_fila["date"] = data.isoformat()
+        escriptor.writerow(nova_fila)
+        files_escrites += 1
+
+preview_csv(AEMET_PAS2_OUT, max_rows=5, title="Preview aemet_pas2_dates.csv")
+print(f"OK -> creat {AEMET_PAS2_OUT}")</code></pre>
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Reconstrucció de la data:</strong> AEMET separa any, mes i dia. Nosaltres els unim per crear un camp <code class="inline">date</code> en ISO.</p>
+                <p><strong>Control d’errors:</strong> alguns dies no existeixen (ex: 30 de febrer). En aquests casos descartem la fila per evitar dates impossibles.</p>
+                <p>Reconstruïm la data completa a partir de columnes separades (ANY, MES, DIA). La funció <code>build_date</code> gestiona dies invàlids (com 30 de febrer) retornant <code>None</code>.</p>
+            </div>
+        </div>
+
+        <!-- EX 10 PRECIP AEMET -->
+        <div id="ex10_precip" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex10_aemet_precip_pas3.py</h3>
+                    <a href="exercicis/ex10_aemet_precip_pas3.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Conversió d'unitats</div>
+            </div>
+            <pre><code class="language-python">import os
+import sys
+
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+from utils.config import AEMET_PAS2_OUT, AEMET_PAS3_OUT, RESULTATS_DIR
+from utils.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
+from utils.parse_utils import to_float
+
+columnes = [
+    "INDICATIVO", "NOMBRE", "ALTITUD", "LONGITUD", "LATITUD",
+    "date", "precip_mm"
+]
+files_llegides = 0
+files_escrites = 0
+
+ensure_dir(RESULTATS_DIR)
+
+with open_csv_reader(AEMET_PAS2_OUT, encoding="utf-8") as lector, \
+     open_csv_writer(AEMET_PAS3_OUT, fieldnames=columnes) as escriptor:
+
+    for fila in lector:
+        files_llegides += 1
+        p_tenths = to_float(fila.get("P_TENTHS"))
+
+        if p_tenths is None or p_tenths < 0:
+            continue
+
+        precip_mm = p_tenths / 10.0
+
+        nova_fila = {
+            "INDICATIVO": fila.get("INDICATIVO", ""),
+            "NOMBRE": fila.get("NOMBRE", ""),
+            "ALTITUD": fila.get("ALTITUD", ""),
+            "LONGITUD": fila.get("LONGITUD", ""),
+            "LATITUD": fila.get("LATITUD", ""),
+            "date": fila.get("date", ""),
+            "precip_mm": precip_mm
+        }
+        escriptor.writerow(nova_fila)
+        files_escrites += 1
+
+preview_csv(AEMET_PAS3_OUT, max_rows=5, title="Preview aemet_pas3_precip.csv")
+print(f"OK -> creat {AEMET_PAS3_OUT}")</code></pre>
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Conversió d’unitats:</strong> AEMET dona precipitació en dècimes de mm. Dividim per 10 per obtenir <code class="inline">precip_mm</code>.</p>
+                <p><strong>Neteja:</strong> si apareixen valors negatius, normalment són codis (no dades reals). En aquest flux, els descartem.</p>
+                <p>AEMET proporciona dades en dècimes de mil·límetre (per estalviar espai i evitar decimals en formats antics). Dividim per 10.0 per obtenir mm reals.</p>
+            </div>
+        </div>
+
+        <!-- EX 11 COORDS AEMET -->
+        <div id="ex11_coords" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex11_aemet_coords_pas4.py</h3>
+                    <a href="exercicis/ex11_aemet_coords_pas4.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Reprojecció AEMET</div>
+            </div>
+            <pre><code class="language-python">import os
+import sys
+
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+from utils.config import AEMET_PAS3_OUT, AEMET_PAS4_OUT, RESULTATS_DIR
+from utils.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
+from utils.parse_utils import to_float
+from utils.qgis_utils import get_utm31_to_wgs84_transformer, transform_utm_to_lonlat
+
+columnes = [
+    "INDICATIVO", "NOMBRE", "ALTITUD",
+    "x_utm", "y_utm", "lon", "lat",
+    "date", "precip_mm"
+]
+files_llegides = 0
+files_escrites = 0
+
+ensure_dir(RESULTATS_DIR)
+xform = get_utm31_to_wgs84_transformer()
+
+with open_csv_reader(AEMET_PAS3_OUT, encoding="utf-8") as lector, \
+     open_csv_writer(AEMET_PAS4_OUT, fieldnames=columnes) as escriptor:
+
+    for fila in lector:
+        files_llegides += 1
+        x = to_float(fila.get("LONGITUD"))
+        y = to_float(fila.get("LATITUD"))
+
+        if x is None or y is None:
+            continue
+
+        try:
+            lon, lat = transform_utm_to_lonlat(x, y, xform)
+        except:
+            continue
+
+        nova_fila = {
+            "INDICATIVO": fila.get("INDICATIVO", ""),
+            "NOMBRE": fila.get("NOMBRE", ""),
+            "ALTITUD": fila.get("ALTITUD", ""),
+            "x_utm": x,
+            "y_utm": y,
+            "lon": lon,
+            "lat": lat,
+            "date": fila.get("date", ""),
+            "precip_mm": fila.get("precip_mm", "")
+        }
+        escriptor.writerow(nova_fila)
+        files_escrites += 1
+
+preview_csv(AEMET_PAS4_OUT, max_rows=5, title="Preview aemet_pas4_coords.csv")
+print(f"OK -> creat {AEMET_PAS4_OUT}")</code></pre>
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Pas espacial:</strong> transformem coordenades perquè totes les fonts acabin amb <code class="inline">lon</code>/<code class="inline">lat</code> en EPSG:4326.</p>
+                <p><strong>Nota didàctica:</strong> encara que una columna es digui “LONGITUD”, no sempre vol dir graus decimals. Sempre cal validar el format abans.</p>
+                <p>Encara que les columnes originals es diuen "LONGITUD" i "LATITUD", en realitat contenen coordenades UTM (metres). Les transformem a WGS84 real.</p>
+            </div>
+        </div>
+
+        <!-- EX 12 STD AEMET -->
+        <div id="ex12_std" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex12_aemet_estandarditza.py</h3>
+                    <a href="exercicis/ex12_aemet_estandarditza.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Mapeig final AEMET</div>
+            </div>
+            <pre><code class="language-python">import os
+import sys
+
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+from utils.config import AEMET_PAS4_OUT, AEMET_STD_OUT, STD_FIELDS, RESULTATS_DIR
+from utils.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
+
+files_llegides = 0
+files_escrites = 0
+
+ensure_dir(RESULTATS_DIR)
+
+with open_csv_reader(AEMET_PAS4_OUT, encoding="utf-8") as lector, \
+     open_csv_writer(AEMET_STD_OUT, fieldnames=STD_FIELDS) as escriptor:
+
+    for fila in lector:
+        files_llegides += 1
+
+        indicatiu = (fila.get("INDICATIVO") or "").strip()
+        nom = (fila.get("NOMBRE") or "").strip()
+        data = (fila.get("date") or "").strip()
+        precip = fila.get("precip_mm")
+        lon = fila.get("lon")
+        lat = fila.get("lat")
+        x_utm = fila.get("x_utm")
+        y_utm = fila.get("y_utm")
+        alt = fila.get("ALTITUD")
+
+        if not (indicatiu and data and lon and lat and x_utm and y_utm):
+            continue
+
+        nova_fila = {
+            "source": "AEMET",
+            "station_id": indicatiu,
+            "station_name": nom,
+            "date": data,
+            "precip_mm": precip,
+            "lon": lon,
+            "lat": lat,
+            "x_utm": x_utm,
+            "y_utm": y_utm,
+            "alt_m": alt
+        }
+        escriptor.writerow(nova_fila)
+        files_escrites += 1
+
+preview_csv(AEMET_STD_OUT, max_rows=5, title="Preview aemet_std.csv")
+print(f"OK -> creat {AEMET_STD_OUT}")</code></pre>
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Objectiu:</strong> deixar AEMET amb EXACTAMENT el mateix esquema que METEOCAT (mateixes columnes i noms). Això prepara el merge final.</p>
+                <p><strong>Estratègia:</strong> omplim <code class="inline">source</code> amb “AEMET” i fem el mapeig de camps al nostre model estàndard.</p>
+                <p>Adaptem l'esquema d'AEMET perquè sigui idèntic al de Meteocat, permetent la fusió posterior.</p>
+            </div>
+        </div>
+
+        <!-- EX 13 MERGE -->
+        <div id="ex13_merge" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex13_merge_std.py</h3>
+                    <a href="exercicis/ex13_merge_std.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Unificació de fonts</div>
+            </div>
+            <pre><code class="language-python">import os
+import sys
+
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+from utils.config import STD_OUT, AEMET_STD_OUT, MERGED_STD_OUT, STD_FIELDS, RESULTATS_DIR
+from utils.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
+
+files_llegides = 0
+files_escrites = 0
+
+ensure_dir(RESULTATS_DIR)
+files_totals = []
+
+# Llegim METEOCAT
+with open_csv_reader(STD_OUT, encoding="utf-8") as lector:
+    for fila in lector:
+        files_totals.append(fila)
+        files_llegides += 1
+
+# Llegim AEMET
+with open_csv_reader(AEMET_STD_OUT, encoding="utf-8") as lector:
+    for fila in lector:
+        files_totals.append(fila)
+        files_llegides += 1
+
+# Ordenem per data i source
+files_totals.sort(key=lambda r: (r.get("date", ""), r.get("source", "")))
+
+with open_csv_writer(MERGED_STD_OUT, fieldnames=STD_FIELDS) as escriptor:
+    for fila in files_totals:
+        escriptor.writerow(fila)
+        files_escrites += 1
+
+preview_csv(MERGED_STD_OUT, max_rows=5, title="Preview precipitacio_olot_estandarditzada.csv")
+print(f"OK -> creat {MERGED_STD_OUT}")</code></pre>
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Què fem?</strong> ajuntem (concatenem) els dos fitxers estandarditzats en un de sol i els ordenem per data.</p>
+                <p><strong>Per què ordenar?</strong> perquè és més fàcil revisar la sèrie temporal i detectar buits o inconsistències quan les files estan en ordre cronològic.</p>
+                <p>Llegim tots dos fitxers a memòria, els afegim a una única llista i utilitzem <code>list.sort</code> amb una funció lambda per ordenar per data.</p>
+            </div>
+        </div>
+
+        <!-- EX 14 EXPORT -->
+        <div id="ex14_export" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex14_export_gpkg.py</h3>
+                    <a href="exercicis/ex14_export_gpkg.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Exportació a GeoPackage</div>
+            </div>
+            <pre><code class="language-python">import os
+import sys
+
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+from qgis.core import QgsVectorLayer, QgsVectorFileWriter, QgsProject
+from utils.config import MERGED_STD_OUT, GPKG_OUT, GPKG_LAYER, RESULTATS_DIR
+from utils.csv_utils import ensure_dir
+
+ensure_dir(RESULTATS_DIR)
+
+# URI Màgica per carregar CSV sense GUI
+uri = f"file:///{MERGED_STD_OUT}?delimiter=,&xField=lon&yField=lat&crs=EPSG:4326"
+
+layer = QgsVectorLayer(uri, "precipitacio_olot", "delimitedtext")
+
+if not layer.isValid():
+    print("ERROR -> No s'ha pogut carregar la capa del CSV.")
+else:
+    QgsProject.instance().addMapLayer(layer)
+
+    options = QgsVectorFileWriter.SaveVectorOptions()
+    options.driverName = "GPKG"
+    options.layerName = GPKG_LAYER
+    options.fileEncoding = "UTF-8"
+
+    QgsVectorFileWriter.writeAsVectorFormatV2(layer, GPKG_OUT, QgsProject.instance().transformContext(), options)
+
+    print(f"OK -> GeoPackage creat: {GPKG_OUT}")
+    print("OK -> Capa afegida al projecte QGIS.")</code></pre>
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Últim pas SIG:</strong> convertim el CSV a un GeoPackage (format espacial estàndard) perquè QGIS i altres SIG el puguin llegir com una capa vectorial real.</p>
+                <p><strong>Idea clau:</strong> un CSV és text; un GPKG és una base de dades espacial. Aquest canvi fa que el dataset sigui més robust i reutilitzable.</p>
+                <p>Utilitza l'API de QGIS per convertir el CSV en text pla a una base de dades espacial GeoPackage real, a punt per ser utilitzada en qualsevol SIG.</p>
+            </div>
+        </div>
+
+        <!-- TANCAMENT -->
+        <div class="exercise-block">
+            <div class="exercise-header">
+                <h3 class="exercise-title">Tancament ✅</h3>
+                <div class="exercise-meta">Què t’emportes i següents passos</div>
+            </div>
+            <div class="explanation">
+                <p>Si has arribat fins aquí, ja has fet una estandardització completa: has passat d’arxius “desordenats” a un conjunt de dades coherent i reutilitzable a QGIS. Això és una habilitat clau perquè et permet treballar amb qualsevol font, encara que vingui en formats diferents.</p>
+                <p>Següent pas recomanat: fes una comprovació visual a QGIS (punts al mapa, rang de dates, valors extrems) i prova d’afegir una columna de qualitat (<code class="inline">qc_flag</code>) per marcar registres sospitosos. Aquesta és la base d’un flux de dades professional.</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Scripts de Prism per a l'acolorit de codi -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    
+    <script>
+        // Ressaltar el menú actiu segons l'scroll
+        const links = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('.exercise-block');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            links.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').includes(current)) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
