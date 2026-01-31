@@ -382,65 +382,256 @@
                     <div class="exercise-meta">Guia inicial del curs</div>
                 </div>
                 <div class="explanation">
-                    <p>Aquesta guia et porta pas a pas des de zero per treballar amb dades de precipitació a QGIS amb Python (PyQGIS). Només necessites QGIS obert i aquest projecte descarregat.</p>
-                    <h3>Prerequisits</h3>
+                    <p>Aquest curs et guia pas a pas per automatitzar tasques reals a QGIS amb Python (PyQGIS). El focus no és “programar per programar”, sinó resoldre un problema típic: integrar dades massives de precipitació provinents de fonts diferents.</p>
+                    <h3>Què aprendràs</h3>
                     <ul>
-                        <li>QGIS obert i projecte guardat (pots crear un projecte nou).</li>
-                        <li>Project Home definit al directori arrel del curs (veuràs la carpeta <strong>dades/</strong> i <strong>exercicis/</strong>).</li>
+                        <li>Netejar i normalitzar dades tabulars de múltiples fonts.</li>
+                        <li>Reprojectar coordenades i preparar capes vectorials.</li>
+                        <li>Consolidar resultats en formats SIG (GeoPackage) i generar sortides reproductibles.</li>
                     </ul>
-                    <h3>Estructura de carpetes esperada</h3>
-                    <pre><code class="language-text">Project Home/
-├─ dades/
-│  ├─ entrada/
-│  └─ sortida/
-├─ exercicis/
-│  ├─ 00_bootstrap/
-│  ├─ 01_meteocat/
-│  ├─ 02_aemet/
-│  ├─ 03_merge_export/
-│  ├─ 04_risc_processing/
-│  └─ 05_qgis_ui/
-└─ utils/
-</code></pre>
-                    <h3>On posar els CSV</h3>
-                    <p>Copia els fitxers d’entrada a <strong>dades/entrada/</strong>. Els scripts generen sortides a <strong>dades/sortida/</strong>.</p>
-                    <h3>Com executar scripts al QGIS Script Editor</h3>
+                    <h3>Enfocament: QGIS com a IDE natural</h3>
+                    <p>Treballarem <strong>dins de QGIS</strong> usant la Consola Python, l’Editor integrat i el panell Navegador. Tot passa en el context del projecte, aprofitant rutes relatives des del <em>Project Home</em>.</p>
+                    <div class="hint">
+                        Consell: desa el projecte a l’arrel del curs i defineix el <em>Project Home</em>. Així les rutes relatives funcionen sense tocar rutes absolutes.
+                    </div>
+                    <h3>Què construirem (visió general)</h3>
+                    <p>Partim de dues fonts (Meteocat i AEMET), les estandarditzem i les unim. A partir d’aquí generem capes i resultats per a l’anàlisi de risc. Tot queda llest per visualitzar a QGIS.</p>
+                    <h3>Com s’executa la feina</h3>
                     <ol>
-                        <li>Obre el menú <em>Plugins → Python Console</em>.</li>
-                        <li>Fes clic a l’icona d’<em>Editor</em> (llapis).</li>
-                        <li>Obre l’arxiu de l’exercici (des de la carpeta <strong>exercicis/</strong>).</li>
-                        <li>Prem el botó <em>Run script</em> (▶) per executar-lo.</li>
-                        <li>Revisa el missatge a la consola i/o els fitxers generats.</li>
+                        <li>Obre la Consola Python a QGIS i l’Editor integrat.</li>
+                        <li>Executa els scripts des de <strong>exercicis/</strong> quan ho indiquin els blocs.</li>
+                        <li>Revisa missatges “OK” a la consola i sortides a <strong>resultats/</strong>.</li>
                     </ol>
-                    <p class="hint">Tip: si tens el projecte guardat, QGIS recorda el Project Home i els scripts trobaran les rutes relatives automàticament.</p>
-                    <h3>Ordre recomanat</h3>
-                    <ol>
-                        <li>00 Bootstrap</li>
-                        <li>01 Meteocat</li>
-                        <li>02 AEMET</li>
-                        <li>03 Merge + Export</li>
-                        <li>04 Risc Processing</li>
-                        <li>05 QGIS UI</li>
-                    </ol>
-                    <h3>Troubleshooting ràpid</h3>
-                    <ul>
-                        <li>Si hi ha errors d’import: comprova que <strong>utils/</strong> existeix i el Project Home és correcte.</li>
-                        <li>Si no troba fitxers: revisa que els CSV estiguin a <strong>dades/entrada/</strong>.</li>
-                        <li>Si surt “Permission denied” a Windows: prova a executar QGIS com a administrador o tria una carpeta sense restriccions.</li>
-                    </ul>
                 </div>
             </section>
 
             <section id="bloc00_bootstrap_intro" class="exercise-block">
                 <div class="exercise-header">
-                    <h3 class="exercise-title">Bloc 00 — Bootstrap del projecte</h3>
+                    <h3 class="exercise-title">Bloc 0 — Posada en marxa + Python mínim</h3>
                     <div class="exercise-meta">Introducció del bloc</div>
                 </div>
                 <div class="explanation">
-                    <p>En aquest bloc preparem l’entorn mínim perquè la resta d’exercicis funcionin sense sorpreses. Crearem carpetes, definirem la configuració bàsica i generarem els mòduls <strong>utils</strong> que reutilitzarem tot el curs.</p>
-                    <p>També validarem que els helpers d’entrada/sortida, parseig i QGIS estan disponibles. És la base per evitar errors d’import i de rutes.</p>
-                    <p><strong>Prerequisits:</strong> Project Home definit i CSV a <strong>dades/entrada/</strong>.</p>
-                    <p><strong>Resultat esperat:</strong> carpetes creades, mòduls <strong>utils/*.py</strong> generats i missatges “OK” a la consola.</p>
+                    <p>Aquest bloc evita el “bootstrap sense context”. Abans de tocar dades, muntem un entorn mínim i entenem com QGIS gestiona rutes, projectes i scripts.</p>
+                    <p>Tot s’explica des de la interfície de QGIS: panell Navegador, Consola Python i Editor. L’objectiu és que l’alumne pugui arrencar sense dependre de terminals externs.</p>
+                    <p><strong>Resultat esperat:</strong> estructura de carpetes llesta, concepte de <em>Project Home</em> clar i un primer contacte real amb dades (preview de 5 files).</p>
+                </div>
+            </section>
+
+            <section id="bloc00_01_preparacion_qgis" class="exercise-block">
+                <div class="exercise-header">
+                    <h3 class="exercise-title">0.1 Preparació a QGIS (sense programar)</h3>
+                    <div class="exercise-meta">Estructura i projecte</div>
+                </div>
+                <div class="explanation">
+                    <h4>Objectiu</h4>
+                    <p>Crear l’estructura base del projecte des de QGIS i deixar a punt el <em>Project Home</em> per treballar amb rutes relatives.</p>
+                    <h4>Què aprendràs</h4>
+                    <ul>
+                        <li>Fer servir el panell Navegador per crear carpetes del projecte.</li>
+                        <li>Desar el projecte a l’arrel i entendre el <em>Project Home Path</em>.</li>
+                    </ul>
+                    <h4>Passos a QGIS</h4>
+                    <ol>
+                        <li>Obre el panell Navegador i localitza la carpeta arrel del curs.</li>
+                        <li>Crea les carpetes: <strong>dades/entrada</strong>, <strong>resultats</strong>, <strong>utils</strong>, <strong>exercicis</strong>.</li>
+                        <li>Desa el projecte (<strong>.qgz</strong>) a l’arrel del curs.</li>
+                        <li>Comprova que el <em>Project Home</em> apunta a aquesta arrel.</li>
+                    </ol>
+                    <h4>Què comprovar</h4>
+                    <ul>
+                        <li>Les carpetes apareixen al Navegador.</li>
+                        <li>El projecte està desat al root del curs.</li>
+                    </ul>
+                    <h4>Errors típics</h4>
+                    <ul>
+                        <li>Desar el projecte en una altra carpeta i trencar rutes relatives.</li>
+                        <li>Crear carpetes fora del Project Home.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="bloc00_02_python_basico" class="exercise-block">
+                <div class="exercise-header">
+                    <h3 class="exercise-title">0.2 Python bàsic a QGIS (ràpid i didàctic)</h3>
+                    <div class="exercise-meta">Fonaments mínims</div>
+                </div>
+                <div class="explanation">
+                    <h4>Objectiu</h4>
+                    <p>Recordar l’imprescindible de Python per seguir els scripts del curs dins de QGIS.</p>
+                    <h4>Què aprendràs</h4>
+                    <ul>
+                        <li>Variables i tipatge dinàmic.</li>
+                        <li>Llistes, diccionaris i tuples.</li>
+                        <li>Funció vs mètode.</li>
+                        <li>Condicionals i bucles (el mínim).</li>
+                    </ul>
+                    <h4>Passos a QGIS</h4>
+                    <ol>
+                        <li>Obre la Consola Python i l’Editor integrat.</li>
+                        <li>Executa un script des de l’Editor per confirmar que saps llançar codi.</li>
+                    </ol>
+                    <h4>Què comprovar</h4>
+                    <ul>
+                        <li>Veus missatges a la consola en executar un script.</li>
+                        <li>Et sents còmode llegint estructures bàsiques.</li>
+                    </ul>
+                    <h4>Errors típics</h4>
+                    <ul>
+                        <li>Confondre una funció amb un mètode (p. ex., <code class="inline">len()</code> vs <code class="inline">llista.append()</code>).</li>
+                        <li>Usar comes decimals a Python (s’usen punts).</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="bloc00_03_utils_modulos" class="exercise-block">
+                <div class="exercise-header">
+                    <h3 class="exercise-title">0.3 Funcions + mòduls: per què existeix utils</h3>
+                    <div class="exercise-meta">Reutilització mínimament viable</div>
+                </div>
+                <div class="explanation">
+                    <h4>Objectiu</h4>
+                    <p>Entendre què és un mòdul i per què centralitzem funcions reutilitzables a <strong>utils</strong>.</p>
+                    <h4>Què aprendràs</h4>
+                    <ul>
+                        <li>Què significa “importar el teu propi mòdul”.</li>
+                        <li>Per què evitem copiar i enganxar codi a cada script.</li>
+                    </ul>
+                    <h4>Passos a QGIS</h4>
+                    <ol>
+                        <li>Al panell Navegador, crea <strong>utils/__init__.py</strong>.</li>
+                        <li>Entén que <strong>utils</strong> és un paquet local del projecte.</li>
+                    </ol>
+                    <h4>Què comprovar</h4>
+                    <ul>
+                        <li>El fitxer <strong>__init__.py</strong> apareix a la carpeta <strong>utils</strong>.</li>
+                    </ul>
+                    <h4>Errors típics</h4>
+                    <ul>
+                        <li>Crear el fitxer fora de la carpeta <strong>utils</strong>.</li>
+                        <li>Escriure’l amb un altre nom (ha de ser exactament <strong>__init__.py</strong>).</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="bloc00_04_config_rutas" class="exercise-block">
+                <div class="exercise-header">
+                    <h3 class="exercise-title">0.4 Rutes del projecte: config mínim viable</h3>
+                    <div class="exercise-meta">Rutes base, sense “monstres”</div>
+                </div>
+                <div class="explanation">
+                    <h4>Objectiu</h4>
+                    <p>Crear el concepte de <strong>config</strong> amb 3–4 rutes base per treballar sempre relatiu al projecte.</p>
+                    <h4>Què aprendràs</h4>
+                    <ul>
+                        <li>Centralitzar rutes per evitar valors absoluts.</li>
+                        <li>Reutilitzar rutes entre scripts.</li>
+                    </ul>
+                    <h4>Passos a QGIS</h4>
+                    <ol>
+                        <li>Crea el fitxer <strong>utils/config.py</strong> des del panell Navegador.</li>
+                        <li>Defineix només rutes base: <code class="inline">ROOT_DIR</code>, <code class="inline">DADES_DIR</code>, <code class="inline">ENTRADA_DIR</code>, <code class="inline">RESULTATS_DIR</code>.</li>
+                    </ol>
+                    <h4>Què comprovar</h4>
+                    <ul>
+                        <li>El fitxer existeix i és a <strong>utils/</strong>.</li>
+                        <li>Entens per què evitem rutes absolutes.</li>
+                    </ul>
+                    <h4>Errors típics</h4>
+                    <ul>
+                        <li>Afegir rutes específiques d’exercicis avançats massa aviat.</li>
+                        <li>Usar rutes absolutes dependents de l’equip.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="bloc00_05_preview_datos" class="exercise-block">
+                <div class="exercise-header">
+                    <h3 class="exercise-title">0.5 Primer contacte amb dades: preview de 5 files</h3>
+                    <div class="exercise-meta">Entendre el problema abans d’automatitzar</div>
+                </div>
+                <div class="explanation">
+                    <h4>Objectiu</h4>
+                    <p>Visualitzar un exemple petit i realista per entendre per què cal estandarditzar dades de Meteocat i AEMET.</p>
+                    <h4>Què aprendràs</h4>
+                    <ul>
+                        <li>Detectar columnes i formats incompatibles entre fonts.</li>
+                        <li>Veure problemes típics de decimals i dates.</li>
+                    </ul>
+                    <h4>Exemple (mock de 5 files)</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>font</th>
+                                <th>estació</th>
+                                <th>data</th>
+                                <th>precip</th>
+                                <th>coord_x</th>
+                                <th>coord_y</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Meteocat</td>
+                                <td>EMA 0250</td>
+                                <td>2020-10-03</td>
+                                <td>12.4</td>
+                                <td>451234</td>
+                                <td>4667890</td>
+                            </tr>
+                            <tr>
+                                <td>Meteocat</td>
+                                <td>EMA 0250</td>
+                                <td>2020-10-04</td>
+                                <td>0</td>
+                                <td>451234</td>
+                                <td>4667890</td>
+                            </tr>
+                            <tr>
+                                <td>AEMET</td>
+                                <td>0200</td>
+                                <td>04/10/2020</td>
+                                <td>"7,8"</td>
+                                <td>456000</td>
+                                <td>4671000</td>
+                            </tr>
+                            <tr>
+                                <td>AEMET</td>
+                                <td>0200</td>
+                                <td>2020-10-05 00:00</td>
+                                <td>""</td>
+                                <td>456000</td>
+                                <td>4671000</td>
+                            </tr>
+                            <tr>
+                                <td>AEMET</td>
+                                <td>0200</td>
+                                <td>20201006</td>
+                                <td>3.2</td>
+                                <td>456000</td>
+                                <td>4671000</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <h4>Passos a QGIS</h4>
+                    <ol>
+                        <li>Explora els CSV des del panell Navegador.</li>
+                        <li>Identifica columnes de data i precipitació.</li>
+                        <li>Observa diferències de formats entre fonts.</li>
+                    </ol>
+                    <h4>Què comprovar</h4>
+                    <ul>
+                        <li>Les dates no sempre estan en el mateix format.</li>
+                        <li>Els decimals poden usar coma o punt.</li>
+                        <li>Hi ha valors buits o nuls.</li>
+                    </ul>
+                    <h4>Errors típics</h4>
+                    <ul>
+                        <li>Suposar que totes les dates ja estan normalitzades.</li>
+                        <li>Tractar “7,8” com a text sense convertir a número.</li>
+                    </ul>
+                    <p><strong>Sobre els floats:</strong> la precipitació és un número real (mm). Si el separador és coma, cal convertir-lo abans de calcular mitjanes o totals.</p>
+                    <p><strong>Sobre les dates:</strong> pots trobar <code class="inline">YYYY-MM-DD</code>, <code class="inline">DD/MM/YYYY</code>, columnes separades o timestamps. Normalitzar dates és obligatori per ordenar sèries temporals.</p>
+                    <div class="hint">Més endavant executarem un “preview real” amb script, però aquí l’objectiu és entendre el problema abans d’automatitzar.</div>
                 </div>
             </section>
 
