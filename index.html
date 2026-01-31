@@ -7,294 +7,7 @@
     
     <!-- Prism.js per ressaltat de sintaxi (Tema Tomorrow Night) -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
-    
-    <style>
-        :root {
-            --primary: #2563eb;
-            --bg-light: #f8fafc;
-            --bg-white: #ffffff;
-            --text-main: #334155;
-            --border: #e2e8f0;
-            --sidebar-width: 300px;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            background-color: var(--bg-light);
-            color: var(--text-main);
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-        /* Sidebar Navigation */
-        .sidebar {
-            width: var(--sidebar-width);
-            background: var(--bg-white);
-            border-right: 1px solid var(--border);
-            overflow-y: auto;
-            flex-shrink: 0;
-            padding-bottom: 2rem;
-        }
-
-        .sidebar-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            background: var(--bg-white);
-            z-index: 10;
-        }
-
-        .back-link {
-            display: inline-block;
-            margin-bottom: 0.5rem;
-            text-decoration: none;
-            color: var(--primary);
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .sidebar h2 { font-size: 1.2rem; color: #1e293b; }
-
-        .nav-group { margin-top: 1rem; }
-        .nav-group-title {
-            padding: 0.5rem 1.5rem;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #64748b;
-            font-weight: 700;
-            display: block;
-            text-decoration: none;
-            transition: color 0.2s ease, background-color 0.2s ease;
-        }
-
-        .nav-group-title:hover {
-            color: var(--primary);
-            text-decoration: underline;
-        }
-
-        .nav-group-title.active {
-            color: var(--primary);
-            text-decoration: underline;
-            background: #eff6ff;
-        }
-
-        .nav-link {
-            display: block;
-            padding: 0.5rem 1.5rem;
-            color: var(--text-main);
-            text-decoration: none;
-            font-size: 0.9rem;
-            border-left: 3px solid transparent;
-            transition: all 0.2s;
-        }
-
-        .nav-link:hover { background: #f1f5f9; color: var(--primary); }
-        .nav-link.active { 
-            background: #eff6ff; 
-            color: var(--primary); 
-            border-left-color: var(--primary);
-            font-weight: 600;
-        }
-
-        /* Main Content Area */
-        .content {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 2rem 4rem;
-            scroll-behavior: smooth;
-        }
-
-        .exercise-block {
-            background: var(--bg-white);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            margin-bottom: 3rem;
-            overflow: hidden;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        }
-
-        .exercise-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--border);
-            background: #f8fafc;
-        }
-
-        /* Nous estils per a la capçalera amb botó de descàrrega */
-        .header-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .exercise-title {
-            font-size: 1.4rem;
-            color: #0f172a;
-            margin: 0;
-        }
-
-        .download-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.4rem 0.8rem;
-            background-color: #fff;
-            color: #475569;
-            text-decoration: none;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            white-space: nowrap;
-            transition: all 0.2s;
-            border: 1px solid #cbd5e1;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-        }
-
-        .copy-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.4rem 0.8rem;
-            background-color: #fff;
-            color: #475569;
-            text-decoration: none;
-            border-radius: 6px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            white-space: nowrap;
-            transition: all 0.2s;
-            border: 1px solid #cbd5e1;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-            cursor: pointer;
-        }
-
-        .download-btn:hover {
-            background-color: #f8fafc;
-            color: var(--primary);
-            border-color: var(--primary);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .copy-btn:hover {
-            background-color: #f8fafc;
-            color: var(--primary);
-            border-color: var(--primary);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .exercise-meta {
-            font-size: 0.9rem;
-            color: #64748b;
-            font-family: monospace;
-        }
-
-        /* Code Block Styling */
-        pre[class*="language-"] {
-            margin: 0 !important;
-            border-radius: 0 !important;
-            max-height: 500px; /* Scrollable code if too long */
-        }
-
-        /* Explanation Section */
-        .explanation {
-            padding: 2rem;
-            background: #fff;
-            border-top: 1px solid var(--border);
-        }
-
-        .explanation h2 {
-            font-size: 1.25rem;
-            margin: 0 0 0.75rem 0;
-            color: #0f172a;
-        }
-
-        .explanation h3 {
-            font-size: 1.1rem;
-            margin: 1rem 0 0.5rem 0;
-            color: #0f172a;
-        }
-
-        .explanation h4 {
-            color: var(--primary);
-            margin-bottom: 1rem;
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .explanation ul {
-            padding-left: 1.5rem;
-            margin-bottom: 1rem;
-        }
-
-        .explanation li { margin-bottom: 0.5rem; }
-
-        .hint {
-            background: #f8fafc;
-            border: 1px solid var(--border);
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
-            color: #475569;
-            margin-top: 1rem;
-        }
-
-        code.inline {
-            background: #f1f5f9;
-            padding: 2px 5px;
-            border-radius: 4px;
-            font-family: monospace;
-            color: #d63384;
-            font-size: 0.9em;
-        }
-        
-        /* Estils per a la llista de dades */
-        .data-files-list {
-            margin-top: 1.5rem; 
-            padding: 1rem; 
-            background: #f1f5f9; 
-            border-radius: 6px;
-            border: 1px solid #e2e8f0;
-        }
-        .data-files-list ul {
-            list-style: none; 
-            margin-top: 0.5rem; 
-            padding-left: 0;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-        .data-file-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: #334155;
-            text-decoration: none;
-            font-weight: 500;
-        }
-        .data-file-link:hover {
-            text-decoration: underline;
-            color: var(--primary);
-        }
-
-        @media (max-width: 1024px) {
-            .content { padding: 1.5rem; }
-            :root { --sidebar-width: 240px; }
-        }
-
-        @media (max-width: 768px) {
-            body { flex-direction: column; height: auto; overflow: auto; }
-            .sidebar { width: 100%; height: auto; overflow: visible; }
-            .content { padding: 1rem; }
-            .sidebar-header { position: relative; }
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
@@ -310,19 +23,10 @@
 
         <div class="nav-group">
                 <a class="nav-group-title" href="#bloc00_bootstrap_intro">00 Bootstrap</a>
-            <a href="#ex01_setup_project" class="nav-link">ex01_setup_project.py</a>
-            <a href="#ex02_utils_config" class="nav-link">ex02_utils_config.py</a>
-            <a href="#ex03_test_config" class="nav-link">ex03_test_config.py</a>
-            <a href="#ex04_utils_csv_utils" class="nav-link">ex04_utils_csv_utils.py</a>
-            <a href="#ex05_test_preview_csv" class="nav-link">ex05_test_preview_csv.py</a>
-            <a href="#ex06_utils_parse_utils" class="nav-link">ex06_utils_parse_utils.py</a>
-            <a href="#ex07_test_parse_utils" class="nav-link">ex07_test_parse_utils.py</a>
-            <a href="#ex08_utils_qgis_utils" class="nav-link">ex08_utils_qgis_utils.py</a>
-            <a href="#ex09_test_qgis_transform" class="nav-link">ex09_test_qgis_transform.py</a>
-            <a href="#ex10_utils_processing_utils" class="nav-link">ex10_utils_processing_utils.py</a>
-            <a href="#ex11_test_processing_utils" class="nav-link">ex11_test_processing_utils.py</a>
-            <a href="#ex12_utils_gui_utils" class="nav-link">ex12_utils_gui_utils.py</a>
-            <a href="#ex13_test_gui_utils" class="nav-link">ex13_test_gui_utils.py</a>
+            <a href="#ex00_02_python_basics_qgis" class="nav-link">ex00_02_python_basics_qgis.py</a>
+            <a href="#ex00_04_test_config_paths" class="nav-link">ex00_04_test_config_paths.py</a>
+            <a href="#ex00_03_utils_modules" class="nav-link">ex00_03_utils_modules.py</a>
+            <a href="#ex00_05_preview_inputs" class="nav-link">ex00_05_preview_inputs.py</a>
         </div>
 
         <div class="nav-group">
@@ -405,1626 +109,7 @@
                 </div>
             </section>
 
-            <section id="bloc00_bootstrap_intro" class="exercise-block">
-                <div class="exercise-header">
-                    <h3 class="exercise-title">Bloc 0 — Posada en marxa + Python mínim</h3>
-                    <div class="exercise-meta">Introducció del bloc</div>
-                </div>
-                <div class="explanation">
-                    <p>Aquest bloc evita el “bootstrap sense context”. Abans de tocar dades, muntem un entorn mínim i entenem com QGIS gestiona rutes, projectes i scripts.</p>
-                    <p>Tot s’explica des de la interfície de QGIS: panell Navegador, Consola Python i Editor. L’objectiu és que l’alumne pugui arrencar sense dependre de terminals externs.</p>
-                    <p><strong>Resultat esperat:</strong> estructura de carpetes llesta, concepte de <em>Project Home</em> clar i un primer contacte real amb dades (preview de 5 files).</p>
-                </div>
-            </section>
-
-            <section id="bloc00_01_preparacion_qgis" class="exercise-block">
-                <div class="exercise-header">
-                    <h3 class="exercise-title">0.1 Preparació a QGIS (sense programar)</h3>
-                    <div class="exercise-meta">Estructura i projecte</div>
-                </div>
-                <div class="explanation">
-                    <h4>Objectiu</h4>
-                    <p>Crear l’estructura base del projecte des de QGIS i deixar a punt el <em>Project Home</em> per treballar amb rutes relatives.</p>
-                    <h4>Què aprendràs</h4>
-                    <ul>
-                        <li>Fer servir el panell Navegador per crear carpetes del projecte.</li>
-                        <li>Desar el projecte a l’arrel i entendre el <em>Project Home Path</em>.</li>
-                    </ul>
-                    <h4>Passos a QGIS</h4>
-                    <ol>
-                        <li>Obre el panell Navegador i localitza la carpeta arrel del curs.</li>
-                        <li>Crea les carpetes: <strong>dades/entrada</strong>, <strong>resultats</strong>, <strong>utils</strong>, <strong>exercicis</strong>.</li>
-                        <li>Desa el projecte (<strong>.qgz</strong>) a l’arrel del curs.</li>
-                        <li>Comprova que el <em>Project Home</em> apunta a aquesta arrel.</li>
-                    </ol>
-                    <h4>Què comprovar</h4>
-                    <ul>
-                        <li>Les carpetes apareixen al Navegador.</li>
-                        <li>El projecte està desat al root del curs.</li>
-                    </ul>
-                    <h4>Errors típics</h4>
-                    <ul>
-                        <li>Desar el projecte en una altra carpeta i trencar rutes relatives.</li>
-                        <li>Crear carpetes fora del Project Home.</li>
-                    </ul>
-                </div>
-            </section>
-
-            <section id="bloc00_02_python_basico" class="exercise-block">
-                <div class="exercise-header">
-                    <h3 class="exercise-title">0.2 Python bàsic a QGIS (ràpid i didàctic)</h3>
-                    <div class="exercise-meta">Fonaments mínims</div>
-                </div>
-                <div class="explanation">
-                    <h4>Objectiu</h4>
-                    <p>Recordar l’imprescindible de Python per seguir els scripts del curs dins de QGIS.</p>
-                    <h4>Què aprendràs</h4>
-                    <ul>
-                        <li>Variables i tipatge dinàmic.</li>
-                        <li>Llistes, diccionaris i tuples.</li>
-                        <li>Funció vs mètode.</li>
-                        <li>Condicionals i bucles (el mínim).</li>
-                    </ul>
-                    <h4>Passos a QGIS</h4>
-                    <ol>
-                        <li>Obre la Consola Python i l’Editor integrat.</li>
-                        <li>Executa un script des de l’Editor per confirmar que saps llançar codi.</li>
-                    </ol>
-                    <h4>Què comprovar</h4>
-                    <ul>
-                        <li>Veus missatges a la consola en executar un script.</li>
-                        <li>Et sents còmode llegint estructures bàsiques.</li>
-                    </ul>
-                    <h4>Errors típics</h4>
-                    <ul>
-                        <li>Confondre una funció amb un mètode (p. ex., <code class="inline">len()</code> vs <code class="inline">llista.append()</code>).</li>
-                        <li>Usar comes decimals a Python (s’usen punts).</li>
-                    </ul>
-                </div>
-            </section>
-
-            <section id="bloc00_03_utils_modulos" class="exercise-block">
-                <div class="exercise-header">
-                    <h3 class="exercise-title">0.3 Funcions + mòduls: per què existeix utils</h3>
-                    <div class="exercise-meta">Reutilització mínimament viable</div>
-                </div>
-                <div class="explanation">
-                    <h4>Objectiu</h4>
-                    <p>Entendre què és un mòdul i per què centralitzem funcions reutilitzables a <strong>utils</strong>.</p>
-                    <h4>Què aprendràs</h4>
-                    <ul>
-                        <li>Què significa “importar el teu propi mòdul”.</li>
-                        <li>Per què evitem copiar i enganxar codi a cada script.</li>
-                    </ul>
-                    <h4>Passos a QGIS</h4>
-                    <ol>
-                        <li>Al panell Navegador, crea <strong>utils/__init__.py</strong>.</li>
-                        <li>Entén que <strong>utils</strong> és un paquet local del projecte.</li>
-                    </ol>
-                    <h4>Què comprovar</h4>
-                    <ul>
-                        <li>El fitxer <strong>__init__.py</strong> apareix a la carpeta <strong>utils</strong>.</li>
-                    </ul>
-                    <h4>Errors típics</h4>
-                    <ul>
-                        <li>Crear el fitxer fora de la carpeta <strong>utils</strong>.</li>
-                        <li>Escriure’l amb un altre nom (ha de ser exactament <strong>__init__.py</strong>).</li>
-                    </ul>
-                </div>
-            </section>
-
-            <section id="bloc00_04_config_rutas" class="exercise-block">
-                <div class="exercise-header">
-                    <h3 class="exercise-title">0.4 Rutes del projecte: config mínim viable</h3>
-                    <div class="exercise-meta">Rutes base, sense “monstres”</div>
-                </div>
-                <div class="explanation">
-                    <h4>Objectiu</h4>
-                    <p>Crear el concepte de <strong>config</strong> amb 3–4 rutes base per treballar sempre relatiu al projecte.</p>
-                    <h4>Què aprendràs</h4>
-                    <ul>
-                        <li>Centralitzar rutes per evitar valors absoluts.</li>
-                        <li>Reutilitzar rutes entre scripts.</li>
-                    </ul>
-                    <h4>Passos a QGIS</h4>
-                    <ol>
-                        <li>Crea el fitxer <strong>utils/config.py</strong> des del panell Navegador.</li>
-                        <li>Defineix només rutes base: <code class="inline">ROOT_DIR</code>, <code class="inline">DADES_DIR</code>, <code class="inline">ENTRADA_DIR</code>, <code class="inline">RESULTATS_DIR</code>.</li>
-                    </ol>
-                    <h4>Què comprovar</h4>
-                    <ul>
-                        <li>El fitxer existeix i és a <strong>utils/</strong>.</li>
-                        <li>Entens per què evitem rutes absolutes.</li>
-                    </ul>
-                    <h4>Errors típics</h4>
-                    <ul>
-                        <li>Afegir rutes específiques d’exercicis avançats massa aviat.</li>
-                        <li>Usar rutes absolutes dependents de l’equip.</li>
-                    </ul>
-                </div>
-            </section>
-
-            <section id="bloc00_05_preview_datos" class="exercise-block">
-                <div class="exercise-header">
-                    <h3 class="exercise-title">0.5 Primer contacte amb dades: preview de 5 files</h3>
-                    <div class="exercise-meta">Entendre el problema abans d’automatitzar</div>
-                </div>
-                <div class="explanation">
-                    <h4>Objectiu</h4>
-                    <p>Visualitzar un exemple petit i realista per entendre per què cal estandarditzar dades de Meteocat i AEMET.</p>
-                    <h4>Què aprendràs</h4>
-                    <ul>
-                        <li>Detectar columnes i formats incompatibles entre fonts.</li>
-                        <li>Veure problemes típics de decimals i dates.</li>
-                    </ul>
-                    <h4>Exemple (mock de 5 files)</h4>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>font</th>
-                                <th>estació</th>
-                                <th>data</th>
-                                <th>precip</th>
-                                <th>coord_x</th>
-                                <th>coord_y</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Meteocat</td>
-                                <td>EMA 0250</td>
-                                <td>2020-10-03</td>
-                                <td>12.4</td>
-                                <td>451234</td>
-                                <td>4667890</td>
-                            </tr>
-                            <tr>
-                                <td>Meteocat</td>
-                                <td>EMA 0250</td>
-                                <td>2020-10-04</td>
-                                <td>0</td>
-                                <td>451234</td>
-                                <td>4667890</td>
-                            </tr>
-                            <tr>
-                                <td>AEMET</td>
-                                <td>0200</td>
-                                <td>04/10/2020</td>
-                                <td>"7,8"</td>
-                                <td>456000</td>
-                                <td>4671000</td>
-                            </tr>
-                            <tr>
-                                <td>AEMET</td>
-                                <td>0200</td>
-                                <td>2020-10-05 00:00</td>
-                                <td>""</td>
-                                <td>456000</td>
-                                <td>4671000</td>
-                            </tr>
-                            <tr>
-                                <td>AEMET</td>
-                                <td>0200</td>
-                                <td>20201006</td>
-                                <td>3.2</td>
-                                <td>456000</td>
-                                <td>4671000</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <h4>Passos a QGIS</h4>
-                    <ol>
-                        <li>Explora els CSV des del panell Navegador.</li>
-                        <li>Identifica columnes de data i precipitació.</li>
-                        <li>Observa diferències de formats entre fonts.</li>
-                    </ol>
-                    <h4>Què comprovar</h4>
-                    <ul>
-                        <li>Les dates no sempre estan en el mateix format.</li>
-                        <li>Els decimals poden usar coma o punt.</li>
-                        <li>Hi ha valors buits o nuls.</li>
-                    </ul>
-                    <h4>Errors típics</h4>
-                    <ul>
-                        <li>Suposar que totes les dates ja estan normalitzades.</li>
-                        <li>Tractar “7,8” com a text sense convertir a número.</li>
-                    </ul>
-                    <p><strong>Sobre els floats:</strong> la precipitació és un número real (mm). Si el separador és coma, cal convertir-lo abans de calcular mitjanes o totals.</p>
-                    <p><strong>Sobre les dates:</strong> pots trobar <code class="inline">YYYY-MM-DD</code>, <code class="inline">DD/MM/YYYY</code>, columnes separades o timestamps. Normalitzar dates és obligatori per ordenar sèries temporals.</p>
-                    <div class="hint">Més endavant executarem un “preview real” amb script, però aquí l’objectiu és entendre el problema abans d’automatitzar.</div>
-                </div>
-            </section>
-
-        <!-- EX 01 SETUP PROJECT -->
-        <div id="ex01_setup_project" class="exercise-block">
-            <div class="exercise-header">
-                <div class="header-row">
-                    <h3 class="exercise-title">ex01_setup_project.py</h3>
-                    <a href="exercicis/00_bootstrap/ex01_setup_project.py" download class="download-btn">📥 Descarregar Script</a>
-                </div>
-                <div class="exercise-meta">Objectiu: preparar carpetes i normalitzar inputs</div>
-            </div>
-            <pre><code class="language-python"># OBJECTIU:
-#   Preparar l'estructura del projecte i normalitzar els CSV d'entrada.
-#
-# ENTRADA:
-#   ./dades/entrada/* (CSV originals del curs)
-#
-# SORTIDA:
-#   Carpetes creades: dades/entrada, resultats, utils (si no existeixen)
-#   CSV renombrats (si venien amb #U00f3 o accents)
-#
-# QUÈ APRENEM:
-#   - Detectar l'arrel del projecte (Project Home de QGIS o fallback).
-#   - Crear una estructura mínima de carpetes.
-#   - Normalitzar noms de fitxer per evitar problemes d'encoding.
-
-from pathlib import Path
-import shutil
-
-
-def get_project_root() -> Path:
-    """Detecta l'arrel del projecte (prioritza Project Home de QGIS)."""
-    try:
-        from qgis.core import QgsProject
-
-        project = QgsProject.instance()
-        home = project.homePath()
-        if home:
-            return Path(home)
-        project_file = project.fileName()
-        if project_file:
-            return Path(project_file).parent
-    except Exception:
-        pass
-
-        try:
-            return Path(__file__).resolve().parents[2]
-        except Exception:
-            return Path.cwd()
-
-
-def ensure_dirs(root: Path) -> dict:
-    """Crea directoris mínims i retorna un diccionari de paths."""
-    entrada = root / "dades" / "entrada"
-    resultats = root / "resultats"
-    utils_dir = root / "utils"
-
-    entrada.mkdir(parents=True, exist_ok=True)
-    resultats.mkdir(parents=True, exist_ok=True)
-    utils_dir.mkdir(parents=True, exist_ok=True)
-
-    return {
-        "root": root,
-        "entrada": entrada,
-        "resultats": resultats,
-        "utils": utils_dir,
-    }
-
-
-def normalize_inputs(entrada_dir: Path) -> dict:
-    """Normalitza noms de CSV i retorna l'estat de cada fitxer esperat."""
-    expected = {
-        "Precipitacio_Olot_METEOCAT.csv": None,
-        "Precipitacio_Olot_AEMET.csv": None,
-    }
-
-    # Possibles variants problemàtiques
-    variants = {
-        "Precipitacio_Olot_METEOCAT.csv": [
-            "Precipitaci#U00f3_Olot_METEOCAT.csv",
-            "Precipitació_Olot_METEOCAT.csv",
-            "PrecipitaciÃ³_Olot_METEOCAT.csv",
-        ],
-        "Precipitacio_Olot_AEMET.csv": [
-            "Precipitaci#U00f3_Olot_AEMET.csv",
-            "Precipitació_Olot_AEMET.csv",
-            "PrecipitaciÃ³_Olot_AEMET.csv",
-        ],
-    }
-
-    for target, names in variants.items():
-        target_path = entrada_dir / target
-        if target_path.exists():
-            expected[target] = target_path
-            continue
-
-        for name in names:
-            candidate = entrada_dir / name
-            if candidate.exists():
-                if "#U00f3" in name or "Ã" in name:
-                    candidate.rename(target_path)
-                else:
-                    shutil.copy2(candidate, target_path)
-                expected[target] = target_path
-                break
-
-    return expected
-
-
-def print_summary(paths: dict, expected: dict) -> None:
-    print("PROJECT ROOT:", paths["root"].resolve().as_posix())
-    print("ENTRADA_DIR:", paths["entrada"].resolve().as_posix())
-    print("RESULTATS_DIR:", paths["resultats"].resolve().as_posix())
-    print("UTILS_DIR:", paths["utils"].resolve().as_posix())
-
-    print("\nCSV d'entrada:")
-    for name, path in expected.items():
-        if path is None:
-            print(f"  MISSING -> {name}")
-        else:
-            print(f"  OK -> {path.name}")
-
-    if any(v is None for v in expected.values()):
-        print("\nAVÍS: Copia els CSV originals a dades/entrada i torna a executar.")
-    else:
-        print("\nOK -> Setup complet.")
-
-
-if __name__ == "__main__":
-    root = get_project_root()
-    paths = ensure_dirs(root)
-    expected = normalize_inputs(paths["entrada"])
-    print_summary(paths, expected)</code></pre>
-            <div class="explanation">
-                <p>Executa aquest script abans de tot: detecta l’arrel del projecte (Project Home de QGIS si està disponible) i crea les carpetes necessàries. També normalitza noms de CSV (sense accents) per evitar errors a Windows.</p>
-            </div>
-        </div>
-
-        <!-- EX 02 UTILS CONFIG -->
-        <div id="ex02_utils_config" class="exercise-block">
-            <div class="exercise-header">
-                <div class="header-row">
-                    <h3 class="exercise-title">ex02_utils_config.py</h3>
-                    <a href="exercicis/00_bootstrap/ex02_utils_config.py" download class="download-btn">📥 Descarregar Script</a>
-                </div>
-                <div class="exercise-meta">Objectiu: crear utils/config.py</div>
-            </div>
-            <pre><code class="language-python"># OBJECTIU:
-#   Crear el mòdul utils/config.py amb rutes i constants del projecte.
-#
-# ENTRADA:
-#   Cap (crea el fitxer dins utils/)
-#
-# SORTIDA:
-#   utils/config.py amb la configuració completa del curs.
-#
-# QUÈ APRENEM:
-#   - Centralitzar rutes i constants en un sol lloc.
-#   - Evitar rutes absolutes i problemes d'encoding.
-#   - Fer que tots els scripts comparteixin la mateixa configuració.
-
-from pathlib import Path
-
-
-def get_project_root() -> Path:
-    """Detecta l'arrel del projecte (prioritza Project Home de QGIS)."""
-    try:
-        from qgis.core import QgsProject
-
-        project = QgsProject.instance()
-        home = project.homePath()
-        if home:
-            return Path(home)
-        project_file = project.fileName()
-        if project_file:
-            return Path(project_file).parent
-    except Exception:
-        pass
-
-    try:
-        return Path(__file__).resolve().parents[2]
-    except Exception:
-        return Path.cwd()
-
-
-def write_text(path: Path, content: str) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(content, encoding="utf-8")
-
-
-ROOT = get_project_root()
-utils_dir = ROOT / "utils"
-utils_dir.mkdir(parents=True, exist_ok=True)
-
-# Assegurem __init__.py
-init_path = utils_dir / "__init__.py"
-if not init_path.exists():
-    init_path.write_text("# Paquet d'utilitats reutilitzables per als exercicis.\n", encoding="utf-8")
-
-config_content = '''"""Configuració centralitzada (rutes i constants) per al curs PyQGIS."""
-
-from pathlib import Path
-import sys
-
-
-def _get_project_root() -> Path:
-    """Detecta l'arrel del projecte (prioritza el Project Home de QGIS)."""
-    try:
-        from qgis.core import QgsProject
-
-        project = QgsProject.instance()
-        home = project.homePath()
-        if home:
-            return Path(home)
-        project_file = project.fileName()
-        if project_file:
-            return Path(project_file).parent
-    except Exception:
-        pass
-    try:
-        return Path(__file__).resolve().parents[1]
-    except Exception:
-        return Path.cwd()
-
-
-def _to_posix(path: Path) -> str:
-    """Converteix un Path a string absolut amb forward slashes."""
-    return str(path.resolve().as_posix())
-
-
-_ROOT = _get_project_root()
-
-# Carpetes principals
-ROOT_DIR = _to_posix(_ROOT)
-DADES_DIR = _to_posix(_ROOT / "dades")
-ENTRADA_DIR = _to_posix(_ROOT / "dades" / "entrada")
-RESULTATS_DIR = _to_posix(_ROOT / "resultats")
-STYLES_DIR = _to_posix(_ROOT / "resultats" / "styles")
-EXERCICIS_DIR = _to_posix(_ROOT / "exercicis")
-UTILS_DIR = _to_posix(_ROOT / "utils")
-
-# Inputs (CSV originals, noms ASCII sense accents)
-METEOCAT_INPUT = _to_posix(_ROOT / "dades" / "entrada" / "Precipitacio_Olot_METEOCAT.csv")
-AEMET_INPUT = _to_posix(_ROOT / "dades" / "entrada" / "Precipitacio_Olot_AEMET.csv")
-
-# Sortides Meteocat
-PAS1_OUT = _to_posix(_ROOT / "resultats" / "meteocat_pas1.csv")
-PAS2A_OUT = _to_posix(_ROOT / "resultats" / "meteocat_pas2a.csv")
-PAS2B_OUT = _to_posix(_ROOT / "resultats" / "meteocat_pas2b.csv")
-PAS3_OUT = _to_posix(_ROOT / "resultats" / "meteocat_pas3.csv")
-PAS4_OUT = _to_posix(_ROOT / "resultats" / "meteocat_pas4.csv")
-STD_OUT = _to_posix(_ROOT / "resultats" / "meteocat_std.csv")
-
-# Sortides AEMET
-AEMET_PAS1_OUT = _to_posix(_ROOT / "resultats" / "aemet_pas1_long.csv")
-AEMET_PAS2_OUT = _to_posix(_ROOT / "resultats" / "aemet_pas2_dates.csv")
-AEMET_PAS3_OUT = _to_posix(_ROOT / "resultats" / "aemet_pas3_precip.csv")
-AEMET_PAS4_OUT = _to_posix(_ROOT / "resultats" / "aemet_pas4_coords.csv")
-AEMET_STD_OUT = _to_posix(_ROOT / "resultats" / "aemet_std.csv")
-
-# Sortides finals
-MERGED_STD_OUT = _to_posix(_ROOT / "resultats" / "precipitacio_olot_estandarditzada.csv")
-GPKG_OUT = _to_posix(_ROOT / "resultats" / "precipitacio_olot_estandarditzada.gpkg")
-GPKG_LAYER = "precip"
-
-# Bloc Processing i Risc
-RISC_GPKG_OUT = _to_posix(_ROOT / "resultats" / "risc_precipitacio_olot.gpkg")
-HEATMAP_OUT_TIF = _to_posix(_ROOT / "resultats" / "hotspots_heatmap_40mm.tif")
-VALIDATION_REPORT_OUT = _to_posix(_ROOT / "resultats" / "validation_report.txt")
-LAYOUT_PDF_OUT = _to_posix(_ROOT / "resultats" / "layout_export.pdf")
-
-# Export seleccions
-EXPORT_SELECTION_OUT = _to_posix(_ROOT / "resultats" / "seleccio_export.gpkg")
-SELECCIO_AEMET_40_CSV = _to_posix(_ROOT / "resultats" / "seleccio_aemet_40mm.csv")
-
-# Estils
-STYLE_OUT_QML = _to_posix(_ROOT / "resultats" / "alerta_40mm_style.qml")
-
-# Camps finals del CSV estandarditzat
-STD_FIELDS = [
-    "source",
-    "station_id",
-    "station_name",
-    "date",
-    "precip_mm",
-    "lon",
-    "lat",
-    "x_utm",
-    "y_utm",
-    "alt_m",
-]
-
-# Noms de capes (layername)
-RISC_LAYER_POINTS = "punts_base"
-RISC_LAYER_ALERTA_20 = "dies_alerta_20mm"
-RISC_LAYER_ALERTA_40 = "dies_alerta_40mm"
-RISC_LAYER_ALERTA_80 = "dies_alerta_80mm"
-RISC_LAYER_EPISODIS_20 = "episodis_alerta_20mm"
-RISC_LAYER_RESUM_20 = "episodis_resum_20mm"
-RISC_LAYER_HOTSPOTS_40 = "hotspots_40mm"
-RISC_LAYER_BASE_FLAGS = "punts_base_flags"
-RISC_LAYER_ZONA_ESTUDI = "zona_estudi"
-RISC_LAYER_BUFFER_ALERTA_40 = "buffer_alerta_40mm"
-RISC_LAYER_BUFFER_80 = "buffer_alerta80_1000m"
-RISC_LAYER_SELECCIO_AEMET_40 = "seleccio_aemet_40mm"
-
-# QGIS projectes i grups
-QGIS_PROJECT_OUT = _to_posix(_ROOT / "projecte_curs.qgz")
-_template_path = _ROOT / "projecte_template.qgz"
-QGIS_PROJECT_TEMPLATE = _to_posix(_template_path) if _template_path.exists() else ""
-GROUP_NAME_DATA = "Dades"
-GROUP_NAME_RISC = "Risc"
-
-# Alias per compatibilitat amb scripts existents
-QGZ_OUT = QGIS_PROJECT_OUT
-
-
-def ensure_project_sys_path() -> None:
-    """Afegeix l'arrel del projecte al sys.path si cal."""
-    root = str(_ROOT)
-    if root not in sys.path:
-        sys.path.append(root)
-'''
-
-config_path = utils_dir / "config.py"
-write_text(config_path, config_content)
-
-print("OK -> creat utils/config.py")
-print("OK -> utils/__init__.py assegurat")</code></pre>
-            <div class="explanation">
-                <p>Creem la configuració centralitzada perquè tots els scripts comparteixin rutes i constants coherents.</p>
-            </div>
-        </div>
-
-        <!-- EX 03 TEST CONFIG -->
-        <div id="ex03_test_config" class="exercise-block">
-            <div class="exercise-header">
-                <div class="header-row">
-                    <h3 class="exercise-title">ex03_test_config.py</h3>
-                    <a href="exercicis/00_bootstrap/ex03_test_config.py" download class="download-btn">📥 Descarregar Script</a>
-                </div>
-                <div class="exercise-meta">Objectiu: Verificar rutes i entorn</div>
-            </div>
-            <pre><code class="language-python">import os  # Per gestionar rutes
-import sys  # Per ajustar el path d'importació
-
-# Afegim la carpeta arrel del projecte al sys.path
-ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-if ROOT_DIR not in sys.path:
-    sys.path.append(ROOT_DIR)
-
-# Importem configuració
-from utils import config  # Mòdul amb totes les rutes
-
-# Mostrem rutes clau
-print("RUTA ARREL:", config.ROOT_DIR)
-print("DADES_DIR:", config.DADES_DIR)
-print("RESULTATS_DIR:", config.RESULTATS_DIR)
-print("METEOCAT_INPUT:", config.METEOCAT_INPUT)
-print("AEMET_INPUT:", config.AEMET_INPUT)
-
-# Mostrem alguns outputs
-print("STD_OUT (METEOCAT):", config.STD_OUT)
-print("AEMET_STD_OUT:", config.AEMET_STD_OUT)
-print("MERGED_STD_OUT:", config.MERGED_STD_OUT)
-print("GPKG_OUT:", config.GPKG_OUT)
-
-# Missatge final
-print("OK -> Configuració carregada correctament.")</code></pre>
-            <div class="explanation">
-                <h4>🔍 Anàlisi Tècnica</h4>
-                <p><strong>Per què hi ha <code class="inline">sys.path</code>?</strong> Perquè Python pugui trobar la carpeta <code class="inline">utils</code> del projecte. Això evita errors del tipus “No module named utils” quan executes el script des d’una subcarpeta.</p>
-                <p><strong>Imports:</strong> <code class="inline">os</code> ens ajuda a construir rutes sense escriure-les “a mà”, i <code class="inline">sys</code> ens permet dir-li a Python on ha de buscar els mòduls del projecte.</p>
-                <p><strong>Pas clau:</strong> afegim l’arrel del projecte a <code class="inline">sys.path</code> perquè els imports com <code class="inline">from utils import config</code> funcionin encara que executem el script des de diferents carpetes.</p>
-            </div>
-        </div>
-
-        <!-- EX 04 UTILS CSV UTILS -->
-        <div id="ex04_utils_csv_utils" class="exercise-block">
-            <div class="exercise-header">
-                <div class="header-row">
-                    <h3 class="exercise-title">ex04_utils_csv_utils.py</h3>
-                    <a href="exercicis/00_bootstrap/ex04_utils_csv_utils.py" download class="download-btn">📥 Descarregar Script</a>
-                </div>
-                <div class="exercise-meta">Objectiu: crear utils/csv_utils.py</div>
-            </div>
-            <pre><code class="language-python"># OBJECTIU:
-#   Crear el mòdul utils/csv_utils.py amb helpers de lectura/escriptura CSV.
-#
-# ENTRADA:
-#   Cap (crea el fitxer dins utils/)
-#
-# SORTIDA:
-#   utils/csv_utils.py amb funcions reutilitzables.
-#
-# QUÈ APRENEM:
-#   - Centralitzar la lectura/escriptura CSV.
-#   - Evitar problemes d'encoding i BOM.
-#   - Reutilitzar funcions a tot el projecte.
-
-from pathlib import Path
-
-
-def get_project_root() -> Path:
-    """Detecta l'arrel del projecte (prioritza Project Home de QGIS)."""
-    try:
-        from qgis.core import QgsProject
-
-        project = QgsProject.instance()
-        home = project.homePath()
-        if home:
-            return Path(home)
-        project_file = project.fileName()
-        if project_file:
-            return Path(project_file).parent
-    except Exception:
-        pass
-
-    try:
-        return Path(__file__).resolve().parents[2]
-    except Exception:
-        return Path.cwd()
-
-
-def write_text(path: Path, content: str) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(content, encoding="utf-8")
-
-
-ROOT = get_project_root()
-utils_dir = ROOT / "utils"
-utils_dir.mkdir(parents=True, exist_ok=True)
-
-content = '''"""Funcions reutilitzables per treballar amb CSV (sense dependències externes)."""
-
-import csv
-from contextlib import contextmanager
-from pathlib import Path
-from typing import Optional, Sequence, Union
-
-
-def ensure_dir(path: Union[str, Path]) -> Path:
-    """Crea la carpeta (o la carpeta pare si és un fitxer) i retorna el Path."""
-    p = Path(path)
-    dir_path = p.parent if p.suffix else p
-    dir_path.mkdir(parents=True, exist_ok=True)
-    return dir_path
-
-
-def _open_text_for_read(path: Union[str, Path], encoding: str):
-    """Obre un fitxer amb encoding i fallback a utf-8-sig per BOM."""
-    try:
-        return open(path, "r", encoding=encoding, newline="")
-    except UnicodeDecodeError:
-        if encoding.lower() != "utf-8-sig":
-            return open(path, "r", encoding="utf-8-sig", newline="")
-        raise
-
-
-@contextmanager
-def open_csv_reader(path: Union[str, Path], encoding: str = "utf-8", delimiter: str = ","):
-    """Context manager que retorna un csv.DictReader."""
-    with _open_text_for_read(path, encoding) as f:
-        reader = csv.DictReader(f, delimiter=delimiter)
-        yield reader
-
-
-@contextmanager
-def open_csv_writer(
-    path: Union[str, Path],
-    fieldnames: Sequence[str],
-    encoding: str = "utf-8",
-    delimiter: str = ",",
-):
-    """Context manager que retorna un csv.DictWriter i escriu la capçalera."""
-    ensure_dir(path)
-    with open(path, "w", encoding=encoding, newline="") as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames, delimiter=delimiter)
-        writer.writeheader()
-        yield writer
-
-
-def preview_csv(path: Union[str, Path], max_rows: int = 5, title: Optional[str] = "") -> None:
-    """Mostra capçaleres i primeres files sense carregar tot el CSV."""
-    if title:
-        print(title)
-
-    p = Path(path)
-    if not p.exists():
-        print(f"AVÍS -> No existeix el fitxer: {p}")
-        return
-
-    with open_csv_reader(p) as reader:
-        print("Columnes:")
-        fieldnames = list(reader.fieldnames) if reader.fieldnames else []
-        print(fieldnames)
-
-        print(f"Primeres {max_rows} files:")
-        for i, row in enumerate(reader):
-            print(row)
-            if i >= max_rows - 1:
-                break
-
-    print("-" * 60)
-'''
-
-write_text(utils_dir / "csv_utils.py", content)
-print("OK -> creat utils/csv_utils.py")</code></pre>
-            <div class="explanation">
-                <p>Creem els helpers CSV i els deixem llestos per reutilitzar als exercicis següents.</p>
-            </div>
-        </div>
-
-        <!-- EX 05 TEST PREVIEW CSV -->
-        <div id="ex05_test_preview_csv" class="exercise-block">
-            <div class="exercise-header">
-                <div class="header-row">
-                    <h3 class="exercise-title">ex05_test_preview_csv.py</h3>
-                    <a href="exercicis/00_bootstrap/ex05_test_preview_csv.py" download class="download-btn">📥 Descarregar Script</a>
-                </div>
-                <div class="exercise-meta">Objectiu: Testejar la previsualització CSV</div>
-            </div>
-            <pre><code class="language-python">import os
-import sys
-
-ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-if ROOT_DIR not in sys.path:
-    sys.path.append(ROOT_DIR)
-
-from utils.config import METEOCAT_INPUT, AEMET_INPUT
-from utils.csv_utils import preview_csv
-
-preview_csv(METEOCAT_INPUT, max_rows=5, title="Preview METEOCAT")
-preview_csv(AEMET_INPUT, max_rows=5, title="Preview AEMET")
-
-print("OK -> Previews mostrats.")</code></pre>
-            <div class="explanation">
-                <h4>🔍 Anàlisi Tècnica</h4>
-                <p><strong>Idea clau:</strong> abans de transformar res, mirem la forma del CSV (capçaleres i 5 files). Aquesta inspecció evita supòsits equivocats sobre noms de columnes o formats.</p>
-                <p><strong>Idea principal:</strong> abans de “netejar”, primer mirem el fitxer. Previsualitzar és com obrir el CSV i entendre quines columnes hi ha i com estan escrites.</p>
-                <p><strong>Per què no llegim tot?</strong> un CSV pot ser gran. Mostrar només 5 files és ràpid i suficient per detectar formats (dates, separadors, valors buits).</p>
-                <p>La funció <code>preview_csv</code> utilitza <code>csv.DictReader</code> per mostrar només les primeres línies, evitant carregar tot el fitxer a memòria. És essencial per a l'exploració ràpida.</p>
-            </div>
-        </div>
-
-        <!-- EX 06 UTILS PARSE UTILS -->
-        <div id="ex06_utils_parse_utils" class="exercise-block">
-            <div class="exercise-header">
-                <div class="header-row">
-                    <h3 class="exercise-title">ex06_utils_parse_utils.py</h3>
-                    <a href="exercicis/00_bootstrap/ex06_utils_parse_utils.py" download class="download-btn">📥 Descarregar Script</a>
-                </div>
-                <div class="exercise-meta">Objectiu: crear utils/parse_utils.py</div>
-            </div>
-            <pre><code class="language-python"># OBJECTIU:
-#   Crear el mòdul utils/parse_utils.py amb funcions de neteja.
-#
-# ENTRADA:
-#   Cap (crea el fitxer dins utils/)
-#
-# SORTIDA:
-#   utils/parse_utils.py amb funcions reutilitzables.
-#
-# QUÈ APRENEM:
-#   - Netejar números amb coma decimal.
-#   - Parsejar dates en formats diferents.
-#   - Validar dates construïdes.
-
-from pathlib import Path
-
-
-def get_project_root() -> Path:
-    """Detecta l'arrel del projecte (prioritza Project Home de QGIS)."""
-    try:
-        from qgis.core import QgsProject
-
-        project = QgsProject.instance()
-        home = project.homePath()
-        if home:
-            return Path(home)
-        project_file = project.fileName()
-        if project_file:
-            return Path(project_file).parent
-    except Exception:
-        pass
-
-    try:
-        return Path(__file__).resolve().parents[2]
-    except Exception:
-        return Path.cwd()
-
-
-def write_text(path: Path, content: str) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(content, encoding="utf-8")
-
-
-ROOT = get_project_root()
-utils_dir = ROOT / "utils"
-utils_dir.mkdir(parents=True, exist_ok=True)
-
-content = '''"""Funcions reutilitzables per netejar números i dates."""
-
-from datetime import datetime, date
-from typing import Optional
-
-
-def to_float(value) -> Optional[float]:
-    """Converteix a float de manera segura (accepta comes com a separador)."""
-    if value is None:
-        return None
-    if isinstance(value, (int, float)):
-        return float(value)
-    s = str(value).strip()
-    if s == "":
-        return None
-    s = s.replace(",", ".")
-    try:
-        return float(s)
-    except Exception:
-        return None
-
-
-def parse_date(value) -> Optional[date]:
-    """Parseja una data en formats DD/MM/YYYY, YYYY-MM-DD o DD-MM-YYYY."""
-    s = (value or "").strip()
-    if s == "":
-        return None
-    for fmt in ("%d/%m/%Y", "%Y-%m-%d", "%d-%m-%Y"):
-        try:
-            return datetime.strptime(s, fmt).date()
-        except Exception:
-            continue
-    return None
-
-
-def build_date(year, month, day) -> Optional[date]:
-    """Construeix una data a partir d'any, mes i dia amb validació."""
-    try:
-        y = int(str(year).strip())
-        m = int(str(month).strip())
-        d = int(str(day).strip())
-        return datetime(y, m, d).date()
-    except Exception:
-        return None
-'''
-
-write_text(utils_dir / "parse_utils.py", content)
-print("OK -> creat utils/parse_utils.py")</code></pre>
-            <div class="explanation">
-                <p>Creem les funcions de neteja de números i dates que s'utilitzaran a Meteocat i AEMET.</p>
-            </div>
-        </div>
-
-        <!-- EX 07 TEST PARSE UTILS -->
-        <div id="ex07_test_parse_utils" class="exercise-block">
-            <div class="exercise-header">
-                <div class="header-row">
-                    <h3 class="exercise-title">ex07_test_parse_utils.py</h3>
-                    <a href="exercicis/00_bootstrap/ex07_test_parse_utils.py" download class="download-btn">📥 Descarregar Script</a>
-                </div>
-                <div class="exercise-meta">Objectiu: Testejar funcions de neteja</div>
-            </div>
-            <pre><code class="language-python">import os
-import sys
-
-ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-if ROOT_DIR not in sys.path:
-    sys.path.append(ROOT_DIR)
-
-from utils.parse_utils import to_float, parse_date, build_date
-
-# Exemples de números
-print("to_float('3,5') ->", to_float("3,5"))
-print("to_float('') ->", to_float(""))
-print("to_float('abc') ->", to_float("abc"))
-
-# Exemples de dates
-print("parse_date('31/12/2024') ->", parse_date("31/12/2024"))
-print("parse_date('2024-12-31') ->", parse_date("2024-12-31"))
-print("parse_date('31-12-2024') ->", parse_date("31-12-2024"))
-
-# Exemples de build_date
-print("build_date(2024, 2, 29) ->", build_date(2024, 2, 29))
-print("build_date(2024, 2, 30) ->", build_date(2024, 2, 30))
-
-print("OK -> Funcions de parseig provades.")</code></pre>
-            <div class="explanation">
-                <h4>🔍 Anàlisi Tècnica</h4>
-                <p><strong>Per què fem proves abans?</strong> Perquè una funció com <code class="inline">to_float</code> o <code class="inline">parse_date</code> és la base de tots els passos següents. Si aquí funciona amb exemples, després podem processar CSV grans amb confiança.</p>
-                <p><strong>Imports:</strong> aquí importem funcions pròpies del projecte. És una manera d’evitar repetir el mateix codi a cada exercici.</p>
-                <p>Abans de processar milers de línies, verifiquem que la funció <code>to_float</code> gestioni bé la coma decimal (estàndard europeu) i que <code>parse_date</code> entengui els diferents formats d'entrada.</p>
-            </div>
-        </div>
-
-        <!-- EX 08 UTILS QGIS UTILS -->
-        <div id="ex08_utils_qgis_utils" class="exercise-block">
-            <div class="exercise-header">
-                <div class="header-row">
-                    <h3 class="exercise-title">ex08_utils_qgis_utils.py</h3>
-                    <a href="exercicis/00_bootstrap/ex08_utils_qgis_utils.py" download class="download-btn">📥 Descarregar Script</a>
-                </div>
-                <div class="exercise-meta">Objectiu: crear utils/qgis_utils.py</div>
-            </div>
-            <pre><code class="language-python"># OBJECTIU:
-#   Crear el mòdul utils/qgis_utils.py amb helpers PyQGIS.
-#
-# ENTRADA:
-#   Cap (crea el fitxer dins utils/)
-#
-# SORTIDA:
-#   utils/qgis_utils.py amb funcions de CRS/Processing.
-#
-# QUÈ APRENEM:
-#   - Encapsular transformacions CRS.
-#   - Envoltar Processing amb wrappers simples.
-#   - Exportar capes a GeoPackage.
-
-from pathlib import Path
-
-
-def get_project_root() -> Path:
-    """Detecta l'arrel del projecte (prioritza Project Home de QGIS)."""
-    try:
-        from qgis.core import QgsProject
-
-        project = QgsProject.instance()
-        home = project.homePath()
-        if home:
-            return Path(home)
-        project_file = project.fileName()
-        if project_file:
-            return Path(project_file).parent
-    except Exception:
-        pass
-
-    try:
-        return Path(__file__).resolve().parents[2]
-    except Exception:
-        return Path.cwd()
-
-
-def write_text(path: Path, content: str) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(content, encoding="utf-8")
-
-
-ROOT = get_project_root()
-utils_dir = ROOT / "utils"
-utils_dir.mkdir(parents=True, exist_ok=True)
-
-content = '''"""Funcions reutilitzables per treballar amb PyQGIS (CRS i transformacions)."""
-
-from pathlib import Path
-
-from utils.csv_utils import ensure_dir
-
-
-def _require_qgis():
-    try:
-        from qgis.core import (
-            QgsCoordinateReferenceSystem,
-            QgsCoordinateTransform,
-            QgsProject,
-            QgsPointXY,
-            QgsVectorFileWriter,
-        )
-        return (
-            QgsCoordinateReferenceSystem,
-            QgsCoordinateTransform,
-            QgsProject,
-            QgsPointXY,
-            QgsVectorFileWriter,
-        )
-    except Exception as exc:
-        raise RuntimeError("PyQGIS no està disponible. Executa aquest script dins QGIS.") from exc
-
-
-def get_utm31_to_wgs84_transformer():
-    """Retorna un QgsCoordinateTransform EPSG:25831 -> EPSG:4326."""
-    QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject, _, _ = _require_qgis()
-    crs_src = QgsCoordinateReferenceSystem("EPSG:25831")
-    crs_dst = QgsCoordinateReferenceSystem("EPSG:4326")
-    return QgsCoordinateTransform(crs_src, crs_dst, QgsProject.instance().transformContext())
-
-
-def transform_utm_to_lonlat(x, y, xform):
-    """Transforma coordenades UTM a lon/lat amb un QgsCoordinateTransform."""
-    _, _, _, QgsPointXY, _ = _require_qgis()
-    pt = QgsPointXY(x, y)
-    pt_ll = xform.transform(pt)
-    return pt_ll.x(), pt_ll.y()
-
-
-def _ensure_processing_initialized():
-    """Inicialitza Processing si cal i retorna el mòdul processing."""
-    try:
-        import processing
-        try:
-            from processing.core.Processing import Processing
-            Processing.initialize()
-        except Exception:
-            pass
-        return processing
-    except Exception as exc:
-        raise RuntimeError(f"Processing no està disponible: {exc}")
-
-
-def run_processing_algorithm(alg_id: str, params: dict) -> dict:
-    """Wrapper de processing.run amb inicialització segura."""
-    processing = _ensure_processing_initialized()
-    return processing.run(alg_id, params)
-
-
-def extract_by_expression(layer, expression: str):
-    """Retorna una capa filtrada en memòria (native:extractbyexpression)."""
-    result = run_processing_algorithm(
-        "native:extractbyexpression",
-        {"INPUT": layer, "EXPRESSION": expression, "OUTPUT": "memory:"},
-    )
-    return result["OUTPUT"]
-
-
-def export_layer_to_gpkg(layer, gpkg_path: str, layer_name: str) -> None:
-    """Exporta una capa a GeoPackage amb overwrite de la capa si existeix."""
-    _, _, QgsProject, _, QgsVectorFileWriter = _require_qgis()
-    ensure_dir(gpkg_path)
-
-    options = QgsVectorFileWriter.SaveVectorOptions()
-    options.driverName = "GPKG"
-    options.layerName = layer_name
-    options.fileEncoding = "UTF-8"
-    options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteLayer
-
-    if hasattr(QgsVectorFileWriter, "writeAsVectorFormatV2"):
-        QgsVectorFileWriter.writeAsVectorFormatV2(
-            layer,
-            gpkg_path,
-            QgsProject.instance().transformContext(),
-            options,
-        )
-    else:
-        QgsVectorFileWriter.writeAsVectorFormat(
-            layer,
-            gpkg_path,
-            options.fileEncoding,
-            layer.crs(),
-            options.driverName,
-        )
-
-
-def as_file_uri(path: Path) -> str:
-    """Retorna un file:/// URI compatible amb QGIS (Windows inclòs)."""
-    return path.resolve().as_uri()
-'''
-
-write_text(utils_dir / "qgis_utils.py", content)
-print("OK -> creat utils/qgis_utils.py")</code></pre>
-            <div class="explanation">
-                <p>Creem els helpers PyQGIS que utilitzarem per transformacions CRS i exportacions.</p>
-            </div>
-        </div>
-
-        <!-- EX 09 TEST QGIS TRANSFORM -->
-        <div id="ex09_test_qgis_transform" class="exercise-block">
-            <div class="exercise-header">
-                <div class="header-row">
-                    <h3 class="exercise-title">ex09_test_qgis_transform.py</h3>
-                    <a href="exercicis/00_bootstrap/ex09_test_qgis_transform.py" download class="download-btn">📥 Descarregar Script</a>
-                </div>
-                <div class="exercise-meta">Objectiu: Testejar transformacions CRS</div>
-            </div>
-            <pre><code class="language-python">import os
-import sys
-
-ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-if ROOT_DIR not in sys.path:
-    sys.path.append(ROOT_DIR)
-
-from utils.qgis_utils import get_utm31_to_wgs84_transformer, transform_utm_to_lonlat
-
-# Coordenades d'exemple (UTM 31N)
-x_utm = 228471
-y_utm = 421015
-
-# Creem el transformador
-xform = get_utm31_to_wgs84_transformer()
-
-# Transformem el punt
-lon, lat = transform_utm_to_lonlat(x_utm, y_utm, xform)
-
-print("UTM:", x_utm, y_utm)
-print("WGS84:", lon, lat)
-print("OK -> Transformació feta.")</code></pre>
-            <div class="explanation">
-                <h4>🔍 Anàlisi Tècnica</h4>
-                <p><strong>Què comprovem exactament?</strong> Que el transformador CRS (UTM31 → WGS84) està ben configurat i retorna una lon/lat plausible. És un test petit per detectar problemes d’entorn abans de transformar milers de punts.</p>
-                <p>Aquí verifiquem que les utilitats basades en <strong>PyQGIS</strong> funcionin correctament per passar d’EPSG:25831 (UTM, metres) a EPSG:4326 (WGS84, graus). Si aquest test falla, la resta d’exercicis espacials també fallaran.</p>
-            </div>
-        </div>
-
-        <!-- EX 10 UTILS PROCESSING UTILS -->
-        <div id="ex10_utils_processing_utils" class="exercise-block">
-            <div class="exercise-header">
-                <div class="header-row">
-                    <h3 class="exercise-title">ex10_utils_processing_utils.py</h3>
-                    <a href="exercicis/00_bootstrap/ex10_utils_processing_utils.py" download class="download-btn">📥 Descarregar Script</a>
-                </div>
-                <div class="exercise-meta">Objectiu: crear utils/processing_utils.py</div>
-            </div>
-            <pre><code class="language-python"># OBJECTIU:
-#   Crear el mòdul utils/processing_utils.py amb helpers de Processing.
-#
-# ENTRADA:
-#   Cap (crea el fitxer dins utils/)
-#
-# SORTIDA:
-#   utils/processing_utils.py amb funcions reutilitzables.
-#
-# QUÈ APRENEM:
-#   - Envoltar Processing en funcions simples.
-#   - Afegir camps i actualitzar valors en capes.
-#   - Reutilitzar helpers en exercicis de risc.
-
-from pathlib import Path
-
-
-def get_project_root() -> Path:
-    """Detecta l'arrel del projecte (prioritza Project Home de QGIS)."""
-    try:
-        from qgis.core import QgsProject
-
-        project = QgsProject.instance()
-        home = project.homePath()
-        if home:
-            return Path(home)
-        project_file = project.fileName()
-        if project_file:
-            return Path(project_file).parent
-    except Exception:
-        pass
-
-    try:
-        return Path(__file__).resolve().parents[2]
-    except Exception:
-        return Path.cwd()
-
-
-def write_text(path: Path, content: str) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(content, encoding="utf-8")
-
-
-ROOT = get_project_root()
-utils_dir = ROOT / "utils"
-utils_dir.mkdir(parents=True, exist_ok=True)
-
-content = '''"""Utilitats per a QGIS Processing i operacions comunes de capes."""
-
-from __future__ import annotations
-
-from typing import Callable
-
-from utils.csv_utils import ensure_dir
-
-
-def _require_qgis():
-    try:
-        from qgis.core import QgsVectorFileWriter, QgsProject, QgsField
-        return QgsVectorFileWriter, QgsProject, QgsField
-    except Exception as exc:
-        raise RuntimeError("PyQGIS no està disponible. Executa aquest script dins QGIS.") from exc
-
-
-def _ensure_processing_initialized():
-    """Inicialitza Processing si cal i retorna el mòdul processing."""
-    try:
-        import processing
-        try:
-            from processing.core.Processing import Processing
-            Processing.initialize()
-        except Exception:
-            pass
-        return processing
-    except Exception as exc:
-        raise RuntimeError(f"Processing no està disponible: {exc}")
-
-
-def run_processing_algorithm(algo_id: str, params: dict) -> dict:
-    """Executa un algoritme de Processing i retorna el dict de resultats."""
-    processing = _ensure_processing_initialized()
-    return processing.run(algo_id, params)
-
-
-def run_processing(algo_id: str, params: dict) -> dict:
-    """Alias didàctic per a processing.run."""
-    return run_processing_algorithm(algo_id, params)
-
-
-def extract_by_expression(layer, expression: str):
-    """Filtra una capa amb una expressió i retorna una capa en memòria."""
-    result = run_processing_algorithm(
-        "native:extractbyexpression",
-        {"INPUT": layer, "EXPRESSION": expression, "OUTPUT": "memory:"},
-    )
-    return result["OUTPUT"]
-
-
-def _write_vector_layer(layer, out_path: str, layer_name: str):
-    QgsVectorFileWriter, QgsProject, _ = _require_qgis()
-    ensure_dir(out_path)
-    options = QgsVectorFileWriter.SaveVectorOptions()
-    options.driverName = "GPKG"
-    options.layerName = layer_name
-    options.fileEncoding = "UTF-8"
-    options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteLayer
-    if hasattr(QgsVectorFileWriter, "writeAsVectorFormatV2"):
-        return QgsVectorFileWriter.writeAsVectorFormatV2(
-            layer,
-            out_path,
-            QgsProject.instance().transformContext(),
-            options,
-        )
-    return QgsVectorFileWriter.writeAsVectorFormat(
-        layer,
-        out_path,
-        options.fileEncoding,
-        layer.crs(),
-        options.driverName,
-    )
-
-
-def export_layer_to_gpkg(layer, gpkg_path: str, layer_name: str) -> None:
-    """Exporta una capa a GeoPackage (sobreescriu la capa si existeix)."""
-    _write_vector_layer(layer, gpkg_path, layer_name)
-
-
-def add_field_if_missing(layer, field_name: str, qvariant_type, default_value=None) -> None:
-    """Afegeix un camp si no existeix i assigna un valor per defecte."""
-    _, _, QgsField = _require_qgis()
-    if layer.fields().indexFromName(field_name) != -1:
-        return
-
-    was_editing = layer.isEditable()
-    if not was_editing:
-        layer.startEditing()
-
-    layer.dataProvider().addAttributes([QgsField(field_name, qvariant_type)])
-    layer.updateFields()
-
-    idx = layer.fields().indexFromName(field_name)
-    if idx != -1:
-        for feat in layer.getFeatures():
-            layer.changeAttributeValue(feat.id(), idx, default_value)
-
-    if not was_editing:
-        layer.commitChanges()
-
-
-def update_field_values(layer, field_name: str, compute_func: Callable) -> None:
-    """Actualitza un camp amb una funció compute_func(feature)."""
-    idx = layer.fields().indexFromName(field_name)
-    if idx == -1:
-        return
-
-    was_editing = layer.isEditable()
-    if not was_editing:
-        layer.startEditing()
-
-    for feat in layer.getFeatures():
-        layer.changeAttributeValue(feat.id(), idx, compute_func(feat))
-
-    if not was_editing:
-        layer.commitChanges()
-
-
-def add_or_update_field(layer, field_name: str, qvariant_type, default_value=None) -> None:
-    """Afegeix un camp si no existeix; si existeix, actualitza valor per defecte."""
-    add_field_if_missing(layer, field_name, qvariant_type, default_value)
-
-
-def update_features_expression(layer, field_name: str, expression_string: str, only_selected: bool = False) -> None:
-    """Actualitza un camp usant una expressió QGIS (Processing)."""
-    params = {
-        "INPUT": layer,
-        "FIELD_NAME": field_name,
-        "FIELD_TYPE": 0,
-        "FIELD_LENGTH": 0,
-        "FIELD_PRECISION": 0,
-        "NEW_FIELD": False,
-        "FORMULA": expression_string,
-        "OUTPUT": "memory:",
-    }
-    if only_selected:
-        params["ONLY_SELECTED"] = True
-    result = run_processing_algorithm("native:fieldcalculator", params)
-    return result.get("OUTPUT")
-
-
-def open_attribute_table(layer) -> None:
-    """Obre la taula d'atributs si hi ha GUI; si no, imprimeix un missatge."""
-    try:
-        from qgis.utils import iface
-
-        if iface is None:
-            raise RuntimeError("No hi ha iface")
-        iface.showAttributeTable(layer)
-    except Exception:
-        print("AVÍS -> No es pot obrir la taula d'atributs (iface no disponible).")
-'''
-
-write_text(utils_dir / "processing_utils.py", content)
-print("OK -> creat utils/processing_utils.py")</code></pre>
-            <div class="explanation">
-                <p>Creem els helpers de Processing per al bloc de risc i exportacions.</p>
-            </div>
-        </div>
-
-        <!-- EX 11 TEST PROCESSING UTILS -->
-        <div id="ex11_test_processing_utils" class="exercise-block">
-            <div class="exercise-header">
-                <div class="header-row">
-                    <h3 class="exercise-title">ex11_test_processing_utils.py</h3>
-                    <a href="exercicis/00_bootstrap/ex11_test_processing_utils.py" download class="download-btn">📥 Descarregar Script</a>
-                </div>
-                <div class="exercise-meta">Objectiu: Importar processing_utils</div>
-            </div>
-            <pre><code class="language-python">import os
-import sys
-
-ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-if ROOT_DIR not in sys.path:
-    sys.path.append(ROOT_DIR)
-
-import utils.processing_utils as pu
-
-print("OK -> processing_utils importat.")
-print("Funcions disponibles:", [name for name in dir(pu) if name.endswith("_utils") is False and name.startswith("_") is False])</code></pre>
-            <div class="explanation">
-                <p>Test d'importació del mòdul de Processing (sense executar cap algorisme).</p>
-            </div>
-        </div>
-
-        <!-- EX 12 UTILS GUI UTILS -->
-        <div id="ex12_utils_gui_utils" class="exercise-block">
-            <div class="exercise-header">
-                <div class="header-row">
-                    <h3 class="exercise-title">ex12_utils_gui_utils.py</h3>
-                    <a href="exercicis/00_bootstrap/ex12_utils_gui_utils.py" download class="download-btn">📥 Descarregar Script</a>
-                </div>
-                <div class="exercise-meta">Objectiu: crear utils/gui_utils.py</div>
-            </div>
-            <pre><code class="language-python"># OBJECTIU:
-#   Crear el mòdul utils/gui_utils.py amb helpers de GUI de QGIS.
-#
-# ENTRADA:
-#   Cap (crea el fitxer dins utils/)
-#
-# SORTIDA:
-#   utils/gui_utils.py amb funcions reutilitzables.
-#
-# QUÈ APRENEM:
-#   - Operar capes des de la GUI (iface).
-#   - Afegir capes a grups i exportar seleccions.
-#   - Guardar projectes QGIS des de Python.
-
-from pathlib import Path
-
-
-def get_project_root() -> Path:
-    """Detecta l'arrel del projecte (prioritza Project Home de QGIS)."""
-    try:
-        from qgis.core import QgsProject
-
-        project = QgsProject.instance()
-        home = project.homePath()
-        if home:
-            return Path(home)
-        project_file = project.fileName()
-        if project_file:
-            return Path(project_file).parent
-    except Exception:
-        pass
-
-    try:
-        return Path(__file__).resolve().parents[2]
-    except Exception:
-        return Path.cwd()
-
-
-def write_text(path: Path, content: str) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(content, encoding="utf-8")
-
-
-ROOT = get_project_root()
-utils_dir = ROOT / "utils"
-utils_dir.mkdir(parents=True, exist_ok=True)
-
-content = '''"""Utilitats per a operacions típiques de la GUI de QGIS via Python."""
-
-import os
-from typing import Optional
-
-from utils.csv_utils import ensure_dir
-
-
-GUI_REQUIRED_MESSAGE = "Aquest exercici necessita QGIS obert (iface)."
-
-
-def _require_iface():
-    try:
-        from qgis.utils import iface
-    except Exception as exc:
-        raise RuntimeError(GUI_REQUIRED_MESSAGE) from exc
-
-    if iface is None:
-        raise RuntimeError(GUI_REQUIRED_MESSAGE)
-
-    return iface
-
-
-def _require_qgis_core():
-    try:
-        from qgis.core import QgsVectorLayer, QgsProject, QgsLayerTreeGroup, QgsVectorFileWriter
-        return QgsVectorLayer, QgsProject, QgsLayerTreeGroup, QgsVectorFileWriter
-    except Exception as exc:
-        raise RuntimeError("PyQGIS no està disponible. Executa aquest script dins QGIS.") from exc
-
-
-def load_project_from_template(template_path: Optional[str]) -> bool:
-    _require_iface()
-    _, QgsProject, _, _ = _require_qgis_core()
-    project = QgsProject.instance()
-    if template_path and os.path.exists(template_path):
-        return project.read(template_path)
-    project.clear()
-    return True
-
-
-def create_or_get_group(group_name: str):
-    _require_iface()
-    _, QgsProject, _, _ = _require_qgis_core()
-    root = QgsProject.instance().layerTreeRoot()
-    group = root.findGroup(group_name)
-    if group is None:
-        group = root.addGroup(group_name)
-    return group
-
-
-def add_layer_to_group(layer, group_name: str, add_to_legend: bool = True) -> None:
-    _require_iface()
-    _, QgsProject, _, _ = _require_qgis_core()
-    if layer is None:
-        return
-    project = QgsProject.instance()
-    project.addMapLayer(layer, False)
-    if add_to_legend:
-        group = create_or_get_group(group_name)
-        group.addLayer(layer)
-
-
-def save_project_if_needed(out_path: str) -> bool:
-    _require_iface()
-    _, QgsProject, _, _ = _require_qgis_core()
-    project = QgsProject.instance()
-    if project.fileName():
-        return True
-    ensure_dir(out_path)
-    return project.write(out_path)
-
-
-def load_vector_layer_gpkg(
-    gpkg_path: str,
-    layer_name: str,
-    name_in_legend: Optional[str] = None,
-    **kwargs,
-):
-    _require_iface()
-    QgsVectorLayer, _, _, _ = _require_qgis_core()
-    if not os.path.exists(gpkg_path):
-        return None
-    if name_in_legend is None and "name" in kwargs:
-        name_in_legend = kwargs.get("name")
-    uri = f"{gpkg_path}|layername={layer_name}"
-    layer = QgsVectorLayer(uri, name_in_legend or layer_name, "ogr")
-    return layer if layer.isValid() else None
-
-
-def export_selected_to_gpkg(layer, out_gpkg: str, out_layer_name: str) -> bool:
-    _require_iface()
-    _, QgsProject, _, QgsVectorFileWriter = _require_qgis_core()
-    if layer is None:
-        return False
-    if layer.selectedFeatureCount() == 0:
-        print("AVÍS -> No hi ha selecció activa.")
-        return False
-    ensure_dir(out_gpkg)
-
-    options = QgsVectorFileWriter.SaveVectorOptions()
-    options.driverName = "GPKG"
-    options.layerName = out_layer_name
-    options.fileEncoding = "UTF-8"
-    options.onlySelectedFeatures = True
-    options.actionOnExistingFile = QgsVectorFileWriter.CreateOrOverwriteLayer
-
-    if hasattr(QgsVectorFileWriter, "writeAsVectorFormatV2"):
-        err = QgsVectorFileWriter.writeAsVectorFormatV2(
-            layer,
-            out_gpkg,
-            QgsProject.instance().transformContext(),
-            options,
-        )
-    else:
-        err = QgsVectorFileWriter.writeAsVectorFormat(
-            layer,
-            out_gpkg,
-            options.fileEncoding,
-            layer.crs(),
-            options.driverName,
-            onlySelected=True,
-        )
-
-    return err == QgsVectorFileWriter.NoError
-
-
-def export_selected_to_csv(layer, out_csv: str) -> bool:
-    _require_iface()
-    _, QgsProject, _, QgsVectorFileWriter = _require_qgis_core()
-    if layer is None:
-        return False
-    if layer.selectedFeatureCount() == 0:
-        print("AVÍS -> No hi ha selecció activa.")
-        return False
-    ensure_dir(out_csv)
-
-    options = QgsVectorFileWriter.SaveVectorOptions()
-    options.driverName = "CSV"
-    options.fileEncoding = "UTF-8"
-    options.onlySelectedFeatures = True
-
-    if hasattr(QgsVectorFileWriter, "writeAsVectorFormatV2"):
-        err = QgsVectorFileWriter.writeAsVectorFormatV2(
-            layer,
-            out_csv,
-            QgsProject.instance().transformContext(),
-            options,
-        )
-    else:
-        err = QgsVectorFileWriter.writeAsVectorFormat(
-            layer,
-            out_csv,
-            options.fileEncoding,
-            layer.crs(),
-            options.driverName,
-            onlySelected=True,
-        )
-
-    return err == QgsVectorFileWriter.NoError
-'''
-
-write_text(utils_dir / "gui_utils.py", content)
-print("OK -> creat utils/gui_utils.py")</code></pre>
-            <div class="explanation">
-                <p>Creem els helpers de GUI de QGIS per a exercicis d'interfície.</p>
-            </div>
-        </div>
-
-        <!-- EX 13 TEST GUI UTILS -->
-        <div id="ex13_test_gui_utils" class="exercise-block">
-            <div class="exercise-header">
-                <div class="header-row">
-                    <h3 class="exercise-title">ex13_test_gui_utils.py</h3>
-                    <a href="exercicis/00_bootstrap/ex13_test_gui_utils.py" download class="download-btn">📥 Descarregar Script</a>
-                </div>
-                <div class="exercise-meta">Objectiu: Importar gui_utils</div>
-            </div>
-            <pre><code class="language-python">import os
-import sys
-
-ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-if ROOT_DIR not in sys.path:
-    sys.path.append(ROOT_DIR)
-
-import utils.gui_utils as gu
-
-print("OK -> gui_utils importat.")
-print("Missatge GUI:", gu.GUI_REQUIRED_MESSAGE)</code></pre>
-            <div class="explanation">
-                <p>Test d'importació del mòdul de GUI (sense executar funcions que requereixin iface).</p>
-            </div>
-        </div>
+            <div id="block00-include" data-include="block00.html"></div>
 
         <section id="bloc01_meteocat_intro" class="exercise-block">
             <div class="exercise-header">
@@ -2034,7 +119,7 @@ print("Missatge GUI:", gu.GUI_REQUIRED_MESSAGE)</code></pre>
             <div class="explanation">
                 <p>En aquest bloc transformarem el CSV de Meteocat en un format net i consistent: seleccionarem columnes, netejarem números, filtrarem coordenades i normalitzarem dates.</p>
                 <p>Aquest procés ens dona un fitxer final estàndard que després podrem combinar amb AEMET.</p>
-                <p><strong>Prerequisits:</strong> Bloc 00 completat (config i utils creats) i CSV Meteocat a <strong>dades/entrada/</strong>.</p>
+                <p><strong>Prerequisits:</strong> Bloc 00 completat (config i tools creats) i CSV Meteocat a <strong>dades/entrada/</strong>.</p>
                 <p><strong>Resultat esperat:</strong> fitxer <strong>meteocat_std.csv</strong> a <strong>resultats/</strong> i missatges “OK” a la consola.</p>
             </div>
         </section>
@@ -2055,8 +140,8 @@ ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
 if ROOT_DIR not in sys.path:
     sys.path.append(ROOT_DIR)
 
-from utils.config import METEOCAT_INPUT
-from utils.csv_utils import preview_csv
+from tools.config import METEOCAT_INPUT
+from tools.csv_utils import preview_csv
 
 preview_csv(METEOCAT_INPUT, max_rows=5, title="Preview del CSV METEOCAT")
 print("OK -> Mostrades capçaleres i 5 files del CSV.")</code></pre>
@@ -2085,8 +170,8 @@ ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
 if ROOT_DIR not in sys.path:
     sys.path.append(ROOT_DIR)
 
-from utils.config import METEOCAT_INPUT, PAS1_OUT, RESULTATS_DIR
-from utils.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
+from tools.config import METEOCAT_INPUT, PAS1_OUT, RESULTATS_DIR
+from tools.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
 
 ensure_dir(RESULTATS_DIR)
 columnes = ["EMA", "DATA", "X", "Y", "PPT"]
@@ -2127,9 +212,9 @@ ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
 if ROOT_DIR not in sys.path:
     sys.path.append(ROOT_DIR)
 
-from utils.config import PAS1_OUT, PAS2A_OUT, RESULTATS_DIR
-from utils.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
-from utils.parse_utils import to_float
+from tools.config import PAS1_OUT, PAS2A_OUT, RESULTATS_DIR
+from tools.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
+from tools.parse_utils import to_float
 
 columnes = ["EMA", "DATA", "X", "Y", "PPT"]
 files_llegides = 0
@@ -2183,8 +268,8 @@ ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
 if ROOT_DIR not in sys.path:
     sys.path.append(ROOT_DIR)
 
-from utils.config import PAS2A_OUT, PAS2B_OUT, RESULTATS_DIR
-from utils.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
+from tools.config import PAS2A_OUT, PAS2B_OUT, RESULTATS_DIR
+from tools.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
 
 columnes = ["EMA", "DATA", "X", "Y", "PPT"]
 files_llegides = 0
@@ -2235,9 +320,9 @@ ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
 if ROOT_DIR not in sys.path:
     sys.path.append(ROOT_DIR)
 
-from utils.config import PAS2B_OUT, PAS3_OUT, RESULTATS_DIR
-from utils.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
-from utils.parse_utils import parse_date
+from tools.config import PAS2B_OUT, PAS3_OUT, RESULTATS_DIR
+from tools.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
+from tools.parse_utils import parse_date
 
 columnes = ["EMA", "DATA", "X", "Y", "PPT"]
 files_llegides = 0
@@ -2289,9 +374,9 @@ ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
 if ROOT_DIR not in sys.path:
     sys.path.append(ROOT_DIR)
 
-from utils.config import PAS3_OUT, PAS4_OUT, RESULTATS_DIR
-from utils.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
-from utils.qgis_utils import get_utm31_to_wgs84_transformer, transform_utm_to_lonlat
+from tools.config import PAS3_OUT, PAS4_OUT, RESULTATS_DIR
+from tools.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
+from tools.qgis_utils import get_utm31_to_wgs84_transformer, transform_utm_to_lonlat
 
 columnes = ["EMA", "DATA", "X", "Y", "PPT", "lon", "lat"]
 xform = get_utm31_to_wgs84_transformer()
@@ -2352,8 +437,8 @@ ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
 if ROOT_DIR not in sys.path:
     sys.path.append(ROOT_DIR)
 
-from utils.config import PAS4_OUT, STD_OUT, STD_FIELDS, RESULTATS_DIR
-from utils.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
+from tools.config import PAS4_OUT, STD_OUT, STD_FIELDS, RESULTATS_DIR
+from tools.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
 
 files_llegides = 0
 files_escrites = 0
@@ -2433,8 +518,8 @@ ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
 if ROOT_DIR not in sys.path:
     sys.path.append(ROOT_DIR)
 
-from utils.config import AEMET_INPUT
-from utils.csv_utils import preview_csv
+from tools.config import AEMET_INPUT
+from tools.csv_utils import preview_csv
 
 preview_csv(AEMET_INPUT, max_rows=5, title="Preview AEMET")
 print("OK -> Previsualització AEMET feta.")</code></pre>
@@ -2462,8 +547,8 @@ ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
 if ROOT_DIR not in sys.path:
     sys.path.append(ROOT_DIR)
 
-from utils.config import AEMET_INPUT, AEMET_PAS1_OUT, RESULTATS_DIR
-from utils.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
+from tools.config import AEMET_INPUT, AEMET_PAS1_OUT, RESULTATS_DIR
+from tools.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
 
 columnes = [
     "INDICATIVO", "NOMBRE", "ALTITUD", "LONGITUD", "LATITUD",
@@ -2528,9 +613,9 @@ ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
 if ROOT_DIR not in sys.path:
     sys.path.append(ROOT_DIR)
 
-from utils.config import AEMET_PAS1_OUT, AEMET_PAS2_OUT, RESULTATS_DIR
-from utils.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
-from utils.parse_utils import build_date
+from tools.config import AEMET_PAS1_OUT, AEMET_PAS2_OUT, RESULTATS_DIR
+from tools.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
+from tools.parse_utils import build_date
 
 columnes = [
     "INDICATIVO", "NOMBRE", "ALTITUD", "LONGITUD", "LATITUD",
@@ -2582,9 +667,9 @@ ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
 if ROOT_DIR not in sys.path:
     sys.path.append(ROOT_DIR)
 
-from utils.config import AEMET_PAS2_OUT, AEMET_PAS3_OUT, RESULTATS_DIR
-from utils.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
-from utils.parse_utils import to_float
+from tools.config import AEMET_PAS2_OUT, AEMET_PAS3_OUT, RESULTATS_DIR
+from tools.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
+from tools.parse_utils import to_float
 
 columnes = [
     "INDICATIVO", "NOMBRE", "ALTITUD", "LONGITUD", "LATITUD",
@@ -2645,10 +730,10 @@ ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
 if ROOT_DIR not in sys.path:
     sys.path.append(ROOT_DIR)
 
-from utils.config import AEMET_PAS3_OUT, AEMET_PAS4_OUT, RESULTATS_DIR
-from utils.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
-from utils.parse_utils import to_float
-from utils.qgis_utils import get_utm31_to_wgs84_transformer, transform_utm_to_lonlat
+from tools.config import AEMET_PAS3_OUT, AEMET_PAS4_OUT, RESULTATS_DIR
+from tools.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
+from tools.parse_utils import to_float
+from tools.qgis_utils import get_utm31_to_wgs84_transformer, transform_utm_to_lonlat
 
 columnes = [
     "INDICATIVO", "NOMBRE", "ALTITUD",
@@ -2718,8 +803,8 @@ ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
 if ROOT_DIR not in sys.path:
     sys.path.append(ROOT_DIR)
 
-from utils.config import AEMET_PAS4_OUT, AEMET_STD_OUT, STD_FIELDS, RESULTATS_DIR
-from utils.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
+from tools.config import AEMET_PAS4_OUT, AEMET_STD_OUT, STD_FIELDS, RESULTATS_DIR
+from tools.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
 
 files_llegides = 0
 files_escrites = 0
@@ -2799,8 +884,8 @@ ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
 if ROOT_DIR not in sys.path:
     sys.path.append(ROOT_DIR)
 
-from utils.config import STD_OUT, AEMET_STD_OUT, MERGED_STD_OUT, STD_FIELDS, RESULTATS_DIR
-from utils.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
+from tools.config import STD_OUT, AEMET_STD_OUT, MERGED_STD_OUT, STD_FIELDS, RESULTATS_DIR
+from tools.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
 
 files_llegides = 0
 files_escrites = 0
@@ -2856,8 +941,8 @@ if ROOT_DIR not in sys.path:
     sys.path.append(ROOT_DIR)
 
 from qgis.core import QgsVectorLayer, QgsVectorFileWriter, QgsProject
-from utils.config import MERGED_STD_OUT, GPKG_OUT, GPKG_LAYER, RESULTATS_DIR
-from utils.csv_utils import ensure_dir
+from tools.config import MERGED_STD_OUT, GPKG_OUT, GPKG_LAYER, RESULTATS_DIR
+from tools.csv_utils import ensure_dir
 
 ensure_dir(RESULTATS_DIR)
 
@@ -2942,12 +1027,12 @@ if ROOT_DIR not in sys.path:
 from qgis.core import QgsVectorLayer, QgsProject
 
 # Importem configuració i utilitats
-from utils.config import (
+from tools.config import (
     MERGED_STD_OUT, GPKG_OUT, GPKG_LAYER, RESULTATS_DIR,
     RISC_GPKG_OUT, RISC_LAYER_ALERTA_20, RISC_LAYER_ALERTA_40, RISC_LAYER_ALERTA_80
 )
-from utils.csv_utils import ensure_dir
-from utils.qgis_utils import extract_by_expression, export_layer_to_gpkg
+from tools.csv_utils import ensure_dir
+from tools.qgis_utils import extract_by_expression, export_layer_to_gpkg
 
 # Assegurem la carpeta de resultats
 ensure_dir(RESULTATS_DIR)
@@ -3055,11 +1140,11 @@ from qgis.core import (
 from qgis.PyQt.QtCore import QVariant
 
 # Importem configuració i utilitats
-from utils.config import (
+from tools.config import (
     MERGED_STD_OUT, GPKG_OUT, GPKG_LAYER,
     RISC_GPKG_OUT, RISC_LAYER_ALERTA_20, RISC_LAYER_EPISODIS_20
 )
-from utils.qgis_utils import export_layer_to_gpkg
+from tools.qgis_utils import export_layer_to_gpkg
 
 # Intentem carregar la capa d'alerta 20mm
 uri_layer = f"{RISC_GPKG_OUT}|layername={RISC_LAYER_ALERTA_20}"
@@ -3189,9 +1274,9 @@ from qgis.core import QgsVectorLayer, QgsField, QgsFeature, QgsFields, QgsProjec
 from qgis.PyQt.QtCore import QVariant
 
 # Importem configuració i utilitats
-from utils.config import RISC_GPKG_OUT, RISC_LAYER_EPISODIS_20, RISC_LAYER_RESUM_20, RESULTATS_DIR
-from utils.csv_utils import ensure_dir
-from utils.qgis_utils import export_layer_to_gpkg
+from tools.config import RISC_GPKG_OUT, RISC_LAYER_EPISODIS_20, RISC_LAYER_RESUM_20, RESULTATS_DIR
+from tools.csv_utils import ensure_dir
+from tools.qgis_utils import export_layer_to_gpkg
 
 # Carreguem capa d'episodis
 uri = f"{RISC_GPKG_OUT}|layername={RISC_LAYER_EPISODIS_20}"
@@ -3334,11 +1419,11 @@ if ROOT_DIR not in sys.path:
 from qgis.core import QgsVectorLayer, QgsProject, QgsRasterLayer
 
 # Importem configuració i utilitats
-from utils.config import (
+from tools.config import (
     MERGED_STD_OUT, GPKG_OUT, GPKG_LAYER, RESULTATS_DIR,
     RISC_GPKG_OUT, RISC_LAYER_ALERTA_40, RISC_LAYER_HOTSPOTS_40, HEATMAP_OUT_TIF
 )
-from utils.qgis_utils import run_processing_algorithm, export_layer_to_gpkg
+from tools.qgis_utils import run_processing_algorithm, export_layer_to_gpkg
 
 # Carreguem capa d'alerta 40mm
 uri = f"{RISC_GPKG_OUT}|layername={RISC_LAYER_ALERTA_40}"
@@ -3465,13 +1550,13 @@ if ROOT_DIR not in sys.path:
 from qgis.core import QgsVectorLayer, QgsProject
 
 # Importem configuració i utilitats
-from utils.config import (
+from tools.config import (
     MERGED_STD_OUT, GPKG_OUT, GPKG_LAYER, RESULTATS_DIR,
     RISC_GPKG_OUT, HEATMAP_OUT_TIF,
     RISC_LAYER_POINTS, RISC_LAYER_ALERTA_20, RISC_LAYER_ALERTA_40, RISC_LAYER_ALERTA_80,
     RISC_LAYER_EPISODIS_20, RISC_LAYER_RESUM_20
 )
-from utils.qgis_utils import export_layer_to_gpkg
+from tools.qgis_utils import export_layer_to_gpkg
 
 print("Iniciant consolidació del GeoPackage de risc...")
 
@@ -3585,13 +1670,13 @@ if ROOT_DIR not in sys.path:
 
 from qgis.core import QgsProject, QgsRasterLayer  # Imports de QGIS
 
-from utils.config import (
+from tools.config import (
     RESULTATS_DIR, GPKG_OUT, GPKG_LAYER, RISC_GPKG_OUT, HEATMAP_OUT_TIF,
     RISC_LAYER_ALERTA_20, RISC_LAYER_ALERTA_40, RISC_LAYER_ALERTA_80,
     RISC_LAYER_EPISODIS_20, RISC_LAYER_RESUM_20, QGZ_OUT
 )
-from utils.csv_utils import ensure_dir
-from utils.gui_utils import load_vector_layer_gpkg, add_layer_to_group, save_project_if_needed
+from tools.csv_utils import ensure_dir
+from tools.gui_utils import load_vector_layer_gpkg, add_layer_to_group, save_project_if_needed
 
 # Assegurem la carpeta de resultats
 ensure_dir(RESULTATS_DIR)
@@ -3687,12 +1772,12 @@ from qgis.core import (
 )
 from qgis.PyQt.QtGui import QColor
 
-from utils.config import (
+from tools.config import (
     RESULTATS_DIR, STYLES_DIR, GPKG_OUT, GPKG_LAYER,
     RISC_GPKG_OUT, RISC_LAYER_ALERTA_20, RISC_LAYER_ALERTA_40, RISC_LAYER_ALERTA_80
 )
-from utils.csv_utils import ensure_dir
-from utils.gui_utils import load_vector_layer_gpkg, add_layer_to_group
+from tools.csv_utils import ensure_dir
+from tools.gui_utils import load_vector_layer_gpkg, add_layer_to_group
 
 # Assegurem carpetes
 ensure_dir(RESULTATS_DIR)
@@ -3799,10 +1884,10 @@ if ROOT_DIR not in sys.path:
 from qgis.core import QgsVectorLayer, QgsField, QgsFeature, QgsFields
 from qgis.PyQt.QtCore import QVariant
 
-from utils.config import GPKG_OUT, GPKG_LAYER, RESULTATS_DIR, RISC_GPKG_OUT, RISC_LAYER_BASE_FLAGS
-from utils.csv_utils import ensure_dir
-from utils.processing_utils import export_layer_to_gpkg
-from utils.parse_utils import to_float
+from tools.config import GPKG_OUT, GPKG_LAYER, RESULTATS_DIR, RISC_GPKG_OUT, RISC_LAYER_BASE_FLAGS
+from tools.csv_utils import ensure_dir
+from tools.processing_utils import export_layer_to_gpkg
+from tools.parse_utils import to_float
 
 # Assegurem la carpeta de resultats
 ensure_dir(RESULTATS_DIR)
@@ -3889,12 +1974,12 @@ if ROOT_DIR not in sys.path:
 
 from qgis.core import QgsVectorLayer
 
-from utils.config import (
+from tools.config import (
     GPKG_OUT, GPKG_LAYER, RESULTATS_DIR, RISC_GPKG_OUT,
     RISC_LAYER_SELECCIO_AEMET_40, SELECCIO_AEMET_40_CSV
 )
-from utils.csv_utils import ensure_dir
-from utils.gui_utils import export_selected_to_gpkg, export_selected_to_csv
+from tools.csv_utils import ensure_dir
+from tools.gui_utils import export_selected_to_gpkg, export_selected_to_csv
 
 # Assegurem la carpeta de resultats
 ensure_dir(RESULTATS_DIR)
@@ -3963,9 +2048,9 @@ if ROOT_DIR not in sys.path:
 from qgis.core import QgsVectorLayer, QgsField, QgsFeature, QgsGeometry, QgsPointXY, QgsFields
 from qgis.PyQt.QtCore import QVariant
 
-from utils.config import GPKG_OUT, GPKG_LAYER, RESULTATS_DIR, RISC_GPKG_OUT, RISC_LAYER_ZONA_ESTUDI
-from utils.csv_utils import ensure_dir
-from utils.processing_utils import export_layer_to_gpkg
+from tools.config import GPKG_OUT, GPKG_LAYER, RESULTATS_DIR, RISC_GPKG_OUT, RISC_LAYER_ZONA_ESTUDI
+from tools.csv_utils import ensure_dir
+from tools.processing_utils import export_layer_to_gpkg
 
 # Assegurem la carpeta de resultats
 ensure_dir(RESULTATS_DIR)
@@ -4051,11 +2136,11 @@ if ROOT_DIR not in sys.path:
 
 from qgis.core import QgsVectorLayer, QgsProject
 
-from utils.config import (
+from tools.config import (
     RESULTATS_DIR, RISC_GPKG_OUT, RISC_LAYER_ALERTA_40, RISC_LAYER_BUFFER_ALERTA_40
 )
-from utils.csv_utils import ensure_dir
-from utils.processing_utils import run_processing_algorithm, export_layer_to_gpkg
+from tools.csv_utils import ensure_dir
+from tools.processing_utils import run_processing_algorithm, export_layer_to_gpkg
 
 # Assegurem la carpeta de resultats
 ensure_dir(RESULTATS_DIR)
@@ -4147,9 +2232,9 @@ if ROOT_DIR not in sys.path:
 
 from qgis.core import QgsVectorLayer
 
-from utils.config import GPKG_OUT, GPKG_LAYER, RESULTATS_DIR, VALIDATION_REPORT_OUT
-from utils.csv_utils import ensure_dir
-from utils.parse_utils import to_float
+from tools.config import GPKG_OUT, GPKG_LAYER, RESULTATS_DIR, VALIDATION_REPORT_OUT
+from tools.csv_utils import ensure_dir
+from tools.parse_utils import to_float
 
 # Assegurem la carpeta de resultats
 ensure_dir(RESULTATS_DIR)
@@ -4260,8 +2345,8 @@ from qgis.core import (
 )
 from qgis.PyQt.QtGui import QFont
 
-from utils.config import RESULTATS_DIR, RISC_GPKG_OUT, RISC_LAYER_ALERTA_40, LAYOUT_PDF_OUT
-from utils.csv_utils import ensure_dir
+from tools.config import RESULTATS_DIR, RISC_GPKG_OUT, RISC_LAYER_ALERTA_40, LAYOUT_PDF_OUT
+from tools.csv_utils import ensure_dir
 
 # Assegurem la carpeta de resultats
 ensure_dir(RESULTATS_DIR)
@@ -4342,6 +2427,22 @@ else:
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
     
         <script>
+            async function loadIncludes() {
+                const targets = Array.from(document.querySelectorAll('[data-include]'));
+                await Promise.all(targets.map(async (el) => {
+                    const url = el.getAttribute('data-include');
+                    if (!url) return;
+                    try {
+                        const res = await fetch(url);
+                        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                        el.innerHTML = await res.text();
+                    } catch (err) {
+                        el.innerHTML = `<div class="exercise-block"><div class="explanation"><strong>Error carregant ${url}</strong></div></div>`;
+                    }
+                }));
+            }
+
+            function initPage() {
             // ---------- Helpers ----------
             const content = document.querySelector('.content');
             const sidebar = document.querySelector('.sidebar');
@@ -4505,7 +2606,7 @@ else:
                         <p><strong>Objectiu:</strong> ${objective}</p>
                         <p><strong>Què aprenem:</strong> aplicar aquest pas del flux i comprovar que rutes, inputs i formats són consistents.</p>
                         <p><strong>Què hauries de veure:</strong> un missatge “OK -> …” a la consola o un fitxer/capa nova a <strong>resultats/</strong> o al projecte QGIS.</p>
-                        <p><strong>Si falla…</strong> revisa Project Home, existència d’inputs a <strong>dades/entrada/</strong> i imports de <strong>utils/</strong>.</p>
+                        <p><strong>Si falla…</strong> revisa Project Home, existència d’inputs a <strong>dades/entrada/</strong> i imports de <strong>tools/</strong>.</p>
                     `;
                     explanation.appendChild(summary);
                 });
@@ -4568,6 +2669,13 @@ else:
                     if (groupTitle) groupTitle.style.display = anyVisible ? '' : 'none';
                 });
             });
+
+            if (window.Prism && typeof window.Prism.highlightAll === 'function') {
+                window.Prism.highlightAll();
+            }
+            }
+
+            loadIncludes().then(initPage);
         </script>
 </body>
 </html>

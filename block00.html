@@ -1,0 +1,740 @@
+            <section id="bloc00_bootstrap_intro" class="exercise-block">
+                <div class="exercise-header">
+                    <h3 class="exercise-title">Bloc 0 — Posada en marxa + Python mínim</h3>
+                    <div class="exercise-meta">Introducció del bloc</div>
+                </div>
+                <div class="explanation">
+                    <p>Abans de tocar dades, muntem un entorn mínim i entenem com QGIS gestiona rutes, projectes i scripts.</p>
+                    Aquest bloc evita el “bootstrap sense context”. En programació, “bootstrap” vol dir fer la posada en marxa inicial d’un projecte (preparar l’entorn bàsic perquè tot funcioni).</p>
+                    <p>Tot s’explica des de la interfície de QGIS: panell Navegador, Consola Python i Editor. L’objectiu és que l’alumne pugui arrencar sense dependre de terminals externs.</p>
+                    <p><strong>Resultat esperat:</strong> estructura de carpetes llesta, concepte de <em>Project Home</em> clar i un primer contacte real amb dades (preview de 5 files).</p>
+                    <p><strong>Jerarquia:</strong> primer veuràs les <em>subseccions 0.1–0.5</em> (guia pas a pas), i just després de cada subsecció trobaràs els <em>exercicis (scripts)</em> associats.</p>
+                </div>
+            </section>
+
+            <div class="block-group" data-block="00">
+
+            <section id="bloc00_01_preparacion_qgis" class="exercise-block subsection">
+                <div class="exercise-header">
+                    <h3 class="exercise-title">0.1 Preparació a QGIS</h3>
+                    <div class="exercise-meta">Subsecció del Bloc 0 · Estructura i projecte</div>
+                </div>
+                <div class="explanation">
+                    <h4>Objectiu</h4>
+                    <p>Crear l’estructura base del projecte des de QGIS i deixar a punt el <em>Project Home</em> per treballar amb rutes relatives.</p>
+                    <h4>Què aprendràs</h4>
+                    <ul>
+                        <li>Fer servir el panell Navegador per crear carpetes del projecte.</li>
+                        <li>Desar el projecte a l’arrel i entendre el <em>Project Home Path</em>.</li>
+                    </ul>
+                    <h4>Passos a QGIS</h4>
+                    <ol>
+                        <li>Obre el panell Navegador. Fes click amb botó dret per crear la carpeta arrel del curs.</li>
+                        <li>A dins de l'arrel de la carpeta del curs crea les carpetes: <strong>dades/entrada</strong>, <strong>resultats</strong>, <strong>tools</strong>, <strong>exercicis</strong>.</li>
+                        <li>Desa el projecte (<strong>.qgz</strong>).</li>
+                    </ol>
+                    <h4>Com obrir la Consola Python i l’Editor</h4>
+                    <ol>
+                        <li>Ves a <strong>Plugins → Python Console</strong>.</li>
+                        <li>A la consola, clica la icona d’<strong>Editor</strong> (llapis).</li>
+                        <li>S’obrirà l’editor integrat per crear o obrir scripts.</li>
+                    </ol>
+                    <h4>Com crear i desar un script</h4>
+                    <ol>
+                        <li>Des de l’Editor, crea un fitxer nou.</li>
+                        <li>Desa’l dins <strong>exercicis/00_bootstrap/</strong>.</li>
+                        <li>Executa’l amb el botó <em>Run script</em> (▶).</li>
+                    </ol>
+                    <p>Prova ràpida (Hola món): executa el petit script següent.</p>
+                    
+            <div id="ex00_01_hola_mon" class="exercise-block script-block">
+                <div class="exercise-header">
+                    <div class="header-row">
+                        <h3 class="exercise-title">ex00_01_hola_mon.py</h3>
+                        <a href="exercicis/00_bootstrap/ex00_01_hola_mon.py" download class="download-btn">📥 Descarregar Script</a>
+                    </div>
+                    <div class="exercise-meta">Exercici (script) del Bloc 0 · Primer “Hola món”</div>
+                </div>
+                <pre><code class="language-python">"""Exercici 0.1 — Hola món (script mínim)."""
+
+print("Hola món!")</code></pre>
+                <div class="explanation">
+                    <p>Desa aquest fitxer a <strong>exercicis/00_bootstrap/</strong> i executa’l des de l’Editor de QGIS.</p>
+                </div>
+            </div>
+
+                    <h4>Com comprovar el Project Home (mini codi)</h4>
+                    <p>A continuació expliquem com comprovar que el <em>Project Home</em> apunta a aquesta arrel.</p>
+                    <p>Obre la <strong>Consola Python</strong> i enganxa aquest codi. Et dirà quin és el <em>homePath</em> actual del projecte:</p>
+                    <pre><code class="language-python"># Mostra la carpeta "home" del projecte QGIS
+from qgis.core import QgsProject
+
+home = QgsProject.instance().homePath()
+print("Project Home:", home)</code></pre>
+                    <p>Si no coincideix amb l’arrel del curs, torna a desar el projecte al lloc correcte.</p>
+                    <h4>Què comprovar</h4>
+                    <ul>
+                        <li>Les carpetes apareixen al Navegador.</li>
+                        <li>El projecte està desat al root del curs.</li>
+                        <li>El <em>Project Home</em> mostra aquesta arrel.</li>
+                    </ul>
+                    <h4>Errors típics</h4>
+                    <ul>
+                        <li>Desar el projecte en una altra carpeta i trencar rutes relatives.</li>
+                        <li>Crear carpetes fora del Project Home.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <section id="bloc00_02_python_basico" class="exercise-block subsection">
+                <div class="exercise-header">
+                    <h3 class="exercise-title">0.2 Python bàsic a QGIS </h3>
+                    <div class="exercise-meta">Subsecció del Bloc 0 · Fonaments mínims</div>
+                </div>
+                <div class="explanation">
+                    <h4>Objectiu</h4>
+                    <p>Recordar l’imprescindible de Python per seguir els scripts del curs dins de QGIS.</p>
+                    <h4>Què aprendràs</h4>
+                    <ul>
+                        <li>Variables i tipatge dinàmic.</li>
+                        <li>Llistes, diccionaris i tuples.</li>
+                        <li>Funció vs mètode.</li>
+                        <li>Condicionals i bucles (el mínim).</li>
+                    </ul>
+                    <h4>Passos a QGIS</h4>
+                    <ol>
+                        <li>Obre la Consola Python i l’Editor integrat.</li>
+                        <li>Executa un script des de l’Editor per confirmar que saps llançar codi.</li>
+                    </ol>
+                    <h4>Què comprovar</h4>
+                    <ul>
+                        <li>Veus missatges a la consola en executar un script.</li>
+                        <li>Et sents còmode llegint estructures bàsiques.</li>
+                    </ul>
+                    <h4>Errors típics</h4>
+                    <ul>
+                        <li>Confondre una funció amb un mètode (p. ex., <code class="inline">len()</code> vs <code class="inline">llista.append()</code>).</li>
+                        <li>Usar comes decimals a Python (s’usen punts).</li>
+                    </ul>
+                </div>
+                <div id="ex00_02_python_basics_qgis" class="exercise-block script-block">
+                <div class="exercise-header">
+                    <div class="header-row">
+                        <h3 class="exercise-title">ex00_02_python_basics_qgis.py</h3>
+                        <a href="exercicis/00_bootstrap/ex00_02_python_basics_qgis.py" download class="download-btn">📥 Descarregar Script</a>
+                    </div>
+                    <div class="exercise-meta">Exercici (script) del Bloc 0 · Practicar fonaments bàsics</div>
+                </div>
+                <pre><code class="language-python">"""Exercici 0.2 — Python bàsic a QGIS (ràpid i didàctic).
+
+Objectiu:
+- Veure exemples curts de tipatge dinàmic, llistes/dict/tuple i funció vs mètode.
+- Executar codi dins el Script Editor de QGIS.
+"""
+
+# --- Tipatge dinàmic (una variable pot canviar de tipus) ---
+valor = 10
+print("OK -> valor (int):", valor)
+
+valor = 3.5
+print("OK -> valor (float):", valor)
+
+valor = "hola"
+print("OK -> valor (str):", valor)
+
+# --- Estructures bàsiques ---
+llista = ["Olot", "Girona", "Barcelona"]
+diccionari = {"estacio": "EMA 0250", "pluja_mm": 12.4}
+tupla = (2024, 10, 3)
+
+print("OK -> llista:", llista)
+print("OK -> diccionari:", diccionari)
+print("OK -> tupla:", tupla)
+
+# Funció vs mètode
+# - Una funció és una cosa que crides amb parèntesis: len(llista)
+# - Un mètode és una funció lligada a un objecte: llista.append("...")
+print("OK -> len(llista):", len(llista))
+llista.append("Tarragona")
+print("OK -> llista després d'append:", llista)
+
+# --- Funcions simples ---
+
+def suma(a, b):
+    """Suma dos valors i retorna el resultat."""
+    return a + b
+
+
+def missatge_benvinguda(nom):
+    """Retorna un missatge simpàtic per a l'usuari."""
+    return f"Benvingut/da, {nom}!"
+
+
+def es_valid(x):
+    """Comprova si un valor és numèric i positiu."""
+    try:
+        return float(x) >= 0
+    except Exception:
+        return False
+
+
+print("OK -> suma(2, 3):", suma(2, 3))
+print("OK -> missatge:", missatge_benvinguda("Anna"))
+print("OK -> es_valid(5):", es_valid(5))
+print("OK -> es_valid('text'):", es_valid("text"))
+
+print("OK -> Exercici 0.2 completat.")</code></pre>
+                <div class="explanation">
+                    <p>Executa aquest script per practicar conceptes bàsics de Python sense tocar fitxers ni rutes.</p>
+                </div>
+            </div>
+
+            </section>
+
+            <section id="bloc00_03_tools_modulos" class="exercise-block subsection">
+                <div class="exercise-header">
+                    <h3 class="exercise-title">0.3 Funcions + mòduls: per què existeix tools</h3>
+                    <div class="exercise-meta">Subsecció del Bloc 0 · Reutilització mínimament viable</div>
+                </div>
+                <div class="explanation">
+                    <h4>Objectiu</h4>
+                    <p>Entendre què és un mòdul i per què centralitzem funcions reutilitzables a <strong>tools</strong>.</p>
+                    <h4>Què aprendràs</h4>
+                    <ul>
+                        <li>Què significa “importar el teu propi mòdul”.</li>
+                        <li>Per què <strong>__init__.py</strong> converteix una carpeta en un paquet de Python.</li>
+                        <li>Per què evitem copiar i enganxar codi a cada script.</li>
+                    </ul>
+                                        <h4>Com funciona l’estructura d’un projecte Python</h4>
+                                        <p>Python organitza el codi en <strong>mòduls</strong> (fitxers .py) i <strong>paquets</strong> (carpetes amb <strong>__init__.py</strong>).</p>
+                                        <ul>
+                                                <li><strong>Mòdul</strong> = un fitxer .py. Es pot importar amb <code class="inline">import nom_modul</code>.</li>
+                                                <li><strong>Paquet</strong> = carpeta amb <strong>__init__.py</strong>. Permet <code class="inline">from paquet import modul</code>.</li>
+                                                <li><strong>__init__.py</strong> pot estar buit: només indica “aquí hi ha un paquet”.</li>
+                                                <li><strong>__main__.py</strong> s’executa si llances el paquet amb <code class="inline">python -m paquet</code> (no cal per aquest curs, però és útil saber-ho).</li>
+                                                <li><strong>if __name__ == "__main__"</strong> defineix el punt d’entrada quan executes un fitxer directament.</li>
+                                        </ul>
+                                        <h4>Exemple d’estructura del curs</h4>
+                                        <pre><code class="language-none">arrel_del_curs/
+    dades/
+        entrada/
+    resultats/
+    tools/
+        __init__.py
+        config.py
+        csv_utils.py
+    exercicis/
+        00_bootstrap/
+            ex00_03_utils_modules.py</code></pre>
+                                        <p><strong>Idea clau:</strong> els scripts d’<strong>exercicis</strong> importen utilitats de <strong>tools</strong>. Això evita repetir codi i manté el projecte ordenat.</p>
+                                        <h4>Imports típics (què passa per sota)</h4>
+                                        <ul>
+                                                <li><code class="inline">from tools import config</code> busca la carpeta <strong>tools</strong> a l’arrel del projecte.</li>
+                                                <li>Si el <em>Project Home</em> és correcte, QGIS sap on és l’arrel i els imports funcionen.</li>
+                                                <li>Si falta <strong>__init__.py</strong>, Python no tracta <strong>tools</strong> com a paquet i l’import falla.</li>
+                                        </ul>
+                    <h4>Passos a QGIS</h4>
+                    <ol>
+                        <li>Al panell Navegador, crea <strong>tools/__init__.py</strong>.</li>
+                        <li>Entén que <strong>tools</strong> és un paquet local del projecte.</li>
+                    </ol>
+                    <h4>Què comprovar</h4>
+                    <ul>
+                        <li>El fitxer <strong>__init__.py</strong> apareix a la carpeta <strong>tools</strong>.</li>
+                        <li>Si falta, els imports com <code class="inline">from tools import config</code> fallaran.</li>
+                    </ul>
+                    <h4>Errors típics</h4>
+                    <ul>
+                        <li>Crear el fitxer fora de la carpeta <strong>tools</strong>.</li>
+                        <li>Escriure’l amb un altre nom (ha de ser exactament <strong>__init__.py</strong>).</li>
+                    </ul>
+                </div>
+                            <div id="ex00_03_utils_modules" class="exercise-block script-block">
+                <div class="exercise-header">
+                    <div class="header-row">
+                        <h3 class="exercise-title">ex00_03_utils_modules.py</h3>
+                        <a href="exercicis/00_bootstrap/ex00_03_utils_modules.py" download class="download-btn">📥 Descarregar Script</a>
+                    </div>
+                    <div class="exercise-meta">Exercici (script) del Bloc 0 · Imports i paquet tools</div>
+                </div>
+                <pre><code class="language-python">"""Exercici 0.3 — Funcions + mòduls: per què existeix tools.
+
+Objectiu:
+- Entendre què és un mòdul i per què el reutilitzem.
+- Comprovar que tools/__init__.py existeix.
+- Intentar importar tools.config i donar instruccions clares si falla.
+"""
+
+from pathlib import Path
+
+# Intentem usar QGIS per trobar l'arrel del projecte (Project Home)
+try:
+    from qgis.core import QgsProject
+except Exception:
+    QgsProject = None
+
+
+def print_header(text):
+    print("=" * 60)
+    print(text)
+    print("=" * 60)
+
+
+print_header("EXERCICI 0.3 — tools i imports")
+
+# 1) Localitzem l'arrel del projecte.
+#    Si QGIS està obert, prioritzem Project Home.
+root = None
+if QgsProject is not None:
+    try:
+        home = QgsProject.instance().homePath()
+        if home:
+            root = Path(home)
+    except Exception:
+        root = None
+
+# Fallback suau: pujem des de la ubicació de l'script
+if root is None:
+    root = Path(__file__).resolve().parents[2]
+
+tools_dir = root / "tools"
+init_file = tools_dir / "__init__.py"
+
+print("Arrel del projecte:", root)
+print("Carpeta tools:", tools_dir)
+
+# 2) Comprovem que la carpeta tools existeix
+if not tools_dir.exists():
+    print("ERROR -> No existeix la carpeta tools")
+    print("SOLUCIÓ -> Crea-la des del panell Navegador de QGIS.")
+    raise SystemExit(1)
+
+# 3) Comprovem si existeix tools/__init__.py
+if not init_file.exists():
+    print("ERROR -> No s'ha trobat tools/__init__.py")
+    print("SOLUCIÓ -> Crea el fitxer des del panell Navegador de QGIS:")
+    print("  1) Clic dret a la carpeta tools")
+    print("  2) Nou fitxer")
+    print("  3) Nom del fitxer: __init__.py")
+    raise SystemExit(1)
+else:
+    print("OK -> tools/__init__.py existeix")
+
+
+
+print("OK -> Exercici 0.3 completat.")</code></pre>
+                <div class="explanation">
+                    <p>Aquest script no crea res automàticament i atura l’execució si falta la carpeta o <code class="inline">__init__.py</code>.</p>
+                </div>
+            </div>
+
+            </section>
+
+            <section id="bloc00_04_config_rutas" class="exercise-block subsection">
+                <div class="exercise-header">
+                    <h3 class="exercise-title">0.4 Rutes del projecte: config mínim viable</h3>
+                    <div class="exercise-meta">Subsecció del Bloc 0 · Rutes base, sense “monstres”</div>
+                </div>
+                <div class="explanation">
+                    <h4>Objectiu</h4>
+                    <p>Crear el concepte de <strong>config</strong> amb 3–4 rutes base per treballar sempre relatiu al projecte.</p>
+                    <h4>Què aprendràs</h4>
+                    <ul>
+                        <li>Centralitzar rutes per evitar valors absoluts.</li>
+                        <li>Reutilitzar rutes entre scripts.</li>
+                    </ul>
+                    <h4>Passos a QGIS</h4>
+                    <ol>
+                        <li>Crea el fitxer <strong>tools/config.py</strong> des del panell Navegador.</li>
+                        <li>Defineix només rutes base: <code class="inline">ROOT_DIR</code>, <code class="inline">DADES_DIR</code>, <code class="inline">ENTRADA_DIR</code>, <code class="inline">RESULTATS_DIR</code>.</li>
+                    </ol>
+                    <h4>Contingut mínim de <code class="inline">tools/config.py</code></h4>
+                    <p>Copia el codi del bloc següent. És curt, didàctic i no crea cap carpeta automàticament.</p>
+                    <h4>Què comprovar</h4>
+                    <ul>
+                        <li>El fitxer existeix i és a <strong>tools/</strong>.</li>
+                        <li>Entens per què evitem rutes absolutes.</li>
+                    </ul>
+                    <h4>Errors típics</h4>
+                    <ul>
+                        <li>Afegir rutes específiques d’exercicis avançats massa aviat.</li>
+                        <li>Usar rutes absolutes dependents de l’equip.</li>
+                    </ul>
+                </div>
+
+                <div id="ex00_04_config_minim" class="exercise-block script-block">
+                <div class="exercise-header">
+                    <div class="header-row">
+                        <h3 class="exercise-title">tools/config.py (mínim viable)</h3>
+                        <a href="tools/config.py" download class="download-btn">📥 Descarregar Script</a>
+                    </div>
+                    <div class="exercise-meta">Exercici (script) del Bloc 0 · Crear el config mínim</div>
+                </div>
+                <pre><code class="language-python">"""Configuració mínima del curs (rutes base)."""
+
+from pathlib import Path
+
+
+def _get_project_root() -> Path:
+    """Detecta l'arrel del projecte (prioritza QGIS Project Home)."""
+    try:
+        from qgis.core import QgsProject
+
+        project = QgsProject.instance()
+        home = project.homePath()
+        if home:
+            return Path(home)
+        project_file = project.fileName()
+        if project_file:
+            return Path(project_file).parent
+    except Exception:
+        pass
+
+    # Fallback: puja des de tools/ cap a l'arrel del projecte
+    try:
+        return Path(__file__).resolve().parents[1]
+    except Exception:
+        return Path.cwd()
+
+
+def as_posix(path: Path) -> str:
+    """Converteix un Path a string absolut amb forward slashes."""
+    return str(path.resolve().as_posix())
+
+
+_ROOT = _get_project_root()
+
+# Rutes base (mínim viable)
+ROOT_DIR = as_posix(_ROOT)
+DADES_DIR = as_posix(_ROOT / "dades")
+ENTRADA_DIR = as_posix(_ROOT / "dades" / "entrada")
+RESULTATS_DIR = as_posix(_ROOT / "resultats")</code></pre>
+                <div class="explanation">
+                    <p>Crea aquest fitxer dins <strong>tools/</strong> abans de continuar amb el test.</p>
+                </div>
+            </div>
+
+            <div id="ex00_04_test_config_paths" class="exercise-block script-block">
+                <div class="exercise-header">
+                    <div class="header-row">
+                        <h3 class="exercise-title">ex00_04_test_config_paths.py</h3>
+                        <a href="exercicis/00_bootstrap/ex00_04_test_config_paths.py" download class="download-btn">📥 Descarregar Script</a>
+                    </div>
+                    <div class="exercise-meta">Exercici (script) del Bloc 0 · Validar rutes base</div>
+                </div>
+                <pre><code class="language-python">"""Exercici 0.4 — Test de config mínim viable.
+
+Objectiu:
+- Importar tools.config.
+- Mostrar les 4 rutes base.
+- Avisar si falten carpetes (sense crear-les automàticament).
+"""
+
+from pathlib import Path
+
+try:
+    from tools import config
+except Exception as exc:
+    print("ERROR -> No s'ha pogut importar tools.config")
+    print("Causa probable:", exc)
+    print("SOLUCIÓ -> Verifica Project Home i l'estructura de carpetes.")
+    raise
+
+print("ROOT_DIR:", config.ROOT_DIR)
+print("DADES_DIR:", config.DADES_DIR)
+print("ENTRADA_DIR:", config.ENTRADA_DIR)
+print("RESULTATS_DIR:", config.RESULTATS_DIR)
+
+# Comprovem que les carpetes existeixen
+entrada = Path(config.ENTRADA_DIR)
+resultats = Path(config.RESULTATS_DIR)
+
+if not entrada.exists():
+    print("AVÍS -> No existeix dades/entrada")
+    print("SOLUCIÓ -> Crea la carpeta des del panell Navegador de QGIS.")
+
+if not resultats.exists():
+    print("AVÍS -> No existeix resultats")
+    print("SOLUCIÓ -> Crea la carpeta des del panell Navegador de QGIS.")
+
+print("OK -> Config mínim validat.")</code></pre>
+                <div class="explanation">
+                    <p>Aquest test només valida rutes; no crea cap carpeta automàticament.</p>
+                </div>
+            </div>
+
+            </section>
+
+            <section id="bloc00_045_tools_csv" class="exercise-block subsection">
+                <div class="exercise-header">
+                    <h3 class="exercise-title">0.4.5 Utilitats CSV mínimes (abans del preview)</h3>
+                    <div class="exercise-meta">Subsecció del Bloc 0 · Eines mínimes per llegir CSV</div>
+                </div>
+                <div class="explanation">
+                    <h4>Objectiu</h4>
+                    <p>Crear <strong>tools/csv_utils.py</strong> abans de fer el preview del fitxer d’entrada.</p>
+                    <h4>Què aprendràs</h4>
+                    <ul>
+                        <li>Com definir una funció reutilitzable per llegir CSV.</li>
+                        <li>Per què evitem dependències externes en aquest punt.</li>
+                    </ul>
+                    <h4>Passos a QGIS</h4>
+                    <ol>
+                        <li>Crea el fitxer <strong>tools/csv_utils.py</strong>.</li>
+                        <li>Copia el codi de l’exemple següent.</li>
+                    </ol>
+                    <h4>Què comprovar</h4>
+                    <ul>
+                        <li>El fitxer existeix dins <strong>tools/</strong>.</li>
+                        <li>La funció <code class="inline">preview_csv</code> està definida.</li>
+                    </ul>
+                </div>
+
+                <div id="ex00_045_csv_utils" class="exercise-block script-block">
+                <div class="exercise-header">
+                    <div class="header-row">
+                        <h3 class="exercise-title">tools/csv_utils.py (mínim viable)</h3>
+                        <a href="tools/csv_utils.py" download class="download-btn">📥 Descarregar Script</a>
+                    </div>
+                    <div class="exercise-meta">Exercici (script) del Bloc 0 · Crear utilitats CSV</div>
+                </div>
+                <pre><code class="language-python">"""Utilitats mínimes per previsualitzar CSV (sense dependències externes)."""
+
+import csv
+from pathlib import Path
+from typing import Optional, Union
+
+
+def _open_text_for_read(path: Union[str, Path], encoding: str):
+    """Obre un fitxer amb encoding i fa fallback a utf-8-sig si hi ha BOM."""
+    try:
+        return open(path, "r", encoding=encoding, newline="")
+    except UnicodeDecodeError:
+        if encoding.lower() != "utf-8-sig":
+            return open(path, "r", encoding="utf-8-sig", newline="")
+        raise
+
+
+def preview_csv(path: Union[str, Path], max_rows: int = 5, title: Optional[str] = "") -> None:
+    """Mostra columnes i les primeres files d'un CSV.
+
+    - No carrega tot el fitxer a memòria.
+    - Gestiona encoding amb fallback.
+    - Si el fitxer no existeix, mostra un missatge didàctic.
+    """
+    if title:
+        print(title)
+
+    p = Path(path)
+    if not p.exists():
+        print(f"AVÍS -> No existeix el fitxer: {p}")
+        print("SOLUCIÓ -> Copia el CSV a dades/entrada i torna-ho a provar.")
+        print("-" * 60)
+        return
+
+    with _open_text_for_read(p, encoding="utf-8") as f:
+        reader = csv.DictReader(f, delimiter=",")
+
+        print("Columnes:")
+        fieldnames = list(reader.fieldnames) if reader.fieldnames else []
+        print(fieldnames)
+
+        print(f"Primeres {max_rows} files:")
+        for i, row in enumerate(reader):
+            print(row)
+            if i >= max_rows - 1:
+                break
+
+    print("-" * 60)</code></pre>
+                <div class="explanation">
+                    <p>Un cop creat aquest fitxer, ja pots executar el preview del següent exercici.</p>
+                </div>
+            </div>
+
+            </section>
+
+
+            <section id="bloc00_05_preview_datos" class="exercise-block subsection">
+                <div class="exercise-header">
+                    <h3 class="exercise-title">0.5 Primer contacte amb dades: preview de 5 files</h3>
+                    <div class="exercise-meta">Subsecció del Bloc 0 · Entendre el problema abans d’automatitzar</div>
+                </div>
+                <div class="explanation">
+                    <h4>Objectiu</h4>
+                    <p>Visualitzar un exemple petit i realista per entendre per què cal estandarditzar dades de Meteocat i AEMET.</p>
+                    <h4>Què aprendràs</h4>
+                    <ul>
+                        <li>Detectar columnes i formats incompatibles entre fonts.</li>
+                        <li>Veure problemes típics de decimals i dates.</li>
+                    </ul>
+                    <h4>Exemple Meteocat (capçalera real)</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>EMA</th>
+                                <th>DATA</th>
+                                <th>X</th>
+                                <th>Y</th>
+                                <th>PPT</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>YB</td>
+                                <td>21/07/2016</td>
+                                <td>456316</td>
+                                <td>4670799</td>
+                                <td>0</td>
+                            </tr>
+                            <tr>
+                                <td>YB</td>
+                                <td>22/07/2016</td>
+                                <td>456316</td>
+                                <td>4670799</td>
+                                <td>5</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Altres columnes Meteocat:</strong> VVM10vec, VVM10, DVM10u, DVM10, VVX10, Data Extrem VVX10, DVVX10, Data Extrem DVVX10.</p>
+
+                    <h4>Exemple AEMET (capçalera real)</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>INDICATIVO</th>
+                                <th>AÑO</th>
+                                <th>MES</th>
+                                <th>NOMBRE</th>
+                                <th>ALTITUD</th>
+                                <th>LONGITUD</th>
+                                <th>LATITUD</th>
+                                <th>P1</th>
+                                <th>P2</th>
+                                <th>P3</th>
+                                <th>P4</th>
+                                <th>P5</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>0390D</td>
+                                <td>1992</td>
+                                <td>1</td>
+                                <td>OLOT (PARC NOU)</td>
+                                <td>440</td>
+                                <td>228471</td>
+                                <td>421015</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                            </tr>
+                            <tr>
+                                <td>0390D</td>
+                                <td>1992</td>
+                                <td>2</td>
+                                <td>OLOT (PARC NOU)</td>
+                                <td>440</td>
+                                <td>228471</td>
+                                <td>421015</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                                <td>0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <p><strong>Altres columnes AEMET:</strong> P6, P7, ..., P31 (precipitació per dia del mes).</p>
+
+                    <h4>Diferències clau (què ens obliga a netejar)</h4>
+                    <ul>
+                        <li><strong>Estructura temporal:</strong> Meteocat és diari (una fila per dia). AEMET és mensual i ve “ample” amb P1..P31.</li>
+                        <li><strong>Data:</strong> Meteocat té <strong>DATA</strong> com a data completa; AEMET separa <strong>AÑO</strong> i <strong>MES</strong> i reparteix els dies a columnes.</li>
+                        <li><strong>Precipitació:</strong> Meteocat usa <strong>PPT</strong>; AEMET reparteix valors a <strong>P1..P31</strong> (cal despivotar).</li>
+                        <li><strong>Coordenades:</strong> Meteocat fa servir <strong>X/Y</strong>, AEMET té <strong>LONGITUD/LATITUD</strong> (cal harmonitzar CRS i formats).</li>
+                    </ul>
+                    <h4>Passos a QGIS</h4>
+                    <ol>
+                        <li>Explora els CSV des del panell Navegador.</li>
+                        <li>Identifica columnes de data i precipitació.</li>
+                        <li>Observa diferències de formats entre fonts.</li>
+                    </ol>
+                    <h4>Què comprovar</h4>
+                    <ul>
+                        <li>Les dates no sempre estan en el mateix format.</li>
+                        <li>Els decimals poden usar coma o punt.</li>
+                        <li>Hi ha valors buits o nuls.</li>
+                    </ul>
+                    <h4>Errors típics</h4>
+                    <ul>
+                        <li>Suposar que totes les dates ja estan normalitzades.</li>
+                        <li>Tractar “7,8” com a text sense convertir a número.</li>
+                    </ul>
+                    <p><strong>Sobre els floats:</strong> la precipitació és un número real (mm). Si el separador és coma, cal convertir-lo abans de calcular mitjanes o totals.</p>
+                    <p><strong>Sobre les dates:</strong> pots trobar <code class="inline">YYYY-MM-DD</code>, <code class="inline">DD/MM/YYYY</code>, columnes separades o timestamps. Normalitzar dates és obligatori per ordenar sèries temporals.</p>
+                    <div class="hint">Més endavant executarem un “preview real” amb script, però aquí l’objectiu és entendre el problema abans d’automatitzar.</div>
+                </div>
+
+                <div id="ex00_05_preview_inputs" class="exercise-block script-block">
+                <div class="exercise-header">
+                    <div class="header-row">
+                        <h3 class="exercise-title">ex00_05_preview_inputs.py</h3>
+                        <a href="exercicis/00_bootstrap/ex00_05_preview_inputs.py" download class="download-btn">📥 Descarregar Script</a>
+                    </div>
+                    <div class="exercise-meta">Exercici (script) del Bloc 0 · Preview de 5 files</div>
+                </div>
+                <pre><code class="language-python">"""Exercici 0.5 — Preview de dades (5 files).
+
+Objectiu:
+- Mostrar capçaleres i 5 files de Meteocat i AEMET.
+- Avisar clarament si falta algun fitxer.
+"""
+
+from pathlib import Path
+
+from tools import config
+from tools.csv_utils import preview_csv
+
+meteocat = Path(config.ENTRADA_DIR) / "Precipitacio_Olot_METEOCAT.csv"
+aemet = Path(config.ENTRADA_DIR) / "Precipitacio_Olot_AEMET.csv"
+
+missing = []
+if not meteocat.exists():
+    missing.append(str(meteocat))
+if not aemet.exists():
+    missing.append(str(aemet))
+
+if missing:
+    print("AVÍS -> Falten fitxers d'entrada:")
+    for p in missing:
+        print("  -", p)
+    print("SOLUCIÓ -> Copia els CSV originals a dades/entrada i torna a provar.")
+
+preview_csv(meteocat, max_rows=5, title="Preview METEOCAT")
+preview_csv(aemet, max_rows=5, title="Preview AEMET")
+
+print("OK -> Preview completat.")</code></pre>
+                <div class="explanation">
+                    <p>Aquest és el primer contacte real amb els CSV: només mirem 5 files per entendre formats i problemes.</p>
+                </div>
+            </div>
+
+                <div class="explanation">
+                    <h4>Opció més visual: carregar el CSV a QGIS</h4>
+                    <p>Un <code class="inline">print()</code> és útil, però no sempre és còmode per explorar dades. Hi ha llibreries Python per millorar això, però no les veurem perquè QGIS ja porta eines visuals.</p>
+                    <h4>Passos a QGIS (manual)</h4>
+                    <ol>
+                        <li>Obre el panell <strong>Navegador</strong> i ves a <strong>dades/entrada</strong> o <strong>resultats</strong>.</li>
+                        <li>Arrossega el CSV al mapa (o doble clic).</li>
+                        <li>Quan aparegui el diàleg, comprova que el delimitador és coma i que detecta les capçaleres.</li>
+                        <li>Si hi ha X/Y o lon/lat, indica-les com a camps de coordenades i el CRS correcte.</li>
+                        <li>Obre la <strong>taula d’atributs</strong> per inspeccionar columnes i valors.</li>
+                    </ol>
+                    <p>Això et dona una visió molt més clara del CSV abans de continuar amb transformacions.</p>
+                </div>
+
+            </section>
+
+            </div>
