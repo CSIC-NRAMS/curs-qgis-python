@@ -13,8 +13,61 @@
 
         <div class="block-group" data-block="02">
 
+        <section id="bloc02_00b_config_aemet" class="exercise-block subsection">
+            <div class="exercise-header">
+                <h3 class="exercise-title">2.0b Completem <strong>tools/config.py</strong> per a l’AEMET</h3>
+                <div class="exercise-meta">Subsecció del Bloc 2 · Dependències explícites</div>
+            </div>
+            <div class="explanation">
+                <h4>Objectiu</h4>
+                <p>Assegurar que totes les constants de fitxers del Bloc 02 existeixen abans d’executar scripts.</p>
+                <h4>Què aprendràs</h4>
+                <ul>
+                    <li>On definir les rutes de sortida intermedies de l’AEMET.</li>
+                    <li>Com evitar errors d’importació per constants inexistents.</li>
+                </ul>
+                <div class="hint">
+                    <p><strong>Prerequisit del Bloc 00:</strong> configuració mínima de rutes.</p>
+                    <p>Revisa’l aquí: <a href="index.html#bloc00_04_config_rutas">Bloc 0 · 0.4 Rutes del projecte</a>.</p>
+                </div>
+                <h4>Passos a QGIS</h4>
+                <ol>
+                    <li>Obre <strong>Projecte → Propietats → General</strong> i comprova que el <em>Project Home</em> és l’arrel del curs.</li>
+                    <li>Obre <strong>tools/config.py</strong> des de l’Editor de QGIS.</li>
+                    <li>Comprova que hi ha constants per a l’AEMET: <code class="inline">AEMET_INPUT</code>, <code class="inline">AEMET_PAS1_OUT</code>, <code class="inline">AEMET_PAS2_OUT</code>, <code class="inline">AEMET_PAS3_OUT</code>, <code class="inline">AEMET_PAS4_OUT</code> i <code class="inline">AEMET_STD_OUT</code>.</li>
+                    <li>Si falta alguna, afegeix-la seguint el mateix patró que al Bloc 0 (rutes relatives al <em>Project Home</em>).</li>
+                    <li>Guarda el fitxer abans de continuar.</li>
+                </ol>
+                <h4>Codi a afegir a <strong>tools/config.py</strong></h4>
+                <p>Copia aquestes línies just després de les rutes base del Bloc 00:</p>
+                <pre><code class="language-python"># --- AEMET (Bloc 02) ---
+# Entrada (ja definida al Bloc 00, però la recordem aquí)
+AEMET_INPUT = as_posix(Path(ENTRADA_DIR) / "Precipitacio_Olot_AEMET.csv")
+
+# Sortides intermèdies
+AEMET_PAS1_OUT = as_posix(Path(RESULTATS_DIR) / "aemet_pas1_long.csv")
+AEMET_PAS2_OUT = as_posix(Path(RESULTATS_DIR) / "aemet_pas2_dates.csv")
+AEMET_PAS3_OUT = as_posix(Path(RESULTATS_DIR) / "aemet_pas3_precip.csv")
+AEMET_PAS4_OUT = as_posix(Path(RESULTATS_DIR) / "aemet_pas4_coords.csv")
+
+# Sortida final
+AEMET_STD_OUT = as_posix(Path(RESULTATS_DIR) / "aemet_std.csv")</code></pre>
+                <h4>Què comprovar</h4>
+                <ul>
+                    <li>Des de la Consola Python, <code class="inline">from tools.config import AEMET_INPUT</code> no dona error.</li>
+                    <li>El valor de <code class="inline">AEMET_INPUT</code> apunta a <strong>dades/entrada/</strong>.</li>
+                </ul>
+                <h4>Errors típics</h4>
+                <ul>
+                    <li>Escriure una ruta amb el nom del fitxer diferent del CSV real.</li>
+                    <li>Oblidar guardar <strong>config.py</strong> abans d’executar els scripts.</li>
+                    <li>Posar constants amb noms diferents dels imports del bloc.</li>
+                </ul>
+            </div>
+        </section>
+
         <!-- EX 01 PEEK AEMET -->
-        <div id="ex01_peek_aemet" class="exercise-block">
+        <section id="ex01_peek_aemet" class="exercise-block script-block">
             <div class="exercise-header">
                 <div class="header-row">
                     <h3 class="exercise-title">ex01_peek.py (AEMET)</h3>
@@ -40,10 +93,10 @@ print("OK -> Previsualització AEMET feta.")</code></pre>
                 <p><strong>Objectiu:</strong> entendre la forma del fitxer abans de transformar-lo a format “una fila = un dia”.</p>
                 <p>Inspecció del fitxer d'AEMET. Observem que té una estructura molt diferent: columnes P1, P2... P31 per als dies del mes (format ample).</p>
             </div>
-        </div>
+        </section>
 
         <!-- EX 02 DESPIVOT -->
-        <div id="ex02_despivot" class="exercise-block">
+        <section id="ex02_despivot" class="exercise-block script-block">
             <div class="exercise-header">
                 <div class="header-row">
                     <h3 class="exercise-title">ex02_despivot.py</h3>
@@ -74,6 +127,7 @@ with open_csv_reader(AEMET_INPUT) as lector, \
      open_csv_writer(AEMET_PAS1_OUT, fieldnames=columnes) as escriptor:
 
     p_cols = [c for c in lector.fieldnames if c.startswith("P") and c[1:].isdigit()]
+    print(f"Columnes P* detectades: {len(p_cols)} -> {p_cols}")
 
     for fila in lector:
         files_llegides += 1
@@ -98,6 +152,7 @@ with open_csv_reader(AEMET_INPUT) as lector, \
             escriptor.writerow(nova_fila)
             files_escrites += 1
 
+print(f"Dies generats (files escrites): {files_escrites}")
 preview_csv(AEMET_PAS1_OUT, max_rows=5, title="Preview aemet_pas1_long.csv")
 print(f"OK -> creat {AEMET_PAS1_OUT}")</code></pre>
             <div class="explanation">
@@ -106,10 +161,106 @@ print(f"OK -> creat {AEMET_PAS1_OUT}")</code></pre>
                 <p><strong>Per què és necessari?</strong> perquè el nostre estàndard final treballa amb una data per fila. Així podem ordenar i unir amb Meteocat.</p>
                 <p>Detectem dinàmicament les columnes P1...P31. Per a cada fila original (que representa un mes), generem múltiples files de sortida (una per a cada dia amb dades). Això es coneix com "despivotar" o "melt".</p>
             </div>
-        </div>
+        </section>
+
+        <section id="bloc02_02b_parse_utils" class="exercise-block subsection">
+            <div class="exercise-header">
+                <h3 class="exercise-title">2.2b Eina de parseig (actualitzada): <strong>tools/parse_utils.py</strong></h3>
+                <div class="exercise-meta">Subsecció del Bloc 2 · Dates segures</div>
+            </div>
+            <div class="explanation">
+                <h4>Objectiu</h4>
+                <p>Afegir la funció <code class="inline">build_date</code> per reconstruir dates d’AEMET a partir d’any/mes/dia.</p>
+                <h4>Què aprendràs</h4>
+                <ul>
+                    <li>Com validar dates impossibles (p. ex. 30/02).</li>
+                    <li>Per què és millor centralitzar el parseig en una única funció reutilitzable.</li>
+                </ul>
+                <h4>Per què aquesta funció?</h4>
+                <p>AEMET separa <code class="inline">AÑO</code>, <code class="inline">MES</code> i <code class="inline">DAY</code>. <code class="inline">build_date</code> els combina i retorna <code class="inline">None</code> si la data és invàlida. Això evita crear files amb dates impossibles.</p>
+                <h4>Passos a QGIS</h4>
+                <ol>
+                    <li>Obre <strong>tools/parse_utils.py</strong>.</li>
+                    <li>Si falta <code class="inline">build_date</code>, afegeix el codi següent (o substitueix el fitxer).</li>
+                    <li>Guarda els canvis abans d’executar el pas 2.3.</li>
+                </ol>
+                <h4>Què comprovar</h4>
+                <ul>
+                    <li>Pots importar sense errors: <code class="inline">from tools.parse_utils import build_date</code>.</li>
+                </ul>
+                <h4>Errors típics</h4>
+                <ul>
+                    <li>Oblidar guardar el fitxer abans d’executar l’script.</li>
+                    <li>Afegir la funció en un altre fitxer o carpeta.</li>
+                </ul>
+                <h4>Resultat esperat</h4>
+                <p>Una utilitat de parseig preparada per reconstruir dates AEMET de forma segura.</p>
+            </div>
+        </section>
+
+        <section id="bloc02_02b_parse_utils_script" class="exercise-block script-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">tools/parse_utils.py (actualitzat)</h3>
+                    <a href="tools/parse_utils.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Eina del Bloc 2 · Parseig de números i dates</div>
+            </div>
+            <pre><code class="language-python">"""tools/parse_utils.py — utilitats de parseig.
+
+Fa: convertir textos a float i dates.
+Inclou: parseig de data completa i construcció de dates a partir d'any/mes/dia.
+Llegeix: valors en memòria.
+Escriu: res.
+OK esperat: import correcte (sense errors).
+"""
+
+from datetime import datetime, date
+from typing import Optional
+
+
+def to_float(value) -> Optional[float]:
+    """Converteix a float de manera segura (accepta comes com a separador)."""
+    if value is None:
+        return None
+    if isinstance(value, (int, float)):
+        return float(value)
+    s = str(value).strip()
+    if s == "":
+        return None
+    s = s.replace(",", ".")
+    try:
+        return float(s)
+    except Exception:
+        return None
+
+
+def parse_date(value) -> Optional[date]:
+    """Parseja una data en formats DD/MM/YYYY, YYYY-MM-DD o DD-MM-YYYY."""
+    s = (value or "").strip()
+    if s == "":
+        return None
+    for fmt in ("%d/%m/%Y", "%Y-%m-%d", "%d-%m-%Y"):
+        try:
+            return datetime.strptime(s, fmt).date()
+        except Exception:
+            continue
+    return None
+
+
+def build_date(year, month, day) -> Optional[date]:
+    """Construeix una data segura a partir d'any/mes/dia separats."""
+    try:
+        y = int(str(year).strip())
+        m = int(str(month).strip())
+        d = int(str(day).strip())
+        return date(y, m, d)
+    except Exception:
+        return None</code></pre>
+        </section>
 
         <!-- EX 03 BUILD DATES AEMET -->
-        <div id="ex03_build_dates" class="exercise-block">
+        <section id="ex03_build_dates" class="exercise-block script-block">
             <div class="exercise-header">
                 <div class="header-row">
                     <h3 class="exercise-title">ex03_build_dates.py</h3>
@@ -160,10 +311,10 @@ print(f"OK -> creat {AEMET_PAS2_OUT}")</code></pre>
                 <p><strong>Control d’errors:</strong> alguns dies no existeixen (ex: 30 de febrer). En aquests casos descartem la fila per evitar dates impossibles.</p>
                 <p>Reconstruïm la data completa a partir de columnes separades (ANY, MES, DIA). La funció <code>build_date</code> gestiona dies invàlids (com 30 de febrer) retornant <code>None</code>.</p>
             </div>
-        </div>
+        </section>
 
         <!-- EX 04 PRECIP UNITS AEMET -->
-        <div id="ex04_precip_units" class="exercise-block">
+        <section id="ex04_precip_units" class="exercise-block script-block">
             <div class="exercise-header">
                 <div class="header-row">
                     <h3 class="exercise-title">ex04_precip_units.py</h3>
@@ -223,10 +374,10 @@ print(f"OK -> creat {AEMET_PAS3_OUT}")</code></pre>
                 <p><strong>Neteja:</strong> si apareixen valors negatius, normalment són codis (no dades reals). En aquest flux, els descartem.</p>
                 <p>AEMET proporciona dades en dècimes de mil·límetre (per estalviar espai i evitar decimals en formats antics). Dividim per 10.0 per obtenir mm reals.</p>
             </div>
-        </div>
+        </section>
 
         <!-- EX 05 TRANSFORM COORDS AEMET -->
-        <div id="ex05_transform_coords" class="exercise-block">
+        <section id="ex05_transform_coords" class="exercise-block script-block">
             <div class="exercise-header">
                 <div class="header-row">
                     <h3 class="exercise-title">ex05_transform_coords.py</h3>
@@ -296,10 +447,10 @@ print(f"OK -> creat {AEMET_PAS4_OUT}")</code></pre>
                 <p><strong>Nota didàctica:</strong> encara que una columna es digui “LONGITUD”, no sempre vol dir graus decimals. Sempre cal validar el format abans.</p>
                 <p>Encara que les columnes originals es diuen "LONGITUD" i "LATITUD", en realitat contenen coordenades UTM (metres). Les transformem a WGS84 real.</p>
             </div>
-        </div>
+        </section>
 
         <!-- EX 06 STANDARDIZE AEMET -->
-        <div id="ex06_standardize_aemet" class="exercise-block">
+        <section id="ex06_standardize_aemet" class="exercise-block script-block">
             <div class="exercise-header">
                 <div class="header-row">
                     <h3 class="exercise-title">ex06_standardize.py</h3>
@@ -364,6 +515,6 @@ print(f"OK -> creat {AEMET_STD_OUT}")</code></pre>
                 <p><strong>Estratègia:</strong> omplim <code class="inline">source</code> amb “AEMET” i fem el mapeig de camps al nostre model estàndard.</p>
                 <p>Adaptem l'esquema d'AEMET perquè sigui idèntic al de Meteocat, permetent la fusió posterior.</p>
             </div>
-        </div>
+        </section>
 
         </div>

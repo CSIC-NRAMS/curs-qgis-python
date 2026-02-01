@@ -349,7 +349,8 @@ print("OK -> Exercici 0.3 completat.")</code></pre>
                     <h4>Passos a QGIS</h4>
                     <ol>
                         <li>Crea el fitxer <strong>tools/config.py</strong> des del panell Navegador.</li>
-                        <li>Defineix només rutes base: <code class="inline">ROOT_DIR</code>, <code class="inline">DADES_DIR</code>, <code class="inline">ENTRADA_DIR</code>, <code class="inline">RESULTATS_DIR</code>.</li>
+                        <li>Defineix rutes base: <code class="inline">ROOT_DIR</code>, <code class="inline">DADES_DIR</code>, <code class="inline">ENTRADA_DIR</code>, <code class="inline">RESULTATS_DIR</code>.</li>
+                        <li>Afegeix les rutes d’entrada dels CSV: <code class="inline">METEOCAT_INPUT</code> i <code class="inline">AEMET_INPUT</code>.</li>
                     </ol>
                     <h4>Contingut mínim de <code class="inline">tools/config.py</code></h4>
                     <p>Copia el codi del bloc següent. És curt, didàctic i no crea cap carpeta automàticament.</p>
@@ -412,7 +413,11 @@ _ROOT = _get_project_root()
 ROOT_DIR = as_posix(_ROOT)
 DADES_DIR = as_posix(_ROOT / "dades")
 ENTRADA_DIR = as_posix(_ROOT / "dades" / "entrada")
-RESULTATS_DIR = as_posix(_ROOT / "resultats")</code></pre>
+RESULTATS_DIR = as_posix(_ROOT / "resultats")
+
+# Fitxers d'entrada (primer ús real de variables)
+METEOCAT_INPUT = as_posix(Path(ENTRADA_DIR) / "Precipitacio_Olot_METEOCAT.csv")
+AEMET_INPUT = as_posix(Path(ENTRADA_DIR) / "Precipitacio_Olot_AEMET.csv")</code></pre>
                 <div class="explanation">
                     <p>Crea aquest fitxer dins <strong>tools/</strong> abans de continuar amb el test.</p>
                 </div>
@@ -701,8 +706,8 @@ from pathlib import Path
 from tools import config
 from tools.csv_utils import preview_csv
 
-meteocat = Path(config.ENTRADA_DIR) / "Precipitacio_Olot_METEOCAT.csv"
-aemet = Path(config.ENTRADA_DIR) / "Precipitacio_Olot_AEMET.csv"
+meteocat = Path(config.METEOCAT_INPUT)
+aemet = Path(config.AEMET_INPUT)
 
 missing = []
 if not meteocat.exists():

@@ -326,6 +326,30 @@
                 header.appendChild(btn);
             });
 
+            const expandBlockForId = (targetId) => {
+                if (!targetId) return;
+                const target = document.getElementById(targetId);
+                if (!target) return;
+
+                const group = target.closest('.block-group');
+                if (!group) return;
+
+                if (!group.classList.contains('is-collapsed')) return;
+
+                const blockNum = group.dataset.block;
+                if (!blockNum) return;
+
+                group.classList.remove('is-collapsed');
+                const storageKey = `block-collapsed-${blockNum}`;
+                localStorage.setItem(storageKey, '0');
+
+                const intro = document.querySelector(`#bloc${blockNum}_intro .collapse-btn`);
+                if (intro) {
+                    intro.textContent = '▾ Plegar bloc';
+                    intro.setAttribute('aria-expanded', 'true');
+                }
+            };
+
             if (content) {
                 let current = '';
 
@@ -354,6 +378,7 @@
                 // Si hi ha hash al carregar, fem scroll al contenidor
                 if (location.hash && location.hash.startsWith('#')) {
                     const id = location.hash.slice(1);
+                    expandBlockForId(id);
                     setTimeout(() => scrollToId(id), 0);
                     setActive(id);
                 } else if (sections[0]) {
@@ -361,6 +386,12 @@
                     setActive(current);
                 }
             }
+
+            window.addEventListener('hashchange', () => {
+                const id = location.hash.replace('#', '');
+                if (!id) return;
+                expandBlockForId(id);
+            });
 
             // ---------- 4) Completar explicacions mínimes ----------
             const enhanceExplanations = () => {

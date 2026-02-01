@@ -4,25 +4,236 @@
                 <div class="exercise-meta">Introducció del bloc</div>
             </div>
             <div class="explanation">
-                <p>En aquest bloc transformarem el CSV de Meteocat en un format net i consistent: seleccionarem columnes, netejarem números, filtrarem coordenades i normalitzarem dates.</p>
-                <p>Aquest procés ens dona un fitxer final estàndard que després podrem combinar amb AEMET.</p>
-                <p><strong>Prerequisits:</strong> Bloc 00 completat (config i tools creats) i CSV Meteocat a <strong>dades/entrada/</strong>.</p>
+                <p>En aquest bloc convertirem el CSV de Meteocat en un fitxer net, coherent i reutilitzable. Ho farem pas a pas i sempre des de QGIS (Consola Python i Editor).</p>
+                <p><strong>Punt clau:</strong> treballem amb rutes relatives basades en el <em>Project Home</em>. Si el Project Home no és l’arrel del curs, els scripts no trobaran els fitxers.</p>
+                <p><strong>Prerequisits:</strong> Bloc 00 completat (carpetes, <strong>tools/</strong> i <strong>config.py</strong>) i CSV Meteocat a <strong>dades/entrada/</strong>.</p>
                 <p><strong>Resultat esperat:</strong> fitxer <strong>meteocat_std.csv</strong> a <strong>resultats/</strong> i missatges “OK” a la consola.</p>
             </div>
         </section>
 
         <div class="block-group" data-block="01">
 
-        <!-- EX 01 PEEK METEOCAT -->
-        <div id="ex01_peek" class="exercise-block">
+        <section id="bloc01_00_mapa" class="exercise-block subsection">
+            <div class="exercise-header">
+                <h3 class="exercise-title">1.0 Mapa del bloc (7 passos)</h3>
+                <div class="exercise-meta">Subsecció del Bloc 1 · Vista general</div>
+            </div>
+            <div class="explanation">
+                <h4>Objectiu</h4>
+                <p>Entendre el recorregut complet abans d’executar res.</p>
+                <h4>Què aprendràs</h4>
+                <ul>
+                    <li>Com cada pas prepara el següent.</li>
+                    <li>On es generen els fitxers intermedis.</li>
+                </ul>
+                <h4>Passos a QGIS</h4>
+                <ol>
+                    <li>Llegeix aquesta taula com un “mapa mental” del bloc.</li>
+                    <li>No executis res encara: és només orientació.</li>
+                </ol>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Pas</th>
+                            <th>Script</th>
+                            <th>Entrada</th>
+                            <th>Sortida</th>
+                            <th>Què validarem</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>ex01_peek.py</td>
+                            <td>dades/entrada/…</td>
+                            <td>—</td>
+                            <td>Columnes i format real</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>ex02_select_columns.py</td>
+                            <td>meteocat (brut)</td>
+                            <td>meteocat_pas1.csv</td>
+                            <td>Només columnes clau</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>ex03_clean_numbers.py</td>
+                            <td>meteocat_pas1.csv</td>
+                            <td>meteocat_pas2a.csv</td>
+                            <td>X/Y/PPT en float</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>ex04_filter_coords.py</td>
+                            <td>meteocat_pas2a.csv</td>
+                            <td>meteocat_pas2b.csv</td>
+                            <td>Sense coordenades buides</td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>ex05_normalize_dates.py</td>
+                            <td>meteocat_pas2b.csv</td>
+                            <td>meteocat_pas3.csv</td>
+                            <td>Dates ISO</td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td>ex06_transform_crs.py</td>
+                            <td>meteocat_pas3.csv</td>
+                            <td>meteocat_pas4.csv</td>
+                            <td>lon/lat correctes</td>
+                        </tr>
+                        <tr>
+                            <td>7</td>
+                            <td>ex07_standardize.py</td>
+                            <td>meteocat_pas4.csv</td>
+                            <td>meteocat_std.csv</td>
+                            <td>Esquema final</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p><strong>Nota:</strong> anirem ampliant <strong>config</strong> i les eines de <strong>tools/</strong> a mesura que calgui (no tot de cop).</p>
+                <h4>Què comprovar</h4>
+                <ul>
+                    <li>Té sentit l’ordre dels 7 passos.</li>
+                    <li>Veus clar quins fitxers es creen a cada pas.</li>
+                </ul>
+                <h4>Errors típics</h4>
+                <ul>
+                    <li>Saltar-se un pas i esperar que el següent funcioni.</li>
+                    <li>Perdre el fil de quin fitxer és l’últim.</li>
+                </ul>
+                <h4>Resultat esperat</h4>
+                <p>Una visió clara del flux: entrada → passos intermedis → fitxer final.</p>
+            </div>
+        </section>
+
+        <section id="bloc01_00b_config_meteocat" class="exercise-block subsection">
+            <div class="exercise-header">
+                <h3 class="exercise-title">1.0b Completem <strong>tools/config.py</strong> per al Meteocat</h3>
+                <div class="exercise-meta">Subsecció del Bloc 1 · Dependències explícites</div>
+            </div>
+            <div class="explanation">
+                <h4>Objectiu</h4>
+                <p>Assegurar que totes les constants de fitxers del Bloc 01 existeixen abans d’executar scripts.</p>
+                <h4>Què aprendràs</h4>
+                <ul>
+                    <li>On definir rutes d’entrada i sortida.</li>
+                    <li>Com evitar “màgia” amb rutes i constants.</li>
+                </ul>
+                <div class="hint">
+                    <p><strong>Prerequisit del Bloc 00:</strong> <strong>tools</strong> ha de ser un paquet Python amb <strong>__init__.py</strong>.</p>
+                    <p>Revisa’l aquí: <a href="index.html#bloc00_03_tools_modulos">Bloc 0 · 0.3 Funcions + mòduls</a>.</p>
+                </div>
+                <div class="hint">
+                    <p><strong>Prerequisit del Bloc 00:</strong> configuració mínima de rutes.</p>
+                    <p>Revisa’l aquí: <a href="index.html#bloc00_04_config_rutas">Bloc 0 · 0.4 Rutes del projecte</a>.</p>
+                </div>
+                <h4>Passos a QGIS</h4>
+                <ol>
+                    <li>Obre <strong>Projecte → Propietats → General</strong> i comprova que el <em>Project Home</em> és l’arrel del curs.</li>
+                    <li>Obre <strong>tools/config.py</strong> des de l’Editor de QGIS.</li>
+                    <li>Comprova que hi ha constants per a Meteocat: <code class="inline">METEOCAT_INPUT</code>, <code class="inline">PAS1_OUT</code>, <code class="inline">PAS2A_OUT</code>, <code class="inline">PAS2B_OUT</code>, <code class="inline">PAS3_OUT</code>, <code class="inline">PAS4_OUT</code>, <code class="inline">STD_OUT</code> i <code class="inline">STD_FIELDS</code>.</li>
+                    <li>Si falta alguna, afegeix-la seguint el mateix patró que al Bloc 0 (rutes relatives al <em>Project Home</em>).</li>
+                    <li>Guarda el fitxer abans de continuar.</li>
+                </ol>
+                <h4>Codi a afegir a <strong>tools/config.py</strong></h4>
+                <p>Copia aquestes línies just després de les rutes base del Bloc 00:</p>
+                <pre><code class="language-python"># --- Meteocat (Bloc 01) ---
+# Entrada (ja definida al Bloc 00, però la recordem aquí)
+METEOCAT_INPUT = as_posix(Path(ENTRADA_DIR) / "Precipitacio_Olot_METEOCAT.csv")
+
+# Sortides intermèdies
+PAS1_OUT = as_posix(Path(RESULTATS_DIR) / "meteocat_pas1.csv")
+PAS2A_OUT = as_posix(Path(RESULTATS_DIR) / "meteocat_pas2a.csv")
+PAS2B_OUT = as_posix(Path(RESULTATS_DIR) / "meteocat_pas2b.csv")
+PAS3_OUT = as_posix(Path(RESULTATS_DIR) / "meteocat_pas3.csv")
+PAS4_OUT = as_posix(Path(RESULTATS_DIR) / "meteocat_pas4.csv")
+
+# Sortida final i esquema
+STD_OUT = as_posix(Path(RESULTATS_DIR) / "meteocat_std.csv")
+STD_FIELDS = [
+    "source", "station_id", "station_name", "date",
+    "precip_mm", "lon", "lat", "x_utm", "y_utm", "alt_m"
+]</code></pre>
+                <h4>Què comprovar</h4>
+                <ul>
+                    <li>Des de la Consola Python, <code class="inline">from tools.config import METEOCAT_INPUT</code> no dona error.</li>
+                    <li>El valor de <code class="inline">METEOCAT_INPUT</code> apunta a <strong>dades/entrada/</strong>.</li>
+                </ul>
+                <h4>Errors típics</h4>
+                <ul>
+                    <li>Escriure la ruta amb barres invertides inconsistents o amb una carpeta equivocada.</li>
+                    <li>Oblidar guardar <strong>config.py</strong> abans d’executar els scripts.</li>
+                    <li>Duplicar constants amb noms diferents (ha de ser exactament el mateix nom).</li>
+                </ul>
+                <h4>Resultat esperat</h4>
+                <p>Les constants del Meteocat existeixen i els scripts poden importar-les sense errors.</p>
+                <p>Si aquesta part està ben feta, la resta del bloc funcionarà sense sorpreses.</p>
+            </div>
+        </section>
+
+        <section id="bloc01_01_preview" class="exercise-block subsection">
+            <div class="exercise-header">
+                <h3 class="exercise-title">1.1 Veure què hi ha dins del CSV (preview)</h3>
+                <div class="exercise-meta">Subsecció del Bloc 1 · Exploració inicial</div>
+            </div>
+            <div class="explanation">
+                <h4>Objectiu</h4>
+                <p>Mirar les columnes reals del CSV abans de fer cap transformació.</p>
+                <h4>Què aprendràs</h4>
+                <ul>
+                    <li>Identificar columnes clau: <code class="inline">EMA</code>, <code class="inline">DATA</code>, <code class="inline">X</code>, <code class="inline">Y</code>, <code class="inline">PPT</code>.</li>
+                    <li>Detectar possibles canvis de format o capçaleres inesperades.</li>
+                    <li>Veure si el CSV usa separador <code class="inline">,</code> o <code class="inline">;</code> i si hi ha codificació rara.</li>
+                </ul>
+                <div class="hint">
+                    <p><strong>Prerequisit del Bloc 00:</strong> <strong>tools/csv_utils.py</strong> és la utilitat que fa el preview.</p>
+                    <p>Revisa’l aquí: <a href="#bloc00_045_tools_csv">Bloc 0 · 0.45 CSV utils</a>.</p>
+                </div>
+                <div class="hint">
+                    <p><strong>Prerequisit del Bloc 00:</strong> les rutes de <strong>tools/config.py</strong>.</p>
+                    <p>Revisa’l aquí: <a href="#bloc00_04_config_rutas">Bloc 0 · 0.4 Rutes del projecte</a>.</p>
+                </div>
+                <h4>Passos a QGIS</h4>
+                <ol>
+                    <li>Obre l’Editor i carrega <strong>exercicis/01_meteocat/ex01_peek.py</strong>.</li>
+                    <li>Executa’l amb ▶ des de QGIS (no des de terminal).</li>
+                </ol>
+                <h4>Què comprovar</h4>
+                <ul>
+                    <li>Veus 5 files i les capçaleres a la consola.</li>
+                    <li>No hi ha cap error de rutes.</li>
+                </ul>
+                <h4>Errors típics</h4>
+                <ul>
+                    <li>El fitxer d’entrada no existeix (CSV no copiat a <strong>dades/entrada/</strong>).</li>
+                    <li>El <em>Project Home</em> no és l’arrel del curs (rutes relatives fallaran).</li>
+                    <li>Canvi de nom de capçaleres respecte el CSV esperat.</li>
+                </ul>
+                <h4>Resultat esperat</h4>
+                <p>Un primer preview net a la consola i cap error d’importació.</p>
+            </div>
+        </section>
+
+        <section id="ex01_peek" class="exercise-block script-block">
             <div class="exercise-header">
                 <div class="header-row">
                     <h3 class="exercise-title">ex01_peek.py (Meteocat)</h3>
                     <a href="exercicis/01_meteocat/ex01_peek.py" download class="download-btn">📥 Descarregar Script</a>
                 </div>
-                <div class="exercise-meta">Fase: Exploració</div>
+                <div class="exercise-meta">Exercici (script) del Bloc 1 · Exploració</div>
             </div>
-            <pre><code class="language-python">import os
+            <pre><code class="language-python">"""Ex01 — Preview del CSV Meteocat.
+
+Fa: mostra capçaleres i 5 files.
+Llegeix: METEOCAT_INPUT
+Escriu: res (només consola)
+OK esperat: missatge d'OK i preview a la consola.
+"""
+
+import os
 import sys
 
 ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -34,25 +245,186 @@ from tools.csv_utils import preview_csv
 
 preview_csv(METEOCAT_INPUT, max_rows=5, title="Preview del CSV METEOCAT")
 print("OK -> Mostrades capçaleres i 5 files del CSV.")</code></pre>
-            <div class="explanation">
-                <h4>🔍 Anàlisi Tècnica</h4>
-                <p><strong>Per què fem un “peek”?</strong> Per identificar les columnes clau (EMA, DATA, X, Y, PPT) i veure exemples reals de valors. És la manera més ràpida d’entendre un dataset nou.</p>
-                <p><strong>Objectiu d’aprenentatge:</strong> entendre què hi ha dins el CSV abans de tocar res. Identifiquem columnes com <code class="inline">EMA</code>, <code class="inline">DATA</code>, <code class="inline">X</code>, <code class="inline">Y</code> i <code class="inline">PPT</code>.</p>
-                <p><strong>Pas important:</strong> aquesta exploració evita errors típics com “la columna no existeix” o “la data té un format diferent del que pensàvem”.</p>
-                <p>Primer contacte amb les dades reals de Meteocat per identificar les columnes clau (X, Y, PPT, EMA).</p>
-            </div>
-        </div>
+        </section>
 
-        <!-- EX 02 SELECT COLUMNS -->
-        <div id="ex02_select_columns" class="exercise-block">
+        <section id="bloc01_01b_csv_utils" class="exercise-block subsection">
+            <div class="exercise-header">
+                <h3 class="exercise-title">1.1b Eines CSV ampliades (necessàries per als passos següents)</h3>
+                <div class="exercise-meta">Subsecció del Bloc 1 · Utilitats de lectura/escriptura</div>
+            </div>
+            <div class="explanation">
+                <h4>Objectiu</h4>
+                <p>Afegir funcions d’entrada/sortida de CSV i crear carpetes de sortida de manera segura.</p>
+                <h4>Què aprendràs</h4>
+                <ul>
+                    <li>Com obrir lectors i escriptors de CSV amb <code class="inline">DictReader</code> i <code class="inline">DictWriter</code>.</li>
+                    <li>Com crear el directori <strong>resultats/</strong> si no existeix.</li>
+                </ul>
+                <h4>Passos a QGIS</h4>
+                <ol>
+                    <li>Obre <strong>tools/csv_utils.py</strong> (el que vas crear al Bloc 00).</li>
+                    <li>Substitueix el contingut pel codi següent i desa’l.</li>
+                </ol>
+                <h4>Què comprovar</h4>
+                <ul>
+                    <li>La funció <code class="inline">ensure_dir</code> existeix.</li>
+                    <li>Pots importar <code class="inline">open_csv_reader</code> i <code class="inline">open_csv_writer</code> sense errors.</li>
+                </ul>
+                <h4>Errors típics</h4>
+                <ul>
+                    <li>Modificar el fitxer en una altra carpeta (ha d’estar dins <strong>tools/</strong>).</li>
+                    <li>Oblidar desar els canvis abans d’executar ex02.</li>
+                </ul>
+                <h4>Resultat esperat</h4>
+                <p>Utilitats CSV completes per als passos 1.2–1.7.</p>
+            </div>
+        </section>
+
+        <section id="bloc01_01b_csv_utils_script" class="exercise-block script-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">tools/csv_utils.py (ampliat)</h3>
+                    <a href="tools/csv_utils.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Eina del Bloc 1 · Lectura i escriptura CSV</div>
+            </div>
+            <pre><code class="language-python">"""Utilitats CSV per al curs (lectura, escriptura i preview)."""
+
+import csv
+from contextlib import contextmanager
+from pathlib import Path
+from typing import Optional, Union
+
+
+def ensure_dir(path: Union[str, Path]) -> None:
+    """Crea la carpeta si no existeix (paths de fitxer o carpeta)."""
+    p = Path(path)
+    if p.suffix:
+        p = p.parent
+    p.mkdir(parents=True, exist_ok=True)
+
+
+def _open_text_for_read(path: Union[str, Path], encoding: str):
+    """Obre un fitxer amb encoding i fa fallback a utf-8-sig si hi ha BOM."""
+    try:
+        return open(path, "r", encoding=encoding, newline="")
+    except UnicodeDecodeError:
+        if encoding.lower() != "utf-8-sig":
+            return open(path, "r", encoding="utf-8-sig", newline="")
+        raise
+
+
+@contextmanager
+def open_csv_reader(path: Union[str, Path], encoding: str = "utf-8"):
+    """Obre un CSV com a DictReader (context manager)."""
+    f = _open_text_for_read(path, encoding=encoding)
+    try:
+        yield csv.DictReader(f, delimiter=",")
+    finally:
+        f.close()
+
+
+@contextmanager
+def open_csv_writer(path: Union[str, Path], fieldnames, encoding: str = "utf-8"):
+    """Obre un CSV per escriure amb capçaleres (context manager)."""
+    ensure_dir(path)
+    f = open(path, "w", encoding=encoding, newline="")
+    try:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        yield writer
+    finally:
+        f.close()
+
+
+def preview_csv(path: Union[str, Path], max_rows: int = 5, title: Optional[str] = "") -> None:
+    """Mostra columnes i les primeres files d'un CSV.
+
+    - No carrega tot el fitxer a memòria.
+    - Gestiona encoding amb fallback.
+    - Si el fitxer no existeix, mostra un missatge didàctic.
+    """
+    if title:
+        print(title)
+
+    p = Path(path)
+    if not p.exists():
+        print(f"AVÍS -> No existeix el fitxer: {p}")
+        print("SOLUCIÓ -> Copia el CSV a dades/entrada i torna-ho a provar.")
+        print("-" * 60)
+        return
+
+    with _open_text_for_read(p, encoding="utf-8") as f:
+        reader = csv.DictReader(f, delimiter=",")
+
+        print("Columnes:")
+        fieldnames = list(reader.fieldnames) if reader.fieldnames else []
+        print(fieldnames)
+
+        print(f"Primeres {max_rows} files:")
+        for i, row in enumerate(reader):
+            print(row)
+            if i >= max_rows - 1:
+                break
+
+    print("-" * 60)</code></pre>
+        </section>
+
+        <section id="bloc01_02_select_columns" class="exercise-block subsection">
+            <div class="exercise-header">
+                <h3 class="exercise-title">1.2 Seleccionar només les columnes útils</h3>
+                <div class="exercise-meta">Subsecció del Bloc 1 · Filtratge de columnes</div>
+            </div>
+            <div class="explanation">
+                <h4>Objectiu</h4>
+                <p>Crear un CSV més petit amb només les columnes que necessitarem.</p>
+                <h4>Què aprendràs</h4>
+                <ul>
+                    <li>Treballar en fases per poder tornar enrere si hi ha errors.</li>
+                    <li>Com crear un CSV de sortida amb un esquema concret.</li>
+                </ul>
+                <div class="hint">
+                    <p><strong>Prerequisit del Bloc 00:</strong> rutes i utilitats base.</p>
+                    <p><a href="#bloc00_04_config_rutas">0.4 Rutes del projecte</a> i <a href="#bloc00_045_tools_csv">0.45 CSV utils</a>.</p>
+                </div>
+                <h4>Passos a QGIS</h4>
+                <ol>
+                    <li>Obre <strong>exercicis/01_meteocat/ex02_select_columns.py</strong>.</li>
+                    <li>Executa’l des de l’Editor de QGIS.</li>
+                </ol>
+                <h4>Què comprovar</h4>
+                <ul>
+                    <li>Es crea el fitxer <strong>meteocat_pas1.csv</strong> a <strong>resultats/</strong>.</li>
+                    <li>El preview mostra només <code class="inline">EMA</code>, <code class="inline">DATA</code>, <code class="inline">X</code>, <code class="inline">Y</code>, <code class="inline">PPT</code>.</li>
+                </ul>
+                <h4>Errors típics</h4>
+                <ul>
+                    <li>No haver executat el preview abans i equivocar-se de columnes.</li>
+                    <li>Canvi de noms de capçaleres en el CSV original.</li>
+                    <li>Permisos d’escriptura al directori <strong>resultats/</strong>.</li>
+                </ul>
+                <h4>Resultat esperat</h4>
+                <p>Fitxer <strong>meteocat_pas1.csv</strong> creat a <strong>resultats/</strong> i amb 5 columnes netes.</p>
+            </div>
+        </section>
+
+        <section id="ex02_select_columns" class="exercise-block script-block">
             <div class="exercise-header">
                 <div class="header-row">
                     <h3 class="exercise-title">ex02_select_columns.py</h3>
                     <a href="exercicis/01_meteocat/ex02_select_columns.py" download class="download-btn">📥 Descarregar Script</a>
                 </div>
-                <div class="exercise-meta">Fase: Filtratge de columnes</div>
+                <div class="exercise-meta">Exercici (script) del Bloc 1 · Filtratge de columnes</div>
             </div>
-            <pre><code class="language-python">import os
+            <pre><code class="language-python">"""Ex02 — Selecció de columnes clau.
+
+Fa: crea un CSV més petit amb camps essencials.
+Llegeix: METEOCAT_INPUT
+Escriu: PAS1_OUT (meteocat_pas1.csv)
+OK esperat: missatge d'OK i preview del pas 1.
+"""
+
+import os
 import sys
 
 ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -77,24 +449,154 @@ with open_csv_reader(METEOCAT_INPUT) as lector, \
 preview_csv(PAS1_OUT, max_rows=5, title="Preview meteocat_pas1.csv")
 print(f"OK -> creat {PAS1_OUT}")
 print(f"Files processades: {files}")</code></pre>
-            <div class="explanation">
-                <h4>🔍 Anàlisi Tècnica</h4>
-                <p>Aquí creem un nou CSV quedant-nos només amb les columnes importants (<code class="inline">EMA</code>, <code class="inline">DATA</code>, <code class="inline">X</code>, <code class="inline">Y</code>, <code class="inline">PPT</code>). Ho fem per simplificar els següents passos: com menys soroll, més fàcil és detectar errors i entendre què està passant.</p>
-                <p><strong>Per què crear un fitxer nou?</strong> Treballar per fases ens permet tornar enrere si alguna cosa surt malament i comparar el resultat pas a pas.</p>
-                <p>Utilitzem una <em>dictionary comprehension</em> per crear un nou diccionari només amb les claus que ens interessen, descartant la resta d'informació.</p>
-            </div>
-        </div>
+        </section>
 
-        <!-- EX 03 CLEAN NUMBERS -->
-        <div id="ex03_clean_numbers" class="exercise-block">
+        <section id="bloc01_02b_parse_utils" class="exercise-block subsection">
+            <div class="exercise-header">
+                <h3 class="exercise-title">1.2b Eina de parseig: <strong>tools/parse_utils.py</strong></h3>
+                <div class="exercise-meta">Subsecció del Bloc 1 · Utilitats de conversió</div>
+            </div>
+            <div class="explanation">
+                <h4>Objectiu</h4>
+                <p>Crear una petita eina per convertir números i dates de manera segura.</p>
+                <h4>Què aprendràs</h4>
+                <ul>
+                    <li>Per què els CSV sovint porten números com a text.</li>
+                    <li>Com normalitzar valors amb coma decimal o buits.</li>
+                </ul>
+                <h4>Passos a QGIS</h4>
+                <ol>
+                    <li>Crea el fitxer <strong>tools/parse_utils.py</strong> al panell Navegador.</li>
+                    <li>Enganxa el codi de sota i desa’l.</li>
+                </ol>
+                <h4>Què comprovar</h4>
+                <ul>
+                    <li>Pots importar-lo sense errors: <code class="inline">from tools.parse_utils import to_float</code>.</li>
+                </ul>
+                <h4>Errors típics</h4>
+                <ul>
+                    <li>Desar el fitxer fora de la carpeta <strong>tools/</strong>.</li>
+                    <li>Oblidar el punt en el nom (<strong>parse_utils.py</strong> és el nom exacte).</li>
+                </ul>
+                <h4>Resultat esperat</h4>
+                <p>Una eina de parseig llesta per als passos 1.3 i 1.5.</p>
+            </div>
+        </section>
+
+        <section id="bloc01_02b_parse_utils_script" class="exercise-block script-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">tools/parse_utils.py</h3>
+                    <a href="tools/parse_utils.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Eina del Bloc 1 · Parseig de números i dates</div>
+            </div>
+            <pre><code class="language-python">"""tools/parse_utils.py — utilitats de parseig.
+
+Fa: convertir textos a float i dates.
+Inclou: parseig de data completa i construcció de dates a partir d'any/mes/dia.
+Llegeix: valors en memòria.
+Escriu: res.
+OK esperat: import correcte (sense errors).
+"""
+
+from datetime import datetime, date
+from typing import Optional
+
+
+def to_float(value) -> Optional[float]:
+    """Converteix a float de manera segura (accepta comes com a separador)."""
+    if value is None:
+        return None
+    if isinstance(value, (int, float)):
+        return float(value)
+    s = str(value).strip()
+    if s == "":
+        return None
+    s = s.replace(",", ".")
+    try:
+        return float(s)
+    except Exception:
+        return None
+
+
+def parse_date(value) -> Optional[date]:
+    """Parseja una data en formats DD/MM/YYYY, YYYY-MM-DD o DD-MM-YYYY."""
+    s = (value or "").strip()
+    if s == "":
+        return None
+    for fmt in ("%d/%m/%Y", "%Y-%m-%d", "%d-%m-%Y"):
+        try:
+            return datetime.strptime(s, fmt).date()
+        except Exception:
+            continue
+    return None
+
+
+def build_date(year, month, day) -> Optional[date]:
+    """Construeix una data segura a partir d'any/mes/dia separats."""
+    try:
+        y = int(str(year).strip())
+        m = int(str(month).strip())
+        d = int(str(day).strip())
+        return date(y, m, d)
+    except Exception:
+        return None</code></pre>
+        </section>
+
+        <section id="bloc01_03_clean_numbers" class="exercise-block subsection">
+            <div class="exercise-header">
+                <h3 class="exercise-title">1.3 Neteja de números (float)</h3>
+                <div class="exercise-meta">Subsecció del Bloc 1 · Tipus de dades</div>
+            </div>
+            <div class="explanation">
+                <h4>Objectiu</h4>
+                <p>Convertir X, Y i PPT a números reals (float) i deixar els valors problemàtics com a buits.</p>
+                <h4>Què aprendràs</h4>
+                <ul>
+                    <li>Per què <em>"7,8"</em> no és un número per a Python.</li>
+                    <li>Com gestionar valors buits o amb coma decimal.</li>
+                    <li>Per què això és crític en dades massives (errors silenciosos).</li>
+                </ul>
+                <p><strong>Exemples típics:</strong> <em>""</em>, <em>"NA"</em>, <em>"7,8"</em>. En un CSV gran, aquests valors poden trencar càlculs si no els normalitzem.</p>
+                <h4>Passos a QGIS</h4>
+                <ol>
+                    <li>Assegura’t que existeix <strong>meteocat_pas1.csv</strong> (exercici anterior).</li>
+                    <li>Obre <strong>exercicis/01_meteocat/ex03_clean_numbers.py</strong> i executa’l.</li>
+                </ol>
+                <h4>Què comprovar</h4>
+                <ul>
+                    <li>Es crea <strong>meteocat_pas2a.csv</strong> a <strong>resultats/</strong>.</li>
+                    <li>Els camps <code class="inline">X</code>, <code class="inline">Y</code> i <code class="inline">PPT</code> ja són numèrics (o buits).</li>
+                </ul>
+                <h4>Errors típics</h4>
+                <ul>
+                    <li>Executar aquest pas sense haver creat <strong>meteocat_pas1.csv</strong>.</li>
+                    <li>Valors com <em>""</em>, <em>"NA"</em> o <em>"7,8"</em> que no es poden convertir a número.</li>
+                    <li>Confondre coma decimal amb punt decimal (Python només accepta punt).</li>
+                </ul>
+                <h4>Resultat esperat</h4>
+                <p>Fitxer <strong>meteocat_pas2a.csv</strong> a <strong>resultats/</strong> amb X/Y/PPT en format numèric (o buit). Aquest pas no elimina files: només converteix textos a números quan es pot.</p>
+            </div>
+        </section>
+
+        <section id="ex03_clean_numbers" class="exercise-block script-block">
             <div class="exercise-header">
                 <div class="header-row">
                     <h3 class="exercise-title">ex03_clean_numbers.py</h3>
                     <a href="exercicis/01_meteocat/ex03_clean_numbers.py" download class="download-btn">📥 Descarregar Script</a>
                 </div>
-                <div class="exercise-meta">Fase: Neteja de tipus de dades</div>
+                <div class="exercise-meta">Exercici (script) del Bloc 1 · Neteja de números</div>
             </div>
-            <pre><code class="language-python">import os
+            <pre><code class="language-python">"""Ex03 — Neteja de números.
+
+Fa: converteix X/Y/PPT a float.
+Llegeix: PAS1_OUT (meteocat_pas1.csv)
+Escriu: PAS2A_OUT (meteocat_pas2a.csv)
+OK esperat: missatge d'OK i preview del pas 2a.
+"""
+
+import os
 import sys
 
 ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -132,25 +634,58 @@ with open_csv_reader(PAS1_OUT, encoding="utf-8") as lector, \
 
 preview_csv(PAS2A_OUT, max_rows=5, title="Preview meteocat_pas2a.csv")
 print(f"OK -> creat {PAS2A_OUT}")</code></pre>
-            <div class="explanation">
-                <h4>🔍 Anàlisi Tècnica</h4>
-                <p><strong>Pas important:</strong> aquí convertim X/Y/PPT a número (float), però encara no descartem files. Separem “convertir” de “validar” perquè el procés sigui més fàcil d’entendre i depurar.</p>
-                <p><strong>Imports i funcions:</strong> usem <code class="inline">to_float</code> perquè molts números venen com a text (i amb coma). Convertir-ho a <em>float</em> és imprescindible per fer càlculs després.</p>
-                <p><strong>Idea clau:</strong> si una coordenada o un valor no es pot convertir, no parem el programa: el marquem com a buit o el descartem segons el criteri de l’exercici.</p>
-                <p>Convertim strings a floats. Això és crucial perquè "10,5" no es pot operar matemàticament, però 10.5 sí. La funció <code>to_float</code> s'encarrega de reemplaçar la coma per punt.</p>
-            </div>
-        </div>
+        </section>
 
-        <!-- EX 04 FILTER COORDS -->
-        <div id="ex04_filter_coords" class="exercise-block">
+        <section id="bloc01_04_filter_coords" class="exercise-block subsection">
+            <div class="exercise-header">
+                <h3 class="exercise-title">1.4 Filtrar coordenades buides</h3>
+                <div class="exercise-meta">Subsecció del Bloc 1 · Control de qualitat espacial</div>
+            </div>
+            <div class="explanation">
+                <h4>Objectiu</h4>
+                <p>Eliminar registres sense coordenades per evitar errors de mapa.</p>
+                <h4>Què aprendràs</h4>
+                <ul>
+                    <li>Per què un punt sense X o Y no es pot representar.</li>
+                    <li>Com fer un filtre senzill amb <code class="inline">continue</code>.</li>
+                </ul>
+                <h4>Passos a QGIS</h4>
+                <ol>
+                    <li>Assegura’t que existeix <strong>meteocat_pas2a.csv</strong>.</li>
+                    <li>Executa <strong>exercicis/01_meteocat/ex04_filter_coords.py</strong>.</li>
+                </ol>
+                <h4>Què comprovar</h4>
+                <ul>
+                    <li>Es crea <strong>meteocat_pas2b.csv</strong>.</li>
+                    <li>A la consola veus quantes files s’han saltat.</li>
+                </ul>
+                <h4>Errors típics</h4>
+                <ul>
+                    <li>Executar el filtre sense haver fet la neteja numèrica.</li>
+                    <li>Que totes les files quedin fora (símptoma de coordenades buides o mal parsejades).</li>
+                </ul>
+                <h4>Resultat esperat</h4>
+                <p>Fitxer <strong>meteocat_pas2b.csv</strong> a <strong>resultats/</strong>, només amb coordenades vàlides.</p>
+            </div>
+        </section>
+
+        <section id="ex04_filter_coords" class="exercise-block script-block">
             <div class="exercise-header">
                 <div class="header-row">
                     <h3 class="exercise-title">ex04_filter_coords.py</h3>
                     <a href="exercicis/01_meteocat/ex04_filter_coords.py" download class="download-btn">📥 Descarregar Script</a>
                 </div>
-                <div class="exercise-meta">Fase: Control de qualitat espacial</div>
+                <div class="exercise-meta">Exercici (script) del Bloc 1 · Filtre de coordenades</div>
             </div>
-            <pre><code class="language-python">import os
+            <pre><code class="language-python">"""Ex04 — Filtre de coordenades buides.
+
+Fa: elimina files sense X o Y.
+Llegeix: PAS2A_OUT (meteocat_pas2a.csv)
+Escriu: PAS2B_OUT (meteocat_pas2b.csv)
+OK esperat: missatge amb files saltades.
+"""
+
+import os
 import sys
 
 ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -184,25 +719,61 @@ with open_csv_reader(PAS2A_OUT, encoding="utf-8") as lector, \
 
 preview_csv(PAS2B_OUT, max_rows=5, title="Preview meteocat_pas2b.csv")
 print(f"Files saltades (X o Y buits): {files_saltades}")</code></pre>
-            <div class="explanation">
-                <h4>🔍 Anàlisi Tècnica</h4>
-                <p><strong>Per què aquest pas existeix?</strong> Un punt sense X o Y no es pot mapar. Per això descartem files amb coordenades buides abans d’intentar transformacions CRS.</p>
-                <p><strong>Control de qualitat:</strong> un punt sense X o Y no es pot dibuixar en un mapa. Per això “saltem” aquestes files amb <code class="inline">continue</code>.</p>
-                <p><strong>Per què fer-ho ara?</strong> si filtrem aviat, evitem errors quan fem la transformació de CRS (que necessita coordenades vàlides).</p>
-                <p>Eliminem registres que no es podrien dibuixar en un mapa. Si <code>x</code> o <code>y</code> són <code>None</code> (fruit de la neteja anterior) o buits, saltem la iteració amb <code class="inline">continue</code>.</p>
-            </div>
-        </div>
+        </section>
 
-        <!-- EX 05 NORMALIZE DATES -->
-        <div id="ex05_normalize_dates" class="exercise-block">
+        <section id="bloc01_05_normalize_dates" class="exercise-block subsection">
+            <div class="exercise-header">
+                <h3 class="exercise-title">1.5 Normalitzar dates</h3>
+                <div class="exercise-meta">Subsecció del Bloc 1 · Estandardització temporal</div>
+            </div>
+            <div class="explanation">
+                <h4>Objectiu</h4>
+                <p>Convertir totes les dates al format ISO <code class="inline">YYYY-MM-DD</code>.</p>
+                <h4>Què aprendràs</h4>
+                <ul>
+                    <li>Que les dates poden venir com <em>DD/MM/YYYY</em>, <em>YYYY-MM-DD</em> o fins i tot com timestamps.</li>
+                    <li>Per què un format únic és clau per ordenar sèries temporals.</li>
+                </ul>
+                <p><strong>Exemples típics:</strong> <em>"2024-10-03"</em>, <em>"03/10/2024"</em>, <em>"20241003"</em>. Si barregem formats, els filtres i les gràfiques fallen.</p>
+                <h4>Passos a QGIS</h4>
+                <ol>
+                    <li>Confirma que existeix <strong>meteocat_pas2b.csv</strong>.</li>
+                    <li>Executa <strong>exercicis/01_meteocat/ex05_normalize_dates.py</strong>.</li>
+                </ol>
+                <h4>Què comprovar</h4>
+                <ul>
+                    <li>Es crea <strong>meteocat_pas3.csv</strong>.</li>
+                    <li>La columna <code class="inline">DATA</code> té format ISO (ex: 2024-10-03).</li>
+                    <li>Veus quantes files s’han descartat per data invàlida.</li>
+                </ul>
+                <h4>Errors típics</h4>
+                <ul>
+                    <li>Dates en formats inesperats (p. ex. <em>03-10-2024</em> o <em>20241003</em>).</li>
+                    <li>Files sense data o amb text en lloc de data.</li>
+                    <li>Executar el pas sense el fitxer de l’etapa anterior.</li>
+                </ul>
+                <h4>Resultat esperat</h4>
+                <p>Fitxer <strong>meteocat_pas3.csv</strong> a <strong>resultats/</strong> amb dates ISO consistents.</p>
+            </div>
+        </section>
+
+        <section id="ex05_normalize_dates" class="exercise-block script-block">
             <div class="exercise-header">
                 <div class="header-row">
                     <h3 class="exercise-title">ex05_normalize_dates.py</h3>
                     <a href="exercicis/01_meteocat/ex05_normalize_dates.py" download class="download-btn">📥 Descarregar Script</a>
                 </div>
-                <div class="exercise-meta">Fase: Estandardització temporal</div>
+                <div class="exercise-meta">Exercici (script) del Bloc 1 · Normalització de dates</div>
             </div>
-            <pre><code class="language-python">import os
+            <pre><code class="language-python">"""Ex05 — Normalització de dates.
+
+Fa: converteix DATA a format ISO.
+Llegeix: PAS2B_OUT (meteocat_pas2b.csv)
+Escriu: PAS3_OUT (meteocat_pas3.csv)
+OK esperat: missatge amb files descartades per data invàlida.
+"""
+
+import os
 import sys
 
 ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -238,25 +809,137 @@ with open_csv_reader(PAS2B_OUT, encoding="utf-8") as lector, \
 
 preview_csv(PAS3_OUT, max_rows=5, title="Preview meteocat_pas3.csv")
 print(f"Files saltades (data invàlida): {files_saltades}")</code></pre>
-            <div class="explanation">
-                <h4>🔍 Anàlisi Tècnica</h4>
-                <p><strong>Què estandarditzem?</strong> Convertim la data a format ISO (YYYY-MM-DD). Això fa que ordenar i unir sèries temporals sigui consistent entre fonts.</p>
-                <p><strong>Objectiu:</strong> convertir totes les dates al mateix format (<code class="inline">YYYY-MM-DD</code>). Això permet ordenar, filtrar i unir dades de fonts diferents sense confusions.</p>
-                <p><strong>Per què ISO?</strong> perquè és un estàndard internacional i, a més, ordena bé alfabèticament (text) i cronològicament (temps).</p>
-                <p>Convertim qualsevol format de data d'entrada (DD/MM/YYYY) a l'estàndard ISO 8601 (YYYY-MM-DD). Això permet ordenar cronològicament les dades com a text simple.</p>
-            </div>
-        </div>
+        </section>
 
-        <!-- EX 06 TRANSFORM CRS -->
-        <div id="ex06_transform_crs" class="exercise-block">
+        <section id="bloc01_05b_qgis_utils" class="exercise-block subsection">
+            <div class="exercise-header">
+                <h3 class="exercise-title">1.5b Eina PyQGIS: <strong>tools/qgis_utils.py</strong></h3>
+                <div class="exercise-meta">Subsecció del Bloc 1 · CRS i transformacions</div>
+            </div>
+            <div class="explanation">
+                <h4>Objectiu</h4>
+                <p>Disposar d’una utilitat mínima per transformar coordenades dins QGIS.</p>
+                <h4>Què aprendràs</h4>
+                <ul>
+                    <li>Que aquestes funcions només funcionen dins QGIS (PyQGIS).</li>
+                    <li>Què és una transformació EPSG:25831 → EPSG:4326.</li>
+                </ul>
+                <h4>Passos a QGIS</h4>
+                <ol>
+                    <li>Crea el fitxer <strong>tools/qgis_utils.py</strong> al panell Navegador.</li>
+                    <li>Enganxa el codi de sota i desa’l.</li>
+                </ol>
+                <h4>Què comprovar</h4>
+                <ul>
+                    <li>Pots importar-lo sense errors: <code class="inline">from tools.qgis_utils import get_utm31_to_wgs84_transformer</code>.</li>
+                </ul>
+                <h4>Errors típics</h4>
+                <ul>
+                    <li>Executar aquest pas fora de QGIS (PyQGIS no disponible).</li>
+                    <li>Desar el fitxer en una carpeta diferent de <strong>tools/</strong>.</li>
+                </ul>
+                <h4>Resultat esperat</h4>
+                <p>Una eina mínima de transformació de coordenades llesta per al pas 1.6.</p>
+            </div>
+        </section>
+
+        <section id="bloc01_05b_qgis_utils_script" class="exercise-block script-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">tools/qgis_utils.py</h3>
+                    <a href="tools/qgis_utils.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Eina del Bloc 1 · Transformacions CRS</div>
+            </div>
+            <pre><code class="language-python">"""tools/qgis_utils.py — utilitats PyQGIS mínimes.
+
+Fa: transforma UTM31 a WGS84.
+Llegeix: res (paràmetres en memòria).
+Escriu: res.
+OK esperat: import correcte dins QGIS.
+"""
+
+
+def _require_qgis():
+    try:
+        from qgis.core import (
+            QgsCoordinateReferenceSystem,
+            QgsCoordinateTransform,
+            QgsProject,
+            QgsPointXY,
+        )
+        return QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject, QgsPointXY
+    except Exception as exc:
+        raise RuntimeError("PyQGIS no està disponible. Executa aquest script dins QGIS.") from exc
+
+
+def get_utm31_to_wgs84_transformer():
+    """Retorna un QgsCoordinateTransform EPSG:25831 -> EPSG:4326."""
+    QgsCoordinateReferenceSystem, QgsCoordinateTransform, QgsProject, _ = _require_qgis()
+    crs_src = QgsCoordinateReferenceSystem("EPSG:25831")
+    crs_dst = QgsCoordinateReferenceSystem("EPSG:4326")
+    return QgsCoordinateTransform(crs_src, crs_dst, QgsProject.instance().transformContext())
+
+
+def transform_utm_to_lonlat(x, y, xform):
+    """Transforma coordenades UTM a lon/lat amb un QgsCoordinateTransform."""
+    _, _, _, QgsPointXY = _require_qgis()
+    pt = QgsPointXY(x, y)
+    pt_ll = xform.transform(pt)
+    return pt_ll.x(), pt_ll.y()</code></pre>
+        </section>
+
+        <section id="bloc01_06_transform_crs" class="exercise-block subsection">
+            <div class="exercise-header">
+                <h3 class="exercise-title">1.6 Transformar CRS (UTM → WGS84)</h3>
+                <div class="exercise-meta">Subsecció del Bloc 1 · Reprojecció</div>
+            </div>
+            <div class="explanation">
+                <h4>Objectiu</h4>
+                <p>Afegir <code class="inline">lon</code> i <code class="inline">lat</code> per poder dibuixar punts al mapa.</p>
+                <h4>Què aprendràs</h4>
+                <ul>
+                    <li>Que la transformació de coordenades es fa amb PyQGIS.</li>
+                    <li>Que aquest pas només funciona dins QGIS (no en Python extern).</li>
+                </ul>
+                <h4>Passos a QGIS</h4>
+                <ol>
+                    <li>Comprova que existeix <strong>meteocat_pas3.csv</strong>.</li>
+                    <li>Executa <strong>exercicis/01_meteocat/ex06_transform_crs.py</strong> des de l’Editor.</li>
+                </ol>
+                <h4>Què comprovar</h4>
+                <ul>
+                    <li>Es crea <strong>meteocat_pas4.csv</strong> amb <code class="inline">lon</code> i <code class="inline">lat</code>.</li>
+                    <li>La consola mostra “OK” i no hi ha errors de transformació.</li>
+                </ul>
+                <h4>Errors típics</h4>
+                <ul>
+                    <li>Executar el script fora de QGIS (manca de PyQGIS).</li>
+                    <li>Coordenades no numèriques perquè passos previs no s’han executat.</li>
+                    <li>Valors UTM fora de rang (transformació fallida).</li>
+                </ul>
+                <h4>Resultat esperat</h4>
+                <p>Fitxer <strong>meteocat_pas4.csv</strong> a <strong>resultats/</strong> amb <code class="inline">lon</code> i <code class="inline">lat</code> correctes.</p>
+            </div>
+        </section>
+
+        <section id="ex06_transform_crs" class="exercise-block script-block">
             <div class="exercise-header">
                 <div class="header-row">
                     <h3 class="exercise-title">ex06_transform_crs.py</h3>
                     <a href="exercicis/01_meteocat/ex06_transform_crs.py" download class="download-btn">📥 Descarregar Script</a>
                 </div>
-                <div class="exercise-meta">Fase: Reprojecció Geogràfica</div>
+                <div class="exercise-meta">Exercici (script) del Bloc 1 · Reprojecció</div>
             </div>
-            <pre><code class="language-python">import os
+            <pre><code class="language-python">"""Ex06 — Transformació CRS UTM → WGS84.
+
+Fa: afegeix lon/lat a partir d'X/Y UTM.
+Llegeix: PAS3_OUT (meteocat_pas3.csv)
+Escriu: PAS4_OUT (meteocat_pas4.csv)
+OK esperat: missatge d'OK i preview del pas 4.
+"""
+
+import os
 import sys
 
 ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -301,25 +984,59 @@ with open_csv_reader(PAS3_OUT, encoding="utf-8") as lector, \
 
 preview_csv(PAS4_OUT, max_rows=5, title="Preview meteocat_pas4.csv")
 print(f"OK -> creat {PAS4_OUT}")</code></pre>
-            <div class="explanation">
-                <h4>🔍 Anàlisi Tècnica</h4>
-                <p><strong>Entrant al SIG:</strong> ara sí, fem la reprojecció amb PyQGIS i afegim <code class="inline">lon</code> i <code class="inline">lat</code>. Aquestes dues columnes permeten carregar el CSV com a punts a QGIS.</p>
-                <p><strong>Imports PyQGIS:</strong> utilitzem QGIS per transformar coordenades d’UTM (metres) a WGS84 (graus). Això ens dona <code class="inline">lon</code> i <code class="inline">lat</code> per poder carregar el CSV com a punts.</p>
-                <p><strong>Pas clau:</strong> la transformació només té sentit si <code class="inline">X</code> i <code class="inline">Y</code> són números vàlids. Per això hem netejat i filtrat abans.</p>
-                <p>Afegim les columnes <code>lon</code> i <code>lat</code>. Utilitzem un bloc <code>try/except</code> per assegurar que si una coordinada concreta és corrupta, no aturi tot el procés.</p>
-            </div>
-        </div>
+        </section>
 
-        <!-- EX 07 STANDARDIZE -->
-        <div id="ex07_standardize" class="exercise-block">
+        <section id="bloc01_07_standardize" class="exercise-block subsection">
+            <div class="exercise-header">
+                <h3 class="exercise-title">1.7 Export estandarditzat (format final)</h3>
+                <div class="exercise-meta">Subsecció del Bloc 1 · Mapeig final</div>
+            </div>
+            <div class="explanation">
+                <h4>Objectiu</h4>
+                <p>Crear el CSV final amb el mateix esquema que farem servir per fusionar amb AEMET.</p>
+                <h4>Què aprendràs</h4>
+                <ul>
+                    <li>Com reanomenar i ordenar camps per fer-los compatibles.</li>
+                    <li>Per què el camp <code class="inline">source</code> és important.</li>
+                </ul>
+                <h4>Passos a QGIS</h4>
+                <ol>
+                    <li>Comprova que existeix <strong>meteocat_pas4.csv</strong>.</li>
+                    <li>Executa <strong>exercicis/01_meteocat/ex07_standardize.py</strong>.</li>
+                </ol>
+                <h4>Què comprovar</h4>
+                <ul>
+                    <li>Es crea <strong>meteocat_std.csv</strong> a <strong>resultats/</strong>.</li>
+                    <li>El preview mostra camps estàndard (source, station_id, date, precip_mm...).</li>
+                </ul>
+                <h4>Errors típics</h4>
+                <ul>
+                    <li>Falta la constant <code class="inline">STD_FIELDS</code> al <strong>config.py</strong>.</li>
+                    <li>Camps buits perquè algun pas anterior no s’ha executat.</li>
+                    <li>Confusió entre <code class="inline">X/Y</code> (UTM) i <code class="inline">lon/lat</code> (WGS84).</li>
+                </ul>
+                <h4>Resultat esperat</h4>
+                <p>Fitxer <strong>meteocat_std.csv</strong> a <strong>resultats/</strong> llest per combinar amb altres fonts.</p>
+            </div>
+        </section>
+
+        <section id="ex07_standardize" class="exercise-block script-block">
             <div class="exercise-header">
                 <div class="header-row">
                     <h3 class="exercise-title">ex07_standardize.py</h3>
                     <a href="exercicis/01_meteocat/ex07_standardize.py" download class="download-btn">📥 Descarregar Script</a>
                 </div>
-                <div class="exercise-meta">Fase: Mapeig final de camps</div>
+                <div class="exercise-meta">Exercici (script) del Bloc 1 · Estandardització</div>
             </div>
-            <pre><code class="language-python">import os
+            <pre><code class="language-python">"""Ex07 — Estandardització final.
+
+Fa: mapeja camps al format estàndard.
+Llegeix: PAS4_OUT (meteocat_pas4.csv)
+Escriu: STD_OUT (meteocat_std.csv)
+OK esperat: missatge d'OK i preview del fitxer final.
+"""
+
+import os
 import sys
 
 ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -370,12 +1087,6 @@ with open_csv_reader(PAS4_OUT, encoding="utf-8") as lector, \
 
 preview_csv(STD_OUT, max_rows=5, title="Preview meteocat_std.csv")
 print(f"OK -> creat {STD_OUT}")</code></pre>
-            <div class="explanation">
-                <h4>🔍 Anàlisi Tècnica</h4>
-                <p><strong>Què vol dir “estandarditzar” aquí?</strong> Crear un fitxer final amb les mateixes columnes i el mateix significat, independentment de la font. Això és el que farà possible el “merge” final.</p>
-                <p><strong>Mapeig de camps:</strong> aquí reanomenem i reordenem camps (ex: <code class="inline">EMA</code> → <code class="inline">station_id</code>) i fixem <code class="inline">source</code> a “METEOCAT”.</p>
-                <p>Creem el fitxer final amb l'estructura definitiva (source, station_id, etc.). Aquí "hardcodegem" el valor de <code>source</code> a "METEOCAT".</p>
-            </div>
-        </div>
+        </section>
 
         </div>

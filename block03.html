@@ -11,6 +11,49 @@
             </div>
         </section>
 
+        <section id="bloc03_00b_config_merge" class="exercise-block subsection">
+            <div class="exercise-header">
+                <h3 class="exercise-title">3.0b Completem <strong>tools/config.py</strong> per al merge</h3>
+                <div class="exercise-meta">Subsecció del Bloc 3 · Dependències explícites</div>
+            </div>
+            <div class="explanation">
+                <h4>Objectiu</h4>
+                <p>Definir les constants que utilitzen els scripts de merge i exportació.</p>
+                <h4>Què aprendràs</h4>
+                <ul>
+                    <li>Com crear la ruta del CSV fusionat.</li>
+                    <li>Com definir el fitxer i el nom de capa del GeoPackage.</li>
+                </ul>
+                <div class="hint">
+                    <p><strong>Prerequisit del Bloc 00:</strong> configuració mínima de rutes.</p>
+                    <p>Revisa’l aquí: <a href="index.html#bloc00_04_config_rutas">Bloc 0 · 0.4 Rutes del projecte</a>.</p>
+                </div>
+                <h4>Passos a QGIS</h4>
+                <ol>
+                    <li>Obre <strong>tools/config.py</strong> des de l’Editor de QGIS.</li>
+                    <li>Afegeix les constants següents si no existeixen.</li>
+                    <li>Guarda el fitxer abans d’executar el pas 3.1.</li>
+                </ol>
+                <h4>Codi a afegir a <strong>tools/config.py</strong></h4>
+                <pre><code class="language-python"># --- Merge i export (Bloc 03) ---
+MERGED_STD_OUT = as_posix(Path(RESULTATS_DIR) / "precipitacio_olot_estandarditzada.csv")
+GPKG_OUT = as_posix(Path(RESULTATS_DIR) / "precipitacio_olot.gpkg")
+GPKG_LAYER = "precipitacio_olot"</code></pre>
+                <h4>Què comprovar</h4>
+                <ul>
+                    <li><code class="inline">from tools.config import MERGED_STD_OUT</code> no dona error.</li>
+                    <li>La ruta de <code class="inline">MERGED_STD_OUT</code> apunta a <strong>resultats/</strong>.</li>
+                </ul>
+                <h4>Errors típics</h4>
+                <ul>
+                    <li>Oblidar importar <code class="inline">Path</code> o <code class="inline">as_posix</code> al <strong>config.py</strong>.</li>
+                    <li>Canviar el nom de la constant i trencar els imports.</li>
+                </ul>
+                <h4>Resultat esperat</h4>
+                <p>Les constants de merge i export existeixen i els scripts del Bloc 3 poden importar-les.</p>
+            </div>
+        </section>
+
         <div class="block-group" data-block="03">
 
         <!-- EX 01 MERGE -->
