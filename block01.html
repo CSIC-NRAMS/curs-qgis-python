@@ -1,0 +1,381 @@
+        <section id="bloc01_meteocat_intro" class="exercise-block">
+            <div class="exercise-header">
+                <h3 class="exercise-title">Bloc 01 — Meteocat: neteja i estandardització</h3>
+                <div class="exercise-meta">Introducció del bloc</div>
+            </div>
+            <div class="explanation">
+                <p>En aquest bloc transformarem el CSV de Meteocat en un format net i consistent: seleccionarem columnes, netejarem números, filtrarem coordenades i normalitzarem dates.</p>
+                <p>Aquest procés ens dona un fitxer final estàndard que després podrem combinar amb AEMET.</p>
+                <p><strong>Prerequisits:</strong> Bloc 00 completat (config i tools creats) i CSV Meteocat a <strong>dades/entrada/</strong>.</p>
+                <p><strong>Resultat esperat:</strong> fitxer <strong>meteocat_std.csv</strong> a <strong>resultats/</strong> i missatges “OK” a la consola.</p>
+            </div>
+        </section>
+
+        <div class="block-group" data-block="01">
+
+        <!-- EX 01 PEEK METEOCAT -->
+        <div id="ex01_peek" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex01_peek.py (Meteocat)</h3>
+                    <a href="exercicis/01_meteocat/ex01_peek.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Exploració</div>
+            </div>
+            <pre><code class="language-python">import os
+import sys
+
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+from tools.config import METEOCAT_INPUT
+from tools.csv_utils import preview_csv
+
+preview_csv(METEOCAT_INPUT, max_rows=5, title="Preview del CSV METEOCAT")
+print("OK -> Mostrades capçaleres i 5 files del CSV.")</code></pre>
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Per què fem un “peek”?</strong> Per identificar les columnes clau (EMA, DATA, X, Y, PPT) i veure exemples reals de valors. És la manera més ràpida d’entendre un dataset nou.</p>
+                <p><strong>Objectiu d’aprenentatge:</strong> entendre què hi ha dins el CSV abans de tocar res. Identifiquem columnes com <code class="inline">EMA</code>, <code class="inline">DATA</code>, <code class="inline">X</code>, <code class="inline">Y</code> i <code class="inline">PPT</code>.</p>
+                <p><strong>Pas important:</strong> aquesta exploració evita errors típics com “la columna no existeix” o “la data té un format diferent del que pensàvem”.</p>
+                <p>Primer contacte amb les dades reals de Meteocat per identificar les columnes clau (X, Y, PPT, EMA).</p>
+            </div>
+        </div>
+
+        <!-- EX 02 SELECT COLUMNS -->
+        <div id="ex02_select_columns" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex02_select_columns.py</h3>
+                    <a href="exercicis/01_meteocat/ex02_select_columns.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Filtratge de columnes</div>
+            </div>
+            <pre><code class="language-python">import os
+import sys
+
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+from tools.config import METEOCAT_INPUT, PAS1_OUT, RESULTATS_DIR
+from tools.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
+
+ensure_dir(RESULTATS_DIR)
+columnes = ["EMA", "DATA", "X", "Y", "PPT"]
+files = 0
+
+with open_csv_reader(METEOCAT_INPUT) as lector, \
+     open_csv_writer(PAS1_OUT, fieldnames=columnes) as escriptor:
+
+    for fila in lector:
+        nova_fila = {col: fila.get(col, "") for col in columnes}
+        escriptor.writerow(nova_fila)
+        files += 1
+
+preview_csv(PAS1_OUT, max_rows=5, title="Preview meteocat_pas1.csv")
+print(f"OK -> creat {PAS1_OUT}")
+print(f"Files processades: {files}")</code></pre>
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p>Aquí creem un nou CSV quedant-nos només amb les columnes importants (<code class="inline">EMA</code>, <code class="inline">DATA</code>, <code class="inline">X</code>, <code class="inline">Y</code>, <code class="inline">PPT</code>). Ho fem per simplificar els següents passos: com menys soroll, més fàcil és detectar errors i entendre què està passant.</p>
+                <p><strong>Per què crear un fitxer nou?</strong> Treballar per fases ens permet tornar enrere si alguna cosa surt malament i comparar el resultat pas a pas.</p>
+                <p>Utilitzem una <em>dictionary comprehension</em> per crear un nou diccionari només amb les claus que ens interessen, descartant la resta d'informació.</p>
+            </div>
+        </div>
+
+        <!-- EX 03 CLEAN NUMBERS -->
+        <div id="ex03_clean_numbers" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex03_clean_numbers.py</h3>
+                    <a href="exercicis/01_meteocat/ex03_clean_numbers.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Neteja de tipus de dades</div>
+            </div>
+            <pre><code class="language-python">import os
+import sys
+
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+from tools.config import PAS1_OUT, PAS2A_OUT, RESULTATS_DIR
+from tools.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
+from tools.parse_utils import to_float
+
+columnes = ["EMA", "DATA", "X", "Y", "PPT"]
+files_llegides = 0
+files_escrites = 0
+
+ensure_dir(RESULTATS_DIR)
+
+with open_csv_reader(PAS1_OUT, encoding="utf-8") as lector, \
+     open_csv_writer(PAS2A_OUT, fieldnames=columnes) as escriptor:
+
+    for fila in lector:
+        files_llegides += 1
+        x = to_float(fila.get("X"))
+        y = to_float(fila.get("Y"))
+        ppt = to_float(fila.get("PPT"))
+
+        nova_fila = {
+            "EMA": fila.get("EMA", ""),
+            "DATA": fila.get("DATA", ""),
+            "X": x,
+            "Y": y,
+            "PPT": ppt
+        }
+        escriptor.writerow(nova_fila)
+        files_escrites += 1
+
+preview_csv(PAS2A_OUT, max_rows=5, title="Preview meteocat_pas2a.csv")
+print(f"OK -> creat {PAS2A_OUT}")</code></pre>
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Pas important:</strong> aquí convertim X/Y/PPT a número (float), però encara no descartem files. Separem “convertir” de “validar” perquè el procés sigui més fàcil d’entendre i depurar.</p>
+                <p><strong>Imports i funcions:</strong> usem <code class="inline">to_float</code> perquè molts números venen com a text (i amb coma). Convertir-ho a <em>float</em> és imprescindible per fer càlculs després.</p>
+                <p><strong>Idea clau:</strong> si una coordenada o un valor no es pot convertir, no parem el programa: el marquem com a buit o el descartem segons el criteri de l’exercici.</p>
+                <p>Convertim strings a floats. Això és crucial perquè "10,5" no es pot operar matemàticament, però 10.5 sí. La funció <code>to_float</code> s'encarrega de reemplaçar la coma per punt.</p>
+            </div>
+        </div>
+
+        <!-- EX 04 FILTER COORDS -->
+        <div id="ex04_filter_coords" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex04_filter_coords.py</h3>
+                    <a href="exercicis/01_meteocat/ex04_filter_coords.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Control de qualitat espacial</div>
+            </div>
+            <pre><code class="language-python">import os
+import sys
+
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+from tools.config import PAS2A_OUT, PAS2B_OUT, RESULTATS_DIR
+from tools.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
+
+columnes = ["EMA", "DATA", "X", "Y", "PPT"]
+files_llegides = 0
+files_escrites = 0
+files_saltades = 0
+
+ensure_dir(RESULTATS_DIR)
+
+with open_csv_reader(PAS2A_OUT, encoding="utf-8") as lector, \
+     open_csv_writer(PAS2B_OUT, fieldnames=columnes) as escriptor:
+
+    for fila in lector:
+        files_llegides += 1
+        x = fila.get("X")
+        y = fila.get("Y")
+
+        if x in (None, "") or y in (None, ""):
+            files_saltades += 1
+            continue
+
+        escriptor.writerow(fila)
+        files_escrites += 1
+
+preview_csv(PAS2B_OUT, max_rows=5, title="Preview meteocat_pas2b.csv")
+print(f"Files saltades (X o Y buits): {files_saltades}")</code></pre>
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Per què aquest pas existeix?</strong> Un punt sense X o Y no es pot mapar. Per això descartem files amb coordenades buides abans d’intentar transformacions CRS.</p>
+                <p><strong>Control de qualitat:</strong> un punt sense X o Y no es pot dibuixar en un mapa. Per això “saltem” aquestes files amb <code class="inline">continue</code>.</p>
+                <p><strong>Per què fer-ho ara?</strong> si filtrem aviat, evitem errors quan fem la transformació de CRS (que necessita coordenades vàlides).</p>
+                <p>Eliminem registres que no es podrien dibuixar en un mapa. Si <code>x</code> o <code>y</code> són <code>None</code> (fruit de la neteja anterior) o buits, saltem la iteració amb <code class="inline">continue</code>.</p>
+            </div>
+        </div>
+
+        <!-- EX 05 NORMALIZE DATES -->
+        <div id="ex05_normalize_dates" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex05_normalize_dates.py</h3>
+                    <a href="exercicis/01_meteocat/ex05_normalize_dates.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Estandardització temporal</div>
+            </div>
+            <pre><code class="language-python">import os
+import sys
+
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+from tools.config import PAS2B_OUT, PAS3_OUT, RESULTATS_DIR
+from tools.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
+from tools.parse_utils import parse_date
+
+columnes = ["EMA", "DATA", "X", "Y", "PPT"]
+files_llegides = 0
+files_escrites = 0
+files_saltades = 0
+
+ensure_dir(RESULTATS_DIR)
+
+with open_csv_reader(PAS2B_OUT, encoding="utf-8") as lector, \
+     open_csv_writer(PAS3_OUT, fieldnames=columnes) as escriptor:
+
+    for fila in lector:
+        files_llegides += 1
+        data = parse_date(fila.get("DATA"))
+
+        if data is None:
+            files_saltades += 1
+            continue
+
+        nova_fila = dict(fila)
+        nova_fila["DATA"] = data.isoformat()
+        escriptor.writerow(nova_fila)
+        files_escrites += 1
+
+preview_csv(PAS3_OUT, max_rows=5, title="Preview meteocat_pas3.csv")
+print(f"Files saltades (data invàlida): {files_saltades}")</code></pre>
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Què estandarditzem?</strong> Convertim la data a format ISO (YYYY-MM-DD). Això fa que ordenar i unir sèries temporals sigui consistent entre fonts.</p>
+                <p><strong>Objectiu:</strong> convertir totes les dates al mateix format (<code class="inline">YYYY-MM-DD</code>). Això permet ordenar, filtrar i unir dades de fonts diferents sense confusions.</p>
+                <p><strong>Per què ISO?</strong> perquè és un estàndard internacional i, a més, ordena bé alfabèticament (text) i cronològicament (temps).</p>
+                <p>Convertim qualsevol format de data d'entrada (DD/MM/YYYY) a l'estàndard ISO 8601 (YYYY-MM-DD). Això permet ordenar cronològicament les dades com a text simple.</p>
+            </div>
+        </div>
+
+        <!-- EX 06 TRANSFORM CRS -->
+        <div id="ex06_transform_crs" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex06_transform_crs.py</h3>
+                    <a href="exercicis/01_meteocat/ex06_transform_crs.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Reprojecció Geogràfica</div>
+            </div>
+            <pre><code class="language-python">import os
+import sys
+
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+from tools.config import PAS3_OUT, PAS4_OUT, RESULTATS_DIR
+from tools.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
+from tools.qgis_utils import get_utm31_to_wgs84_transformer, transform_utm_to_lonlat
+
+columnes = ["EMA", "DATA", "X", "Y", "PPT", "lon", "lat"]
+xform = get_utm31_to_wgs84_transformer()
+files_llegides = 0
+files_escrites = 0
+files_saltades = 0
+
+ensure_dir(RESULTATS_DIR)
+
+with open_csv_reader(PAS3_OUT, encoding="utf-8") as lector, \
+     open_csv_writer(PAS4_OUT, fieldnames=columnes) as escriptor:
+
+    for fila in lector:
+        files_llegides += 1
+        try:
+            x = float(fila.get("X"))
+            y = float(fila.get("Y"))
+        except:
+            files_saltades += 1
+            continue
+
+        try:
+            lon, lat = transform_utm_to_lonlat(x, y, xform)
+        except:
+            files_saltades += 1
+            continue
+
+        nova_fila = dict(fila)
+        nova_fila["lon"] = lon
+        nova_fila["lat"] = lat
+        escriptor.writerow(nova_fila)
+        files_escrites += 1
+
+preview_csv(PAS4_OUT, max_rows=5, title="Preview meteocat_pas4.csv")
+print(f"OK -> creat {PAS4_OUT}")</code></pre>
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Entrant al SIG:</strong> ara sí, fem la reprojecció amb PyQGIS i afegim <code class="inline">lon</code> i <code class="inline">lat</code>. Aquestes dues columnes permeten carregar el CSV com a punts a QGIS.</p>
+                <p><strong>Imports PyQGIS:</strong> utilitzem QGIS per transformar coordenades d’UTM (metres) a WGS84 (graus). Això ens dona <code class="inline">lon</code> i <code class="inline">lat</code> per poder carregar el CSV com a punts.</p>
+                <p><strong>Pas clau:</strong> la transformació només té sentit si <code class="inline">X</code> i <code class="inline">Y</code> són números vàlids. Per això hem netejat i filtrat abans.</p>
+                <p>Afegim les columnes <code>lon</code> i <code>lat</code>. Utilitzem un bloc <code>try/except</code> per assegurar que si una coordinada concreta és corrupta, no aturi tot el procés.</p>
+            </div>
+        </div>
+
+        <!-- EX 07 STANDARDIZE -->
+        <div id="ex07_standardize" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex07_standardize.py</h3>
+                    <a href="exercicis/01_meteocat/ex07_standardize.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Mapeig final de camps</div>
+            </div>
+            <pre><code class="language-python">import os
+import sys
+
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+from tools.config import PAS4_OUT, STD_OUT, STD_FIELDS, RESULTATS_DIR
+from tools.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
+
+files_llegides = 0
+files_escrites = 0
+files_saltades = 0
+
+ensure_dir(RESULTATS_DIR)
+
+with open_csv_reader(PAS4_OUT, encoding="utf-8") as lector, \
+     open_csv_writer(STD_OUT, fieldnames=STD_FIELDS) as escriptor:
+
+    for fila in lector:
+        files_llegides += 1
+
+        ema = (fila.get("EMA") or "").strip()
+        data = (fila.get("DATA") or "").strip()
+        ppt = fila.get("PPT")
+        lon = fila.get("lon")
+        lat = fila.get("lat")
+        x_utm = fila.get("X")
+        y_utm = fila.get("Y")
+
+        if not (ema and data and lon and lat and x_utm and y_utm):
+            files_saltades += 1
+            continue
+
+        nova_fila = {
+            "source": "METEOCAT",
+            "station_id": ema,
+            "station_name": f"Olot (Meteocat EMA {ema})",
+            "date": data,
+            "precip_mm": ppt,
+            "lon": lon,
+            "lat": lat,
+            "x_utm": x_utm,
+            "y_utm": y_utm,
+            "alt_m": ""
+        }
+        escriptor.writerow(nova_fila)
+        files_escrites += 1
+
+preview_csv(STD_OUT, max_rows=5, title="Preview meteocat_std.csv")
+print(f"OK -> creat {STD_OUT}")</code></pre>
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Què vol dir “estandarditzar” aquí?</strong> Crear un fitxer final amb les mateixes columnes i el mateix significat, independentment de la font. Això és el que farà possible el “merge” final.</p>
+                <p><strong>Mapeig de camps:</strong> aquí reanomenem i reordenem camps (ex: <code class="inline">EMA</code> → <code class="inline">station_id</code>) i fixem <code class="inline">source</code> a “METEOCAT”.</p>
+                <p>Creem el fitxer final amb l'estructura definitiva (source, station_id, etc.). Aquí "hardcodegem" el valor de <code>source</code> a "METEOCAT".</p>
+            </div>
+        </div>
+
+        </div>

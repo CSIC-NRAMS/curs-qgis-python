@@ -1,0 +1,123 @@
+        <section id="bloc03_merge_export_intro" class="exercise-block">
+            <div class="exercise-header">
+                <h3 class="exercise-title">Bloc 03 — Merge i exportació</h3>
+                <div class="exercise-meta">Introducció del bloc</div>
+            </div>
+            <div class="explanation">
+                <p>Un cop tenim els dos fitxers estandarditzats (Meteocat i AEMET), els unim en un sol CSV i el convertim a un format geoespacial.</p>
+                <p>Això ens prepara per treballar amb capes dins de QGIS i aplicar anàlisis de risc.</p>
+                <p><strong>Prerequisits:</strong> fitxers <strong>meteocat_std.csv</strong> i <strong>aemet_std.csv</strong> generats als blocs 01 i 02.</p>
+                <p><strong>Resultat esperat:</strong> fitxer fusionat i un GeoPackage amb capes carregables a QGIS.</p>
+            </div>
+        </section>
+
+        <div class="block-group" data-block="03">
+
+        <!-- EX 01 MERGE -->
+        <div id="ex01_merge" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex01_merge.py</h3>
+                    <a href="exercicis/03_merge_export/ex01_merge.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Unificació de fonts</div>
+            </div>
+            <pre><code class="language-python">import os
+import sys
+
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+from tools.config import STD_OUT, AEMET_STD_OUT, MERGED_STD_OUT, STD_FIELDS, RESULTATS_DIR
+from tools.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
+
+files_llegides = 0
+files_escrites = 0
+
+ensure_dir(RESULTATS_DIR)
+files_totals = []
+
+# Llegim METEOCAT
+with open_csv_reader(STD_OUT, encoding="utf-8") as lector:
+    for fila in lector:
+        files_totals.append(fila)
+        files_llegides += 1
+
+# Llegim AEMET
+with open_csv_reader(AEMET_STD_OUT, encoding="utf-8") as lector:
+    for fila in lector:
+        files_totals.append(fila)
+        files_llegides += 1
+
+# Ordenem per data i source
+files_totals.sort(key=lambda r: (r.get("date", ""), r.get("source", "")))
+
+with open_csv_writer(MERGED_STD_OUT, fieldnames=STD_FIELDS) as escriptor:
+    for fila in files_totals:
+        escriptor.writerow(fila)
+        files_escrites += 1
+
+preview_csv(MERGED_STD_OUT, max_rows=5, title="Preview precipitacio_olot_estandarditzada.csv")
+print(f"OK -> creat {MERGED_STD_OUT}")</code></pre>
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Exercici de síntesi:</strong> aquí no transformem dades noves, sinó que confiem que METEOCAT i AEMET ja tenen exactament el mateix esquema. Això demostra per què l’estandardització prèvia era tan important.</p>
+                <p><strong>Què fem?</strong> ajuntem (concatenem) els dos fitxers estandarditzats en un de sol i els ordenem per data.</p>
+                <p><strong>Per què ordenar?</strong> perquè és més fàcil revisar la sèrie temporal i detectar buits o inconsistències quan les files estan en ordre cronològic.</p>
+                <p>Llegim tots dos fitxers a memòria, els afegim a una única llista i utilitzem <code>list.sort</code> amb una funció lambda per ordenar per data.</p>
+            </div>
+        </div>
+
+        <!-- EX 02 EXPORT GPKG -->
+        <div id="ex02_export_gpkg" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex02_export_gpkg.py</h3>
+                    <a href="exercicis/03_merge_export/ex02_export_gpkg.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Exportació a GeoPackage</div>
+            </div>
+            <pre><code class="language-python">import os
+import sys
+
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+from qgis.core import QgsVectorLayer, QgsVectorFileWriter, QgsProject
+from tools.config import MERGED_STD_OUT, GPKG_OUT, GPKG_LAYER, RESULTATS_DIR
+from tools.csv_utils import ensure_dir
+
+ensure_dir(RESULTATS_DIR)
+
+# URI Màgica per carregar CSV sense GUI
+uri = f"file:///{MERGED_STD_OUT}?delimiter=,&xField=lon&yField=lat&crs=EPSG:4326"
+
+layer = QgsVectorLayer(uri, "precipitacio_olot", "delimitedtext")
+
+if not layer.isValid():
+    print("ERROR -> No s'ha pogut carregar la capa del CSV.")
+else:
+    QgsProject.instance().addMapLayer(layer)
+
+    options = QgsVectorFileWriter.SaveVectorOptions()
+    options.driverName = "GPKG"
+    options.layerName = GPKG_LAYER
+    options.fileEncoding = "UTF-8"
+
+    QgsVectorFileWriter.writeAsVectorFormatV2(layer, GPKG_OUT, QgsProject.instance().transformContext(), options)
+
+    print(f"OK -> GeoPackage creat: {GPKG_OUT}")
+    print("OK -> Capa afegida al projecte QGIS.")</code></pre>
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Del CSV al SIG:</strong> aquest és el pas final del projecte. Convertim dades tabulars en una capa espacial real, la visualitzem directament a QGIS i la desem en un format professional (GeoPackage).</p>
+                <p><strong>Idea clau:</strong> tot el que has fet fins ara (neteja, dates, CRS, estandardització) té sentit perquè ara la capa es comporta correctament dins d’un SIG.</p>
+                <p><strong>Últim pas SIG:</strong> convertim el CSV a un GeoPackage (format espacial estàndard) perquè QGIS i altres SIG el puguin llegir com una capa vectorial real.</p>
+                <p><strong>Idea clau:</strong> un CSV és text; un GPKG és una base de dades espacial. Aquest canvi fa que el dataset sigui més robust i reutilitzable.</p>
+                <p>Utilitza l'API de QGIS per convertir el CSV en text pla a una base de dades espacial GeoPackage real, a punt per ser utilitzada en qualsevol SIG.</p>
+            </div>
+        </div>
+
+        </div>

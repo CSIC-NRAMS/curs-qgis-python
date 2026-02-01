@@ -1,0 +1,369 @@
+        <section id="bloc02_aemet_intro" class="exercise-block">
+            <div class="exercise-header">
+                <h3 class="exercise-title">Bloc 02 — AEMET: preparació i estandardització</h3>
+                <div class="exercise-meta">Introducció del bloc</div>
+            </div>
+            <div class="explanation">
+                <p>Repetirem el procés de neteja i transformació, però ara amb dades AEMET. Inclou despivotar, normalitzar dates i preparar les coordenades.</p>
+                <p>L’objectiu és obtenir un fitxer estàndard amb el mateix esquema que Meteocat per poder fusionar després.</p>
+                <p><strong>Prerequisits:</strong> Bloc 00 completat i CSV AEMET a <strong>dades/entrada/</strong>.</p>
+                <p><strong>Resultat esperat:</strong> fitxer <strong>aemet_std.csv</strong> a <strong>resultats/</strong> i missatges “OK” a la consola.</p>
+            </div>
+        </section>
+
+        <div class="block-group" data-block="02">
+
+        <!-- EX 01 PEEK AEMET -->
+        <div id="ex01_peek_aemet" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex01_peek.py (AEMET)</h3>
+                    <a href="exercicis/02_aemet/ex01_peek.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Exploració AEMET</div>
+            </div>
+            <pre><code class="language-python">import os
+import sys
+
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+from tools.config import AEMET_INPUT
+from tools.csv_utils import preview_csv
+
+preview_csv(AEMET_INPUT, max_rows=5, title="Preview AEMET")
+print("OK -> Previsualització AEMET feta.")</code></pre>
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Què observem?</strong> AEMET té una estructura diferent: sovint té un registre per mes i moltes columnes de dies (<code class="inline">P1</code>…<code class="inline">P31</code>). Això és el contrari del que volem.</p>
+                <p><strong>Objectiu:</strong> entendre la forma del fitxer abans de transformar-lo a format “una fila = un dia”.</p>
+                <p>Inspecció del fitxer d'AEMET. Observem que té una estructura molt diferent: columnes P1, P2... P31 per als dies del mes (format ample).</p>
+            </div>
+        </div>
+
+        <!-- EX 02 DESPIVOT -->
+        <div id="ex02_despivot" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex02_despivot.py</h3>
+                    <a href="exercicis/02_aemet/ex02_despivot.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Transformació Wide to Long</div>
+            </div>
+            <pre><code class="language-python">import os
+import sys
+
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+from tools.config import AEMET_INPUT, AEMET_PAS1_OUT, RESULTATS_DIR
+from tools.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
+
+columnes = [
+    "INDICATIVO", "NOMBRE", "ALTITUD", "LONGITUD", "LATITUD",
+    "AÑO", "MES", "DAY", "P_TENTHS"
+]
+files_llegides = 0
+files_escrites = 0
+
+ensure_dir(RESULTATS_DIR)
+
+with open_csv_reader(AEMET_INPUT) as lector, \
+     open_csv_writer(AEMET_PAS1_OUT, fieldnames=columnes) as escriptor:
+
+    p_cols = [c for c in lector.fieldnames if c.startswith("P") and c[1:].isdigit()]
+
+    for fila in lector:
+        files_llegides += 1
+        for col in p_cols:
+            val = fila.get(col)
+            if val is None or str(val).strip() == "":
+                continue
+
+            day_num = int(col.replace("P", ""))
+            
+            nova_fila = {
+                "INDICATIVO": fila.get("INDICATIVO", ""),
+                "NOMBRE": fila.get("NOMBRE", ""),
+                "ALTITUD": fila.get("ALTITUD", ""),
+                "LONGITUD": fila.get("LONGITUD", ""),
+                "LATITUD": fila.get("LATITUD", ""),
+                "AÑO": fila.get("AÑO", ""),
+                "MES": fila.get("MES", ""),
+                "DAY": day_num,
+                "P_TENTHS": val
+            }
+            escriptor.writerow(nova_fila)
+            files_escrites += 1
+
+preview_csv(AEMET_PAS1_OUT, max_rows=5, title="Preview aemet_pas1_long.csv")
+print(f"OK -> creat {AEMET_PAS1_OUT}")</code></pre>
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Concepte nou:</strong> “despivotar” (de <em>wide</em> a <em>long</em>). Passem de columnes P1…P31 a moltes files, una per dia.</p>
+                <p><strong>Per què és necessari?</strong> perquè el nostre estàndard final treballa amb una data per fila. Així podem ordenar i unir amb Meteocat.</p>
+                <p>Detectem dinàmicament les columnes P1...P31. Per a cada fila original (que representa un mes), generem múltiples files de sortida (una per a cada dia amb dades). Això es coneix com "despivotar" o "melt".</p>
+            </div>
+        </div>
+
+        <!-- EX 03 BUILD DATES AEMET -->
+        <div id="ex03_build_dates" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex03_build_dates.py</h3>
+                    <a href="exercicis/02_aemet/ex03_build_dates.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Reconstrucció de dates</div>
+            </div>
+            <pre><code class="language-python">import os
+import sys
+
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+from tools.config import AEMET_PAS1_OUT, AEMET_PAS2_OUT, RESULTATS_DIR
+from tools.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
+from tools.parse_utils import build_date
+
+columnes = [
+    "INDICATIVO", "NOMBRE", "ALTITUD", "LONGITUD", "LATITUD",
+    "AÑO", "MES", "DAY", "date", "P_TENTHS"
+]
+files_llegides = 0
+files_escrites = 0
+
+ensure_dir(RESULTATS_DIR)
+
+with open_csv_reader(AEMET_PAS1_OUT, encoding="utf-8") as lector, \
+     open_csv_writer(AEMET_PAS2_OUT, fieldnames=columnes) as escriptor:
+
+    for fila in lector:
+        files_llegides += 1
+        data = build_date(fila.get("AÑO"), fila.get("MES"), fila.get("DAY"))
+
+        if data is None:
+            continue
+
+        nova_fila = dict(fila)
+        nova_fila["date"] = data.isoformat()
+        escriptor.writerow(nova_fila)
+        files_escrites += 1
+
+preview_csv(AEMET_PAS2_OUT, max_rows=5, title="Preview aemet_pas2_dates.csv")
+print(f"OK -> creat {AEMET_PAS2_OUT}")</code></pre>
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Reconstrucció de la data:</strong> AEMET separa any, mes i dia. Nosaltres els unim per crear un camp <code class="inline">date</code> en ISO.</p>
+                <p><strong>Control d’errors:</strong> alguns dies no existeixen (ex: 30 de febrer). En aquests casos descartem la fila per evitar dates impossibles.</p>
+                <p>Reconstruïm la data completa a partir de columnes separades (ANY, MES, DIA). La funció <code>build_date</code> gestiona dies invàlids (com 30 de febrer) retornant <code>None</code>.</p>
+            </div>
+        </div>
+
+        <!-- EX 04 PRECIP UNITS AEMET -->
+        <div id="ex04_precip_units" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex04_precip_units.py</h3>
+                    <a href="exercicis/02_aemet/ex04_precip_units.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Conversió d'unitats</div>
+            </div>
+            <pre><code class="language-python">import os
+import sys
+
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+from tools.config import AEMET_PAS2_OUT, AEMET_PAS3_OUT, RESULTATS_DIR
+from tools.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
+from tools.parse_utils import to_float
+
+columnes = [
+    "INDICATIVO", "NOMBRE", "ALTITUD", "LONGITUD", "LATITUD",
+    "date", "precip_mm"
+]
+files_llegides = 0
+files_escrites = 0
+
+ensure_dir(RESULTATS_DIR)
+
+with open_csv_reader(AEMET_PAS2_OUT, encoding="utf-8") as lector, \
+     open_csv_writer(AEMET_PAS3_OUT, fieldnames=columnes) as escriptor:
+
+    for fila in lector:
+        files_llegides += 1
+        p_tenths = to_float(fila.get("P_TENTHS"))
+
+        if p_tenths is None or p_tenths < 0:
+            continue
+
+        precip_mm = p_tenths / 10.0
+
+        nova_fila = {
+            "INDICATIVO": fila.get("INDICATIVO", ""),
+            "NOMBRE": fila.get("NOMBRE", ""),
+            "ALTITUD": fila.get("ALTITUD", ""),
+            "LONGITUD": fila.get("LONGITUD", ""),
+            "LATITUD": fila.get("LATITUD", ""),
+            "date": fila.get("date", ""),
+            "precip_mm": precip_mm
+        }
+        escriptor.writerow(nova_fila)
+        files_escrites += 1
+
+preview_csv(AEMET_PAS3_OUT, max_rows=5, title="Preview aemet_pas3_precip.csv")
+print(f"OK -> creat {AEMET_PAS3_OUT}")</code></pre>
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Conversió d’unitats:</strong> AEMET dona precipitació en dècimes de mm. Dividim per 10 per obtenir <code class="inline">precip_mm</code>.</p>
+                <p><strong>Neteja:</strong> si apareixen valors negatius, normalment són codis (no dades reals). En aquest flux, els descartem.</p>
+                <p>AEMET proporciona dades en dècimes de mil·límetre (per estalviar espai i evitar decimals en formats antics). Dividim per 10.0 per obtenir mm reals.</p>
+            </div>
+        </div>
+
+        <!-- EX 05 TRANSFORM COORDS AEMET -->
+        <div id="ex05_transform_coords" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex05_transform_coords.py</h3>
+                    <a href="exercicis/02_aemet/ex05_transform_coords.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Reprojecció AEMET</div>
+            </div>
+            <pre><code class="language-python">import os
+import sys
+
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+from tools.config import AEMET_PAS3_OUT, AEMET_PAS4_OUT, RESULTATS_DIR
+from tools.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
+from tools.parse_utils import to_float
+from tools.qgis_utils import get_utm31_to_wgs84_transformer, transform_utm_to_lonlat
+
+columnes = [
+    "INDICATIVO", "NOMBRE", "ALTITUD",
+    "x_utm", "y_utm", "lon", "lat",
+    "date", "precip_mm"
+]
+files_llegides = 0
+files_escrites = 0
+
+ensure_dir(RESULTATS_DIR)
+xform = get_utm31_to_wgs84_transformer()
+
+with open_csv_reader(AEMET_PAS3_OUT, encoding="utf-8") as lector, \
+     open_csv_writer(AEMET_PAS4_OUT, fieldnames=columnes) as escriptor:
+
+    for fila in lector:
+        files_llegides += 1
+        x = to_float(fila.get("LONGITUD"))
+        y = to_float(fila.get("LATITUD"))
+
+        if x is None or y is None:
+            continue
+
+        try:
+            lon, lat = transform_utm_to_lonlat(x, y, xform)
+        except:
+            continue
+
+        nova_fila = {
+            "INDICATIVO": fila.get("INDICATIVO", ""),
+            "NOMBRE": fila.get("NOMBRE", ""),
+            "ALTITUD": fila.get("ALTITUD", ""),
+            "x_utm": x,
+            "y_utm": y,
+            "lon": lon,
+            "lat": lat,
+            "date": fila.get("date", ""),
+            "precip_mm": fila.get("precip_mm", "")
+        }
+        escriptor.writerow(nova_fila)
+        files_escrites += 1
+
+preview_csv(AEMET_PAS4_OUT, max_rows=5, title="Preview aemet_pas4_coords.csv")
+print(f"OK -> creat {AEMET_PAS4_OUT}")</code></pre>
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Atenció important:</strong> tot i que les columnes originals d’AEMET s’anomenen <code class="inline">LONGITUD</code> i <code class="inline">LATITUD</code>, <u>NO estan en graus</u>. Contenen coordenades UTM (metres). Si les carreguéssim directament com lon/lat, els punts apareixerien en llocs incorrectes del mapa.</p>
+                <p><strong>Pas espacial:</strong> transformem coordenades perquè totes les fonts acabin amb <code class="inline">lon</code>/<code class="inline">lat</code> en EPSG:4326.</p>
+                <p><strong>Nota didàctica:</strong> encara que una columna es digui “LONGITUD”, no sempre vol dir graus decimals. Sempre cal validar el format abans.</p>
+                <p>Encara que les columnes originals es diuen "LONGITUD" i "LATITUD", en realitat contenen coordenades UTM (metres). Les transformem a WGS84 real.</p>
+            </div>
+        </div>
+
+        <!-- EX 06 STANDARDIZE AEMET -->
+        <div id="ex06_standardize_aemet" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex06_standardize.py</h3>
+                    <a href="exercicis/02_aemet/ex06_standardize.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Mapeig final AEMET</div>
+            </div>
+            <pre><code class="language-python">import os
+import sys
+
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+from tools.config import AEMET_PAS4_OUT, AEMET_STD_OUT, STD_FIELDS, RESULTATS_DIR
+from tools.csv_utils import ensure_dir, open_csv_reader, open_csv_writer, preview_csv
+
+files_llegides = 0
+files_escrites = 0
+
+ensure_dir(RESULTATS_DIR)
+
+with open_csv_reader(AEMET_PAS4_OUT, encoding="utf-8") as lector, \
+     open_csv_writer(AEMET_STD_OUT, fieldnames=STD_FIELDS) as escriptor:
+
+    for fila in lector:
+        files_llegides += 1
+
+        indicatiu = (fila.get("INDICATIVO") or "").strip()
+        nom = (fila.get("NOMBRE") or "").strip()
+        data = (fila.get("date") or "").strip()
+        precip = fila.get("precip_mm")
+        lon = fila.get("lon")
+        lat = fila.get("lat")
+        x_utm = fila.get("x_utm")
+        y_utm = fila.get("y_utm")
+        alt = fila.get("ALTITUD")
+
+        if not (indicatiu and data and lon and lat and x_utm and y_utm):
+            continue
+
+        nova_fila = {
+            "source": "AEMET",
+            "station_id": indicatiu,
+            "station_name": nom,
+            "date": data,
+            "precip_mm": precip,
+            "lon": lon,
+            "lat": lat,
+            "x_utm": x_utm,
+            "y_utm": y_utm,
+            "alt_m": alt
+        }
+        escriptor.writerow(nova_fila)
+        files_escrites += 1
+
+preview_csv(AEMET_STD_OUT, max_rows=5, title="Preview aemet_std.csv")
+print(f"OK -> creat {AEMET_STD_OUT}")</code></pre>
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Objectiu:</strong> deixar AEMET amb EXACTAMENT el mateix esquema que METEOCAT (mateixes columnes i noms). Això prepara el merge final.</p>
+                <p><strong>Estratègia:</strong> omplim <code class="inline">source</code> amb “AEMET” i fem el mapeig de camps al nostre model estàndard.</p>
+                <p>Adaptem l'esquema d'AEMET perquè sigui idèntic al de Meteocat, permetent la fusió posterior.</p>
+            </div>
+        </div>
+
+        </div>

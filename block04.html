@@ -1,0 +1,651 @@
+        <section id="bloc04_risc_processing_intro" class="exercise-block">
+            <div class="exercise-header">
+                <h3 class="exercise-title">Bloc 04 — Risc i Processing</h3>
+                <div class="exercise-meta">Introducció del bloc</div>
+            </div>
+            <div class="explanation">
+                <p>A partir del GeoPackage, calculem dies d’alerta, episodis i zones de risc. Farem servir Processing per generar capes derivades i analitzar intensitats.</p>
+                <p>Treballarem amb sortides vectorials i taules de resum per preparar mapes de risc.</p>
+                <p><strong>Prerequisits:</strong> GeoPackage creat al bloc 03 i capa carregada a QGIS.</p>
+                <p><strong>Resultat esperat:</strong> capes de dies d’alerta, episodis i hotspots a <strong>resultats/</strong> i al projecte QGIS.</p>
+            </div>
+        </section>
+
+        <div class="block-group" data-block="04">
+
+        <!-- EX 01 THRESHOLDS -->
+        <div id="ex01_thresholds" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex01_thresholds.py</h3>
+                    <a href="exercicis/04_risc_processing/ex01_thresholds.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Processing (risc) — Dies d’alerta per llindars</div>
+            </div>
+
+            <pre><code class="language-python"># OBJECTIU:
+#   Crear capes de dies d’alerta per llindars de precipitació (20, 40, 80 mm).
+#
+# ENTRADA:
+#   resultats/precipitacio_olot_estandarditzada.gpkg (capa de punts) o CSV unificat.
+#
+# SORTIDA:
+#   resultats/risc_precipitacio_olot.gpkg amb capes:
+#   - dies_alerta_20mm
+#   - dies_alerta_40mm
+#   - dies_alerta_80mm
+#
+# QUÈ APRENEM:
+#   - Carregar capes i filtrar per expressió.
+#   - Generar capes de risc per llindars.
+#   - Exportar capes a GeoPackage.
+
+import os  # Per gestionar rutes
+import sys  # Per ajustar el path d'importació
+
+# Afegim la carpeta arrel del projecte al sys.path
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+# Imports de QGIS
+from qgis.core import QgsVectorLayer, QgsProject
+
+# Importem configuració i utilitats
+from tools.config import (
+    MERGED_STD_OUT, GPKG_OUT, GPKG_LAYER, RESULTATS_DIR,
+    RISC_GPKG_OUT, RISC_LAYER_ALERTA_20, RISC_LAYER_ALERTA_40, RISC_LAYER_ALERTA_80
+)
+from tools.csv_utils import ensure_dir
+from tools.qgis_utils import extract_by_expression, export_layer_to_gpkg
+
+# Assegurem la carpeta de resultats
+ensure_dir(RESULTATS_DIR)
+
+def load_base_points_layer():
+    """Carrega la capa base des del GPKG, o des del CSV si el GPKG no existeix."""
+    # 1) Intentem carregar des del GPKG (preferit)
+    uri_gpkg = f"{GPKG_OUT}|layername={GPKG_LAYER}"
+    layer = QgsVectorLayer(uri_gpkg, "precip_base", "ogr")
+    if layer.isValid():
+        return layer
+    
+    # 2) Si falla, intentem CSV
+    print("AVÍS -> No s'ha trobat la capa al GPKG. Intentant carregar CSV...")
+    uri_csv = f"file:///{MERGED_STD_OUT}?delimiter=,&xField=lon&yField=lat&crs=EPSG:4326"
+    layer = QgsVectorLayer(uri_csv, "precip_base", "delimitedtext")
+    if layer.isValid():
+        return layer
+
+    # Si no hem pogut carregar res, retornem None
+    return None
+
+# Carreguem la capa base
+base_layer = load_base_points_layer()
+if base_layer is None:
+    print("ERROR -> No s'ha trobat cap capa base (GPKG o CSV).")
+else:
+    # Afegim la capa base al projecte (opcional, per visualitzar-la)
+    QgsProject.instance().addMapLayer(base_layer)
+
+    # Llista de llindars i noms de capa
+    thresholds = [
+        (20, RISC_LAYER_ALERTA_20),
+        (40, RISC_LAYER_ALERTA_40),
+        (80, RISC_LAYER_ALERTA_80)
+    ]
+
+    # Comptadors
+    files_llegides = base_layer.featureCount()
+
+    for thresh, layer_name in thresholds:
+        # Definim l’expressió de filtre
+        expr = f"\"precip_mm\" >= {thresh}"
+
+        # Generem la capa filtrada amb Processing
+        alert_layer = extract_by_expression(base_layer, expr)
+
+        # Comptem files filtrades
+        files_filtrades = alert_layer.featureCount()
+
+        # Exportem la capa al GPKG de risc
+        export_layer_to_gpkg(alert_layer, RISC_GPKG_OUT, layer_name)
+
+        print(f"OK -> Capa '{layer_name}' creada amb {files_filtrades} punts (Llindar >= {thresh}mm).")
+
+    print(f"Procés complet. Capes guardades a: {RISC_GPKG_OUT}")</code></pre>
+
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Context de risc:</strong> en riscos naturals, un “llindar” és un valor a partir del qual la probabilitat d’impacte augmenta (p. ex. inundacions locals o esllavissades). Aquí definim llindars de <code class="inline">20</code>, <code class="inline">40</code> i <code class="inline">80</code> mm/24h per identificar dies potencialment problemàtics.</p>
+                <p><strong>Què fa Processing aquí?</strong> en lloc de “netejar dades”, ara fem anàlisi: filtrem la capa per una condició (expressió) i generem noves capes (punts) només amb els dies que compleixen el llindar. Això és el primer pas per passar de dades a “perill”.</p>
+                <p><strong>Per què exportem a GeoPackage?</strong> un GPKG és un contenidor robust: guarda capes vectorials (i pot conviure amb altres capes del projecte). Això converteix el resultat en un producte reutilitzable del projecte de risc (no només un CSV temporal).</p>
+                <p><strong>Com interpretar el resultat:</strong> cada capa (<em>dies_alerta_20mm</em>, <em>dies_alerta_40mm</em>, <em>dies_alerta_80mm</em>) és un “nivell d’alerta” que pots simbolitzar, comptar o creuar amb altres dades (població, equipaments, etc.).</p>
+            </div>
+        </div>
+
+        <!-- EX 02 EPISODES -->
+        <div id="ex02_episodes" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex02_episodes.py</h3>
+                    <a href="exercicis/04_risc_processing/ex02_episodes.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Processing (risc) — Episodis (dies consecutius)</div>
+            </div>
+
+            <pre><code class="language-python"># OBJECTIU:
+#   Crear episodis d’alerta (dies consecutius) per a llindar 20 mm.
+#
+# ENTRADA:
+#   resultats/risc_precipitacio_olot.gpkg (capa dies_alerta_20mm)
+#   o capa base per generar-la si no existeix.
+#
+# SORTIDA:
+#   resultats/risc_precipitacio_olot.gpkg (capa episodis_alerta_20mm)
+#
+# QUÈ APRENEM:
+#   - Ordenar per data i detectar salts > 1 dia.
+#   - Crear un camp episode_id.
+#   - Exportar capes amb nou camp.
+
+import os  # Per gestionar rutes
+import sys  # Per ajustar el path d'importació
+from datetime import datetime  # Per treballar amb dates
+
+# Afegim la carpeta arrel del projecte al sys.path
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+# Imports de QGIS
+from qgis.core import (
+    QgsVectorLayer, QgsProject, QgsField, QgsFields, QgsFeature
+)
+from qgis.PyQt.QtCore import QVariant
+
+# Importem configuració i utilitats
+from tools.config import (
+    MERGED_STD_OUT, GPKG_OUT, GPKG_LAYER,
+    RISC_GPKG_OUT, RISC_LAYER_ALERTA_20, RISC_LAYER_EPISODIS_20
+)
+from tools.qgis_utils import export_layer_to_gpkg
+
+# Intentem carregar la capa d'alerta 20mm
+uri_layer = f"{RISC_GPKG_OUT}|layername={RISC_LAYER_ALERTA_20}"
+layer = QgsVectorLayer(uri_layer, "dies_alerta_20mm", "ogr")
+
+if not layer.isValid():
+    print("ERROR -> No s'ha trobat la capa de dies d'alerta > 20mm.")
+    print("SOLUCIÓ -> Executa primer l'exercici ex01_thresholds.")
+else:
+    # Creem una capa en memòria per processar
+    out_layer = QgsVectorLayer("Point?crs=EPSG:4326", "episodis_temp", "memory")
+    out_dp = out_layer.dataProvider()
+
+    # Copiem els camps originals i afegim episode_id
+    base_fields = layer.fields()
+    out_dp.addAttributes(base_fields.toList())
+    out_dp.addAttributes([QgsField("episode_id", QVariant.Int)])
+    out_layer.updateFields()
+
+    # Obtenim totes les features i les ordenem per estació i data
+    # (Assumeix que 'date' està en format YYYY-MM-DD string ISO)
+    feats = []
+    for f in layer.getFeatures():
+        date_str = f["date"]
+        station = f["station_id"]
+        try:
+            date_obj = datetime.strptime(date_str, "%Y-%m-%d")
+            feats.append((station, date_obj, f))
+        except:
+            continue
+
+    # Ordenem: primer per estació, després per data
+    feats.sort(key=lambda x: (x[0], x[1]))
+
+    # Lògica d'episodis
+    episode_id = 0
+    last_date_by_station = {}
+    current_episode_by_station = {}
+    
+    # Per estadística
+    total_days = 0
+    first_date = None
+    last_date = None
+
+    out_layer.startEditing()
+    
+    for station_id, date_obj, feat in feats:
+        if station_id not in last_date_by_station:
+            episode_id += 1
+            current_episode_by_station[station_id] = episode_id
+        else:
+            gap = (date_obj - last_date_by_station[station_id]).days
+            if gap > 1:
+                episode_id += 1
+                current_episode_by_station[station_id] = episode_id
+
+        # Actualitzem la data anterior
+        last_date_by_station[station_id] = date_obj
+
+        # Actualitzem dates globals
+        first_date = date_obj if first_date is None else min(first_date, date_obj)
+        last_date = date_obj if last_date is None else max(last_date, date_obj)
+
+        # Creem la nova feature amb episode_id
+        new_feat = QgsFeature(out_layer.fields())
+        new_feat.setGeometry(feat.geometry())
+        attrs = feat.attributes() + [current_episode_by_station[station_id]]
+        new_feat.setAttributes(attrs)
+        out_layer.dataProvider().addFeature(new_feat)
+        total_days += 1
+
+    # Exportem la capa amb episodis
+    export_layer_to_gpkg(out_layer, RISC_GPKG_OUT, RISC_LAYER_EPISODIS_20)
+
+    # Afegim al projecte
+    QgsProject.instance().addMapLayer(out_layer)
+
+    print(f"OK -> Generats {episode_id} episodis a partir de {total_days} dies d'alerta.")
+    if first_date and last_date:
+        print(f"Període analitzat: {first_date.date()} - {last_date.date()}")</code></pre>
+
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Prerequisit:</strong> aquest exercici assumeix que ja existeix el GeoPackage de risc i la capa <code class="inline">dies_alerta_20mm</code>. Si no, executa primer l’EX01 i comprova que la carpeta <code class="inline">resultats</code> existeix.</p>
+                <p><strong>Concepte clau en risc:</strong> un episodi no és un dia aïllat. Sovint el risc creix quan hi ha <strong>dies consecutius</strong> amb pluja significativa (saturació del sòl, resposta hidrològica acumulada, etc.). Per això transformem “dies d’alerta” en <strong>episodis</strong>.</p>
+                <p><strong>Què fa l’script?</strong> ordena els registres per data i assigna un camp <code class="inline">episode_id</code>. Quan detecta un salt de més d’1 dia entre dates, crea un nou episodi. El resultat és una capa amb el mateix conjunt de punts, però ara cada punt sap a quin episodi pertany.</p>
+                <p><strong>Important (interpretació):</strong> si el codi calcula episodis <em>per estació</em>, això vol dir que cada estació pot tenir els seus episodis (perquè la pluja pot variar espacialment). Això és útil en risc local, però cal recordar que no és “un únic episodi global” per tota la zona.</p>
+                <p><strong>Per què és útil?</strong> amb <code class="inline">episode_id</code> ja podem resumir durada, màxim i acumulat per episodi (pas següent). Això és el que ens apropa a indicadors de perill i severitat.</p>
+            </div>
+        </div>
+
+        <!-- EX 03 EPISODE SUMMARY -->
+        <div id="ex03_episode_summary" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex03_episode_summary.py</h3>
+                    <a href="exercicis/04_risc_processing/ex03_episode_summary.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Processing (risc) — Resum per episodi (durada i severitat)</div>
+            </div>
+
+            <pre><code class="language-python"># OBJECTIU:
+#   Crear un resum per episode_id (inici, final, durada, màxim, suma, nombre de dies).
+#
+# ENTRADA:
+#   resultats/risc_precipitacio_olot.gpkg (capa episodis_alerta_20mm)
+#
+# SORTIDA:
+#   resultats/risc_precipitacio_olot.gpkg (taula episodis_resum_20mm)
+#
+# QUÈ APRENEM:
+#   - Agregar estadístiques per grup.
+#   - Crear una taula sense geometria.
+#   - Fer un preview de resultats a consola.
+
+import os  # Per gestionar rutes
+import sys  # Per ajustar el path d'importació
+from datetime import datetime  # Per dates
+
+# Afegim la carpeta arrel del projecte al sys.path
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+# Imports de QGIS
+from qgis.core import QgsVectorLayer, QgsField, QgsFeature, QgsFields, QgsProject
+from qgis.PyQt.QtCore import QVariant
+
+# Importem configuració i utilitats
+from tools.config import RISC_GPKG_OUT, RISC_LAYER_EPISODIS_20, RISC_LAYER_RESUM_20, RESULTATS_DIR
+from tools.csv_utils import ensure_dir
+from tools.qgis_utils import export_layer_to_gpkg
+
+# Carreguem capa d'episodis
+uri = f"{RISC_GPKG_OUT}|layername={RISC_LAYER_EPISODIS_20}"
+layer = QgsVectorLayer(uri, "episodis_raw", "ogr")
+
+if not layer.isValid():
+    print("ERROR -> No s'ha trobat la capa d'episodis.")
+    print("SOLUCIÓ -> Executa primer ex02_episodes.")
+else:
+    # Estructura per guardar estadístiques {episode_id: {start, end, max, sum, count}}
+    stats = {}
+
+    for f in layer.getFeatures():
+        ep_id = f["episode_id"]
+        date_str = f["date"]
+        precip = f["precip_mm"]
+
+        try:
+            date_obj = datetime.strptime(date_str, "%Y-%m-%d")
+        except:
+            continue
+
+        if ep_id not in stats:
+            stats[ep_id] = {
+                "start": date_obj,
+                "end": date_obj,
+                "max": precip,
+                "sum": precip,
+                "n": 1
+            }
+        else:
+            s = stats[ep_id]
+            s["start"] = min(s["start"], date_obj)
+            s["end"] = max(s["end"], date_obj)
+            s["max"] = max(s["max"], precip)
+            s["sum"] += precip
+            s["n"] += 1
+
+    # Creem taula de sortida (sense geometria)
+    out_layer = QgsVectorLayer("None", "episodis_resum", "memory")
+    pr = out_layer.dataProvider()
+
+    # Definim camps
+    fields = QgsFields()
+    fields.append(QgsField("episode_id", QVariant.Int))
+    fields.append(QgsField("start_date", QVariant.String))
+    fields.append(QgsField("end_date", QVariant.String))
+    fields.append(QgsField("duration_days", QVariant.Int))
+    fields.append(QgsField("max_precip", QVariant.Double))
+    fields.append(QgsField("total_precip", QVariant.Double))
+    fields.append(QgsField("n_days", QVariant.Int))
+    
+    pr.addAttributes(fields)
+    out_layer.updateFields()
+
+    # Afegim features de resum
+    for episode_id in sorted(stats.keys()):
+        s = stats[episode_id]
+        duration = (s["end"] - s["start"]).days + 1
+
+        feat = QgsFeature(out_layer.fields())
+        feat.setAttributes([
+            episode_id,
+            s["start"].isoformat(),
+            s["end"].isoformat(),
+            duration,
+            s["max"],
+            s["sum"],
+            s["n"]
+        ])
+        out_layer.dataProvider().addFeature(feat)
+
+    # Exportem la taula al GeoPackage
+    export_layer_to_gpkg(out_layer, RISC_GPKG_OUT, RISC_LAYER_RESUM_20)
+
+    # Afegim la taula al projecte (si QGIS ho permet)
+    QgsProject.instance().addMapLayer(out_layer)
+
+    # Preview per consola (primeres 10 files)
+    print("Preview episodis_resum_20mm (primeres 10 files):")
+    count = 0
+    for episode_id in sorted(stats.keys()):
+        s = stats[episode_id]
+        duration = (s["end"] - s["start"]).days + 1
+        print({
+            "episode_id": episode_id,
+            "start_date": s["start"].isoformat(),
+            "max": s["max"],
+            "total": round(s["sum"], 1),
+            "days": duration
+        })
+        count += 1
+        if count >= 10: break
+
+    print(f"OK -> Resum generat: {len(stats)} episodis únics.")</code></pre>
+
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Prerequisit:</strong> aquest exercici assumeix que ja existeix la capa <code class="inline">episodis_alerta_20mm</code>. Si no, executa primer l’EX02 i comprova que la carpeta <code class="inline">resultats</code> existeix.</p>
+                <p><strong>Objectiu:</strong> passar de punts individuals a <strong>indicadors per episodi</strong>. En riscos naturals, els episodis interessen perquè concentren el perill en una finestra temporal concreta.</p>
+                <p><strong>Què fem tècnicament?</strong> agrupem per <code class="inline">episode_id</code> i calculem: data d’inici, data final, durada (dies), màxim de precipitació, suma acumulada i nombre de registres. Això és una “agregació per categories”: moltes files → una fila resum.</p>
+                <p><strong>Com llegir aquests indicadors?</strong> el <em>màxim</em> s’associa a intensitat (episodis curts però intensos), i la <em>suma</em> i la <em>durada</em> a acumulació (molt rellevant per lliscaments i resposta de conques).</p>
+                <p><strong>Nota de qualitat:</strong> si hi hagués valors buits, la suma i el màxim només tenen sentit per valors vàlids. El recompte (<code class="inline">n_days</code>) s’ha d’interpretar com “nombre de registres” de l’episodi.</p>
+            </div>
+        </div>
+
+        <!-- EX 04 HOTSPOTS HEATMAP -->
+        <div id="ex04_hotspots_heatmap" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex04_hotspots_heatmap.py</h3>
+                    <a href="exercicis/04_risc_processing/ex04_hotspots_heatmap.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Processing (risc) — Hotspots / Heatmap de recurrència</div>
+            </div>
+
+            <pre><code class="language-python"># OBJECTIU:
+#   Generar un heatmap de dies d’alerta >= 40 mm i afegir-lo al projecte.
+#
+# ENTRADA:
+#   resultats/risc_precipitacio_olot.gpkg (capa dies_alerta_40mm)
+#
+# SORTIDA:
+#   resultats/hotspots_heatmap_40mm.tif (raster) o capa vectorial de grid com a alternativa.
+#
+# QUÈ APRENEM:
+#   - Fer un heatmap amb Processing.
+#   - Entendre hotspots com zones de recurrència de precipitació intensa.
+#   - Afegir raster o vector al projecte.
+
+import os  # Per gestionar rutes
+import sys  # Per ajustar el path d'importació
+
+# Afegim la carpeta arrel del projecte al sys.path
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+# Imports de QGIS
+from qgis.core import QgsVectorLayer, QgsProject, QgsRasterLayer
+
+# Importem configuració i utilitats
+from tools.config import (
+    MERGED_STD_OUT, GPKG_OUT, GPKG_LAYER, RESULTATS_DIR,
+    RISC_GPKG_OUT, RISC_LAYER_ALERTA_40, RISC_LAYER_HOTSPOTS_40, HEATMAP_OUT_TIF
+)
+from tools.qgis_utils import run_processing_algorithm, export_layer_to_gpkg
+
+# Carreguem capa d'alerta 40mm
+uri = f"{RISC_GPKG_OUT}|layername={RISC_LAYER_ALERTA_40}"
+alert_layer = QgsVectorLayer(uri, "alerta_40mm", "ogr")
+
+if not alert_layer.isValid():
+    print("ERROR -> No s'ha trobat la capa d'alerta 40mm.")
+else:
+    # Intentem crear un Heatmap (Kernel Density Estimation)
+    # Radi de cerca: depèn del CRS. Si és graus (EPSG:4326), 0.1 graus ~ 11km.
+    # Si és UTM, serien metres. Com que els nostres punts estan en EPSG:4326:
+    RADIUS = 0.05  # ~5 km
+    PIXEL_SIZE = 0.001 # ~100 m
+
+    print(f"Generant heatmap amb radi {RADIUS} (graus)...")
+    
+    try:
+        result = run_processing_algorithm(
+            "qgis:heatmapkerneldensityestimation",
+            {
+                "INPUT": alert_layer,
+                "RADIUS": RADIUS,
+                "RADIUS_FIELD": None,
+                "PIXEL_SIZE": PIXEL_SIZE,
+                "WEIGHT_FIELD": None,
+                "KERNEL": 0, # Quartic
+                "OUTPUT": HEATMAP_OUT_TIF
+            }
+        )
+        
+        # Carreguem el resultat al projecte
+        if os.path.exists(HEATMAP_OUT_TIF):
+            rlayer = QgsRasterLayer(HEATMAP_OUT_TIF, "heatmap_40mm")
+            if rlayer.isValid():
+                QgsProject.instance().addMapLayer(rlayer)
+                print(f"OK -> Heatmap creat a {HEATMAP_OUT_TIF}")
+            else:
+                print("AVÍS -> Raster creat però no s'ha pogut carregar al projecte.")
+
+    except Exception as exc:
+        # Alternativa: crear grid i comptar punts
+        print(f"AVÍS -> Heatmap raster no disponible ({exc}).")
+        print("Alternativa -> Creem un grid i comptem punts per cel·la.")
+
+        # Extensió de la capa
+        extent = alert_layer.extent()
+        extent_str = f"{extent.xMinimum()},{extent.xMaximum()},{extent.yMinimum()},{extent.yMaximum()}"
+
+        # Creem un grid
+        grid = run_processing_algorithm(
+            "native:creategrid",
+            {
+                "TYPE": 2,
+                "EXTENT": extent_str,
+                "HSPACING": 0.01,
+                "VSPACING": 0.01,
+                "HOVERLAY": 0,
+                "VOVERLAY": 0,
+                "CRS": alert_layer.crs(),
+                "OUTPUT": "memory:"
+            }
+        )["OUTPUT"]
+
+        # Comptem punts dins de cada cel·la
+        grid_count = run_processing_algorithm(
+            "native:countpointsinpolygon",
+            {
+                "POLYGONS": grid,
+                "POINTS": alert_layer,
+                "FIELD": "n_points",
+                "OUTPUT": "memory:"
+            }
+        )["OUTPUT"]
+
+        # Exportem la capa de hotspots vectorials al GPKG
+        export_layer_to_gpkg(grid_count, RISC_GPKG_OUT, RISC_LAYER_HOTSPOTS_40)
+        QgsProject.instance().addMapLayer(grid_count)
+        print(f"OK -> Hotspots vectorials creats (capa {RISC_LAYER_HOTSPOTS_40})")</code></pre>
+
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Context de risc:</strong> un “hotspot” és una zona on es concentren els casos (aquí: dies de pluja intensa). Un heatmap ens ajuda a visualitzar <strong>recurrència espacial</strong>: on “passen coses sovint”.</p>
+                <p><strong>Què fa l’eina?</strong> genera un raster de densitat (Kernel Density) a partir dels punts d’alerta (p. ex. >= 40 mm). Les zones més “calentes” indiquen més concentració o pes de punts.</p>
+                <p><strong>Nota important de CRS:</strong> si la capa està en EPSG:4326 (graus), els paràmetres <code class="inline">RADIUS</code> i <code class="inline">PIXEL_SIZE</code> estan en <strong>graus</strong>, no en metres. En projectes reals de risc és preferible reprojecció a un CRS en metres (p. ex. EPSG:25831) per definir radis i resolucions de forma intuïtiva.</p>
+                <p><strong>Resultat:</strong> el heatmap es guarda com a GeoTIFF i es pot superposar amb altres capes (rius, pendents, usos del sòl) per discutir hipòtesis de perill i vulnerabilitat.</p>
+            </div>
+        </div>
+
+        <!-- EX 05 EXPORT RISC GPKG -->
+        <div id="ex05_export_risc_gpkg" class="exercise-block">
+            <div class="exercise-header">
+                <div class="header-row">
+                    <h3 class="exercise-title">ex05_export_risc_gpkg.py</h3>
+                    <a href="exercicis/04_risc_processing/ex05_export_risc_gpkg.py" download class="download-btn">📥 Descarregar Script</a>
+                </div>
+                <div class="exercise-meta">Fase: Projecte final — GeoPackage de risc (entregable)</div>
+            </div>
+
+            <pre><code class="language-python"># OBJECTIU:
+#   Crear/actualitzar el GeoPackage final de risc amb totes les capes.
+#
+# ENTRADA:
+#   - resultats/precipitacio_olot_estandarditzada.gpkg (capa base)
+#   - capes de risc (si existeixen) al risc_precipitacio_olot.gpkg
+#
+# SORTIDA:
+#   resultats/risc_precipitacio_olot.gpkg amb totes les capes de risc.
+#
+# QUÈ APRENEM:
+#   - Consolidar capes en un sol GeoPackage.
+#   - Validar CRS i camps clau.
+#   - Generar un resum final del paquet.
+
+import os  # Per gestionar rutes
+import sys  # Per ajustar el path d'importació
+from datetime import datetime  # Per timestamps del resum
+
+# Afegim la carpeta arrel del projecte al sys.path
+ROOT_DIR = os.path.dirname(os.path.dirname(__file__))
+if ROOT_DIR not in sys.path:
+    sys.path.append(ROOT_DIR)
+
+# Imports de QGIS
+from qgis.core import QgsVectorLayer, QgsProject
+
+# Importem configuració i utilitats
+from tools.config import (
+    MERGED_STD_OUT, GPKG_OUT, GPKG_LAYER, RESULTATS_DIR,
+    RISC_GPKG_OUT, HEATMAP_OUT_TIF,
+    RISC_LAYER_POINTS, RISC_LAYER_ALERTA_20, RISC_LAYER_ALERTA_40, RISC_LAYER_ALERTA_80,
+    RISC_LAYER_EPISODIS_20, RISC_LAYER_RESUM_20
+)
+from tools.qgis_utils import export_layer_to_gpkg
+
+print("Iniciant consolidació del GeoPackage de risc...")
+
+# 1. Copiem la capa base de punts (si no existeix ja)
+uri_base = f"{GPKG_OUT}|layername={GPKG_LAYER}"
+base_layer = QgsVectorLayer(uri_base, "punts_base", "ogr")
+
+if base_layer.isValid():
+    export_layer_to_gpkg(base_layer, RISC_GPKG_OUT, RISC_LAYER_POINTS)
+    print(f"OK -> Capa base '{RISC_LAYER_POINTS}' afegida.")
+else:
+    print("AVÍS -> No s'ha trobat la capa base original.")
+
+# 2. Llista de capes a verificar/consolidar
+layers_exportades = []
+
+# Carreguem capes de dies d'alerta
+for layer_name in [RISC_LAYER_ALERTA_20, RISC_LAYER_ALERTA_40, RISC_LAYER_ALERTA_80]:
+    uri = f"{RISC_GPKG_OUT}|layername={layer_name}"
+    l = QgsVectorLayer(uri, layer_name, "ogr")
+    if l.isValid():
+        # Ja està dins el GPKG, però la re-afegim al projecte per visualitzar
+        QgsProject.instance().addMapLayer(l)
+        layers_exportades.append(layer_name)
+    else:
+        print(f"AVÍS -> No s'ha trobat {layer_name}. Executa ex01_thresholds si cal.")
+
+    # Carreguem episodis i resum
+    uri_episodis = f"{RISC_GPKG_OUT}|layername={RISC_LAYER_EPISODIS_20}"
+    episodis_layer = QgsVectorLayer(uri_episodis, "episodis_alerta_20mm", "ogr")
+    if episodis_layer.isValid():
+        export_layer_to_gpkg(episodis_layer, RISC_GPKG_OUT, RISC_LAYER_EPISODIS_20)
+        QgsProject.instance().addMapLayer(episodis_layer)
+        layers_exportades.append(RISC_LAYER_EPISODIS_20)
+    else:
+        print("AVÍS -> No s'ha trobat episodis_alerta_20mm. Executa ex02_episodes si cal.")
+
+    # Carreguem resum d'episodis si existeix
+    uri_resum = f"{RISC_GPKG_OUT}|layername={RISC_LAYER_RESUM_20}"
+    resum_layer = QgsVectorLayer(uri_resum, "episodis_resum_20mm", "ogr")
+    if resum_layer.isValid():
+        export_layer_to_gpkg(resum_layer, RISC_GPKG_OUT, RISC_LAYER_RESUM_20)
+        QgsProject.instance().addMapLayer(resum_layer)
+        layers_exportades.append(RISC_LAYER_RESUM_20)
+    else:
+        print("AVÍS -> No s'ha trobat episodis_resum_20mm. Executa ex03_episode_summary si cal.")
+
+    # Hotspots (raster extern)
+    if os.path.exists(HEATMAP_OUT_TIF):
+        print(f"OK -> Heatmap raster disponible a: {HEATMAP_OUT_TIF}")
+    
+    print("-" * 30)
+    print(f"RESUM FINAL: GeoPackage '{RISC_GPKG_OUT}' conté:")
+    for l in set(layers_exportades):
+        print(f" - {l}")
+    print("-" * 30)</code></pre>
+
+            <div class="explanation">
+                <h4>🔍 Anàlisi Tècnica</h4>
+                <p><strong>Exercici de síntesi:</strong> aquest script empaqueta tot el treball del bloc de risc en un únic GeoPackage final. És el “producte” que podríem entregar en un projecte real: dades + capes derivades + resultats.</p>
+                <p><strong>Què hi incloem?</strong> com a mínim: punts base estandarditzats, capes de dies d’alerta per llindar, capa d’episodis amb <code class="inline">episode_id</code> i el resum d’episodis. Si s’ha generat el heatmap, també queda com a resultat complementari (raster) del projecte.</p>
+                <p><strong>Per què és important en riscos naturals?</strong> perquè permet passar de dades crues a capes interpretables: alertes (perill), episodis (severitat temporal) i hot                                                       spots (patró espacial). Això facilita comunicar resultats i prendre decisions.</p>
+                <p><strong>Nota:</strong> el codi revisa capes d’alerta en un bucle i després comprova també episodis i resum. Si veus missatges repetits, és normal: és només una comprovació automàtica de disponibilitat de capes.</p>
+            </div>
+        </div>
+
+        </div>
