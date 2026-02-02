@@ -6,6 +6,7 @@
             <div class="explanation">
                 <h4>Objectiu</h4>
                 <p>Convertir tot el pipeline (neteja → estandardització → merge → GPKG → capes de risc → estil → animació → export) en una eina reutilitzable dins QGIS.</p>
+                <p><strong>Nota important:</strong> en aquest bloc <u>no</u> s’executen scripts manuals pas a pas. L’algorisme de Processament ja existeix (o s’ofereix com a annex) i aquí ens centrem en el disseny del pipeline, la comprensió dels paràmetres i la validació dels resultats finals.</p>
                 <h4>Què aprendràs</h4>
                 <ul>
                     <li>Com estructurar un algorisme de Processament de principi a fi.</li>
@@ -20,6 +21,7 @@
                 </ul>
                 <h4>Resultat esperat</h4>
                 <p>Una entrada a la Caixa d’eines: <strong>Curs Precipitació → Pipeline complet</strong>, amb sortides repetibles i estils aplicats.</p>
+                <p>Les capes de risc i el heatmap són <strong>sortides derivades</strong> del pipeline: es generen en el tram de Processament i poden ser <strong>opcionals</strong> segons el flux activat.</p>
             </div>
         </section>
 
@@ -78,14 +80,15 @@
                 </ul>
                 <h4>Passos a QGIS</h4>
                 <ol>
-                    <li>Obre <strong>Procesamiento → Caja de herramientas</strong>.</li>
-                    <li>Localitza el grup del curs i comprova la ubicació del nou algorisme.</li>
-                    <li>Comprova que el nom visible és “Pipeline complet”.</li>
-                    <li>Revisa que el flux demana inputs i mostra outputs deterministes.</li>
+                    <li>Obre <strong>Procesamiento → Caja de herramientas</strong> i <strong>verifica</strong> que el grup del curs és visible.</li>
+                    <li><strong>Comprova</strong> que l’algorisme apareix amb el nom “Pipeline complet”.</li>
+                    <li><strong>Observa</strong> que el formulari d’inputs i outputs és coherent i determinista.</li>
+                    <li>Aquest pas <strong>no crea</strong> l’algorisme; només <strong>verifica</strong> el seu comportament.</li>
                 </ol>
                 <h4>Què comprovar</h4>
                 <ul>
                     <li>L’algorisme apareix com a única entrada del pipeline.</li>
+                    <li><strong>Checkpoint conceptual:</strong> si entens que aquest algorisme és “infraestructura” i no una eina GUI manual, ja entens la base del flux professional.</li>
                 </ul>
                 <h4>Errors típics</h4>
                 <ul>
@@ -94,6 +97,7 @@
                 </ul>
                 <h4>Resultat esperat</h4>
                 <p>Un algorisme central que concentra tot el pipeline.</p>
+                <p><strong>Frase frontera:</strong> el <code class="inline">QgsProcessingAlgorithm</code> és infraestructura del pipeline, no una acció manual de la GUI.</p>
             </div>
         </section>
 
@@ -218,10 +222,10 @@
                 </ul>
                 <h4>Passos a QGIS</h4>
                 <ol>
-                    <li>Obre <strong>Procesamiento → Caja de herramientas</strong>.</li>
-                    <li>Busca el grup <strong>Curs Precipitació</strong>.</li>
-                    <li>Verifica que dins hi ha <strong>Pipeline complet</strong>.</li>
-                    <li>Executa’l des d’aquí, no des de scripts.</li>
+                    <li>Obre <strong>Procesamiento → Caja de herramientas</strong> i <strong>verifica</strong> el grup <strong>Curs Precipitació</strong>.</li>
+                    <li><strong>Comprova</strong> que dins hi ha <strong>Pipeline complet</strong>.</li>
+                    <li><strong>Observa</strong> que l’usuari final només interactua amb paràmetres i sortides.</li>
+                    <li>Aquest pas <strong>no crea</strong> el Provider: només <strong>fa visible</strong> l’eina a la GUI.</li>
                 </ol>
                 <h4>Què comprovar</h4>
                 <ul>
@@ -234,6 +238,7 @@
                 </ul>
                 <h4>Resultat esperat</h4>
                 <p>L’usuari executa el pipeline com si fos una eina nativa de QGIS.</p>
+                <p><strong>Frase frontera:</strong> el Provider fa visible l’eina, però no canvia el seu funcionament intern.</p>
             </div>
         </section>
 
@@ -260,6 +265,7 @@
                 <h4>Què comprovar</h4>
                 <ul>
                     <li>En aplicar l’estil, la capa mostra mida, color i etiqueta correctes.</li>
+                    <li><strong>Checkpoint conceptual:</strong> aquest és el punt on el pipeline deixa de ser un script i passa a ser una eina amb resultat visual professional.</li>
                 </ul>
                 <h4>Errors típics</h4>
                 <ul>
@@ -358,6 +364,7 @@
                 <h4>Què comprovar</h4>
                 <ul>
                     <li>El projecte .qgz obre i mostra la capa amb estil correcte.</li>
+                    <li><strong>Checkpoint conceptual:</strong> si això funciona, ja tens el flux complet llest per compartir amb altres usuaris.</li>
                 </ul>
                 <h4>Errors típics</h4>
                 <ul>
@@ -366,6 +373,7 @@
                 </ul>
                 <h4>Resultat esperat</h4>
                 <p>Projecte final i animació exportats de manera reproductible.</p>
+                <p>El heatmap i les capes de risc són sortides <strong>derivades</strong>: poden ser opcionals segons el pipeline activat, però formen part del resultat professional quan s’han generat.</p>
             </div>
         </section>
 
@@ -478,6 +486,8 @@
                     <li>La velocitat de l’animació es controla amb la <strong>⚙️</strong> i <strong>Frame rate (frames per second)</strong>, no amb <strong>Paso</strong>.</li>
                 </ul>
                 <p>El resultat és un producte reutilitzable, coherent i transportable a altres equips sense perdre qualitat ni claredat visual.</p>
+                <p><strong>Bloc opcional i avançat:</strong> està pensat per alumnat que vol anar més enllà i entendre com es professionalitza un flux dins QGIS.</p>
+                <p>Amb aquest bloc, el curs deixa de ser un tutorial i es converteix en un flux professional complet.</p>
             </div>
         </section>
 
@@ -1272,4 +1282,4 @@ else:
         </div>
 
         </div>
-        OLD BLOCK 05 END -->
+        <!-- BLOCK 05 END -->

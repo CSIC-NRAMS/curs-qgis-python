@@ -77,6 +77,18 @@
             <a href="#ex07_quick_validation_report" class="nav-link">ex07_quick_validation_report.py</a>
             <a href="#ex08_export_layout_pdf_optional" class="nav-link">ex08_export_layout_pdf_optional.py</a>
         </div>
+
+        <div class="nav-group">
+                <a class="nav-group-title" href="#annexA_intro">Annex A</a>
+            <a href="#annexA_a1_visio" class="nav-link">A.1 Visió general</a>
+            <a href="#annexA_a2_algorithm" class="nav-link">A.2 QgsProcessingAlgorithm</a>
+            <a href="#annexA_a3_params" class="nav-link">A.3 Paràmetres i sortides</a>
+            <a href="#annexA_a4_validacions" class="nav-link">A.4 Validacions</a>
+            <a href="#annexA_a5_provider" class="nav-link">A.5 Provider</a>
+            <a href="#annexA_a6_estil_export" class="nav-link">A.6 Estil i export</a>
+            <a href="#annexA_a7_reutilitzacio" class="nav-link">A.7 Reutilització</a>
+            <a href="#annexA_a8_tancament" class="nav-link">A.8 Tancament</a>
+        </div>
     </nav>
 
     <!-- Main Content -->
@@ -124,6 +136,8 @@
 
             <div id="block05-include" data-include="block05.html"></div>
 
+            <div id="annexA-include" data-include="annexA.html"></div>
+
         <!-- TANCAMENT -->
         <div class="exercise-block">
             <div class="exercise-header">
@@ -133,6 +147,7 @@
             <div class="explanation">
                 <p>Si has arribat fins aquí, ja has fet una estandardització completa: has passat d’arxius “desordenats” a un conjunt de dades coherent i reutilitzable a QGIS. Això és una habilitat clau perquè et permet treballar amb qualsevol font, encara que vingui en formats diferents.</p>
                 <p>Següent pas recomanat: fes una comprovació visual a QGIS (punts al mapa, rang de dates, valors extrems) i prova d’afegir una columna de qualitat (<code class="inline">qc_flag</code>) per marcar registres sospitosos. Aquesta és la base d’un flux de dades professional.</p>
+                <p><strong>Opcional:</strong> si vols entendre com s’encapsula el pipeline com a eina professional, revisa l’<strong>Annex A</strong> al final de la pàgina.</p>
             </div>
         </div>
 
@@ -288,8 +303,14 @@
                 const id = safeId(block);
                 if (!id || !id.endsWith('_intro')) return;
 
+                let blockNum = null;
                 const match = id.match(/^bloc(\d+)_/);
-                if (!match) return;
+                if (match) {
+                    blockNum = match[1];
+                } else if (id === 'annexA_intro') {
+                    blockNum = 'A';
+                }
+                if (!blockNum) return;
 
                 const group = block.nextElementSibling;
                 if (!group || !group.classList.contains('block-group')) return;
@@ -297,7 +318,6 @@
                 const header = block.querySelector('.exercise-header');
                 if (!header || header.querySelector('.collapse-btn')) return;
 
-                const blockNum = match[1];
                 const storageKey = `block-collapsed-${blockNum}`;
 
                 const btn = document.createElement('button');
@@ -344,7 +364,8 @@
                 const storageKey = `block-collapsed-${blockNum}`;
                 localStorage.setItem(storageKey, '0');
 
-                const intro = document.querySelector(`#bloc${blockNum}_intro .collapse-btn`);
+                const introSelector = blockNum === 'A' ? '#annexA_intro .collapse-btn' : `#bloc${blockNum}_intro .collapse-btn`;
+                const intro = document.querySelector(introSelector);
                 if (intro) {
                     intro.textContent = '▾ Plegar bloc';
                     intro.setAttribute('aria-expanded', 'true');
