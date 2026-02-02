@@ -1,3 +1,489 @@
+        <section id="bloc05_bonus_intro" class="exercise-block">
+            <div class="exercise-header">
+                <h3 class="exercise-title">Bloc 05 Bonus (avançat) — Del pipeline a eina professional</h3>
+                <div class="exercise-meta">Introducció del bloc</div>
+            </div>
+            <div class="explanation">
+                <h4>Objectiu</h4>
+                <p>Convertir tot el pipeline (neteja → estandardització → merge → GPKG → capes de risc → estil → animació → export) en una eina reutilitzable dins QGIS.</p>
+                <h4>Què aprendràs</h4>
+                <ul>
+                    <li>Com estructurar un algorisme de Processament de principi a fi.</li>
+                    <li>Com publicar-lo com a Provider propi del curs.</li>
+                    <li>Com deixar una “sortida professional” per defecte (estil + animació).</li>
+                </ul>
+                <h4>Prerequisits</h4>
+                <ul>
+                    <li>Project Home definit i estructura del curs correcta.</li>
+                    <li>Capa <code class="inline">precipitacio_olot</code> disponible.</li>
+                    <li>Campos <code class="inline">precip_mm</code> i <code class="inline">date</code> existents.</li>
+                </ul>
+                <h4>Resultat esperat</h4>
+                <p>Una entrada a la Caixa d’eines: <strong>Curs Precipitació → Pipeline complet</strong>, amb sortides repetibles i estils aplicats.</p>
+            </div>
+        </section>
+
+        <div class="block-group" data-block="05">
+
+        <section id="bloc05_b0_preparacio" class="exercise-block subsection">
+            <div class="exercise-header">
+                <h3 class="exercise-title">5.B0 Preparació del Bonus: estructura i regles del pipeline</h3>
+                <div class="exercise-meta">Subsecció del Bloc 05 · Visió global</div>
+            </div>
+            <div class="explanation">
+                <h4>Objectiu</h4>
+                <p>Fixar una estructura única i estable perquè el pipeline sigui repetible i professional.</p>
+                <h4>Què aprendràs</h4>
+                <ul>
+                    <li>Per què una eina no pot dependre de rutes locals.</li>
+                    <li>Com separar sortides intermèdies i finals.</li>
+                    <li>Com mantenir noms coherents per trobar resultats.</li>
+                </ul>
+                <h4>Passos a QGIS</h4>
+                <ol>
+                    <li>Revisa que <strong>Project Home</strong> està definit a l’arrel del curs.</li>
+                    <li>Verifica que la capa <strong>precipitacio_olot</strong> està carregada.</li>
+                    <li>Comprova que els fitxers finals es guarden a <strong>resultats/</strong>.</li>
+                    <li>Confirma que els noms de capes i fitxers són estables.</li>
+                </ol>
+                <h4>Què comprovar</h4>
+                <ul>
+                    <li>La mateixa execució genera les mateixes rutes i noms.</li>
+                </ul>
+                <h4>Errors típics</h4>
+                <ul>
+                    <li>Confondre <code class="inline">precipitacio_olot</code> amb altres capes.</li>
+                    <li>Generar sortides amb noms diferents a cada execució.</li>
+                    <li>Barrejar fitxers intermedis i finals a la mateixa carpeta.</li>
+                    <li>Project Home mal definit i rutes absolutes.</li>
+                </ul>
+                <h4>Resultat esperat</h4>
+                <p>Una base estable per convertir el pipeline en eina.</p>
+            </div>
+        </section>
+
+        <section id="bloc05_b1_processing_algo" class="exercise-block subsection">
+            <div class="exercise-header">
+                <h3 class="exercise-title">5.B1 Crear un QgsProcessingAlgorithm: “Pipeline complet”</h3>
+                <div class="exercise-meta">Subsecció del Bloc 05 · Algorisme central</div>
+            </div>
+            <div class="explanation">
+                <h4>Objectiu</h4>
+                <p>Definir l’algorisme únic que executa tot el flux de treball.</p>
+                <h4>Què aprendràs</h4>
+                <ul>
+                    <li>Com agrupar passos en un sol algorisme.</li>
+                    <li>Com documentar entrades i sortides clares.</li>
+                    <li>Com mostrar missatges de procés a l’usuari.</li>
+                </ul>
+                <h4>Passos a QGIS</h4>
+                <ol>
+                    <li>Obre <strong>Procesamiento → Caja de herramientas</strong>.</li>
+                    <li>Localitza el grup del curs i comprova la ubicació del nou algorisme.</li>
+                    <li>Comprova que el nom visible és “Pipeline complet”.</li>
+                    <li>Revisa que el flux demana inputs i mostra outputs deterministes.</li>
+                </ol>
+                <h4>Què comprovar</h4>
+                <ul>
+                    <li>L’algorisme apareix com a única entrada del pipeline.</li>
+                </ul>
+                <h4>Errors típics</h4>
+                <ul>
+                    <li>L’algorisme existeix però no apareix a la Caixa d’eines perquè no és Provider.</li>
+                    <li>Canviar el nom/grup i després no trobar-lo a la cerca.</li>
+                </ul>
+                <h4>Resultat esperat</h4>
+                <p>Un algorisme central que concentra tot el pipeline.</p>
+            </div>
+        </section>
+
+        <section id="bloc05_b1_1_params" class="exercise-block subsection">
+            <div class="exercise-header">
+                <h3 class="exercise-title">5.B1.1 Dissenyar paràmetres (inputs)</h3>
+                <div class="exercise-meta">Subsecció del Bloc 05 · Entrades</div>
+            </div>
+            <div class="explanation">
+                <h4>Objectiu</h4>
+                <p>Definir inputs mínims i obligatoris per evitar errors de dades.</p>
+                <h4>Què aprendràs</h4>
+                <ul>
+                    <li>Quins camps són mínims per al pipeline.</li>
+                    <li>Com validar abans d’executar.</li>
+                    <li>Com guiar l’usuari perquè no falli.</li>
+                </ul>
+                <h4>Passos a QGIS</h4>
+                <ol>
+                    <li>Defineix inputs que incloguin <code class="inline">date</code>, <code class="inline">lat</code>, <code class="inline">lon</code> i <code class="inline">precip_mm</code>.</li>
+                    <li>Fes que el nom visible sigui coherent amb la capa <code class="inline">precipitacio_olot</code>.</li>
+                    <li>Deixa clar quin fitxer és entrada i quin és sortida.</li>
+                </ol>
+                <h4>Què comprovar</h4>
+                <ul>
+                    <li>Els inputs demanen exactament les columnes necessàries.</li>
+                </ul>
+                <h4>Errors típics</h4>
+                <ul>
+                    <li>CSV sense columnes mínimes (<code class="inline">date</code>, <code class="inline">lat</code>, <code class="inline">lon</code>, <code class="inline">precip_mm</code>).</li>
+                    <li>Dates en format inconsistent.</li>
+                    <li><code class="inline">precip_mm</code> com a text no parsejable.</li>
+                </ul>
+                <h4>Resultat esperat</h4>
+                <p>Inputs clars que eviten errors abans d’executar.</p>
+            </div>
+        </section>
+
+        <section id="bloc05_b1_2_outputs" class="exercise-block subsection">
+            <div class="exercise-header">
+                <h3 class="exercise-title">5.B1.2 Definir sortides (outputs)</h3>
+                <div class="exercise-meta">Subsecció del Bloc 05 · Sortides</div>
+            </div>
+            <div class="explanation">
+                <h4>Objectiu</h4>
+                <p>Fixar sortides deterministes perquè cada execució sigui comparable.</p>
+                <h4>Què aprendràs</h4>
+                <ul>
+                    <li>Com evitar noms variables en cada execució.</li>
+                    <li>Com separar intermedis i finals.</li>
+                    <li>Com assegurar la reproductibilitat.</li>
+                </ul>
+                <h4>Passos a QGIS</h4>
+                <ol>
+                    <li>Defineix una única carpeta de sortida final a <strong>resultats/</strong>.</li>
+                    <li>Assegura que els noms de fitxers i capes són constants.</li>
+                    <li>Indica clarament quina sortida és “final”.</li>
+                </ol>
+                <h4>Què comprovar</h4>
+                <ul>
+                    <li>El pipeline genera sempre els mateixos noms.</li>
+                </ul>
+                <h4>Errors típics</h4>
+                <ul>
+                    <li>Sortides amb noms no deterministes.</li>
+                    <li>Barrejar intermedis i finals al mateix lloc.</li>
+                    <li>Reexecutar i sobreescriure sense voler resultats finals.</li>
+                    <li>No netejar sortides antigues → confusió de què és “el d’avui”.</li>
+                </ul>
+                <h4>Resultat esperat</h4>
+                <p>Outputs clars, estables i fàcils de validar.</p>
+            </div>
+        </section>
+
+        <section id="bloc05_b1_3_validacions" class="exercise-block subsection">
+            <div class="exercise-header">
+                <h3 class="exercise-title">5.B1.3 Validacions i missatges</h3>
+                <div class="exercise-meta">Subsecció del Bloc 05 · Control de qualitat</div>
+            </div>
+            <div class="explanation">
+                <h4>Objectiu</h4>
+                <p>Definir comprovacions i missatges clars per a l’usuari.</p>
+                <h4>Què aprendràs</h4>
+                <ul>
+                    <li>Com detectar dades incompletes abans de processar.</li>
+                    <li>Com explicar errors de forma útil.</li>
+                    <li>Com guiar l’usuari cap a la solució.</li>
+                </ul>
+                <h4>Passos a QGIS</h4>
+                <ol>
+                    <li>Defineix missatges d’error per camps inexistents.</li>
+                    <li>Inclou avisos per dates mal formatades.</li>
+                    <li>Mostra confirmacions quan les sortides es generen.</li>
+                </ol>
+                <h4>Què comprovar</h4>
+                <ul>
+                    <li>Els errors són explícits i indiquen la causa.</li>
+                </ul>
+                <h4>Errors típics</h4>
+                <ul>
+                    <li>Validacions absents i errors silenciosos.</li>
+                    <li>Missatges que no indiquen quin camp falla.</li>
+                </ul>
+                <h4>Resultat esperat</h4>
+                <p>Un pipeline robust amb missatges d’aula, clars i accionables.</p>
+            </div>
+        </section>
+
+        <section id="bloc05_b2_provider" class="exercise-block subsection">
+            <div class="exercise-header">
+                <h3 class="exercise-title">5.B2 Crear un Processing Provider del curs</h3>
+                <div class="exercise-meta">Subsecció del Bloc 05 · Publicació</div>
+            </div>
+            <div class="explanation">
+                <h4>Objectiu</h4>
+                <p>Registrar el pipeline perquè aparegui a la Caixa d’eines.</p>
+                <h4>Què aprendràs</h4>
+                <ul>
+                    <li>Què és un Provider dins de QGIS.</li>
+                    <li>Com agrupar eines sota un nom de curs.</li>
+                    <li>Com fer que l’algorisme sigui descobrible.</li>
+                </ul>
+                <h4>Passos a QGIS</h4>
+                <ol>
+                    <li>Obre <strong>Procesamiento → Caja de herramientas</strong>.</li>
+                    <li>Busca el grup <strong>Curs Precipitació</strong>.</li>
+                    <li>Verifica que dins hi ha <strong>Pipeline complet</strong>.</li>
+                    <li>Executa’l des d’aquí, no des de scripts.</li>
+                </ol>
+                <h4>Què comprovar</h4>
+                <ul>
+                    <li>Veus “Curs Precipitació → Pipeline complet” a la Caixa d’eines.</li>
+                </ul>
+                <h4>Errors típics</h4>
+                <ul>
+                    <li>L’algorisme no apareix perquè no està registrat com a Provider.</li>
+                    <li>Canviar el nom/grup i després no trobar-lo a la cerca.</li>
+                </ul>
+                <h4>Resultat esperat</h4>
+                <p>L’usuari executa el pipeline com si fos una eina nativa de QGIS.</p>
+            </div>
+        </section>
+
+        <section id="bloc05_b3_style" class="exercise-block subsection">
+            <div class="exercise-header">
+                <h3 class="exercise-title">5.B3 Estil automàtic: QML + etiquetes + semàfor</h3>
+                <div class="exercise-meta">Subsecció del Bloc 05 · Presentació</div>
+            </div>
+            <div class="explanation">
+                <h4>Objectiu</h4>
+                <p>Garantir una simbologia “bonica per defecte” després d’executar el pipeline.</p>
+                <h4>Què aprendràs</h4>
+                <ul>
+                    <li>Com fer que l’estil es reprodueixi sense tocar res.</li>
+                    <li>Què inclou una simbologia professional.</li>
+                    <li>Com validar que els camps existeixen abans d’aplicar estil.</li>
+                </ul>
+                <h4>Passos a QGIS</h4>
+                <ol>
+                    <li>Defineix un estil base per a <code class="inline">precipitacio_olot</code>.</li>
+                    <li>Assegura que inclou mida per <code class="inline">precip_mm</code>, color semàfor verd→vermell i etiqueta banderita amb “mm”.</li>
+                    <li>Prepara el fitxer d’estil per a reutilització.</li>
+                </ol>
+                <h4>Què comprovar</h4>
+                <ul>
+                    <li>En aplicar l’estil, la capa mostra mida, color i etiqueta correctes.</li>
+                </ul>
+                <h4>Errors típics</h4>
+                <ul>
+                    <li>Guardar l’estil només dins el projecte i no com a fitxer .qml.</li>
+                    <li>Aplicar un .qml que fa referència a camps inexistents.</li>
+                    <li>Aplicar l’estil a la capa equivocada.</li>
+                </ul>
+                <h4>Resultat esperat</h4>
+                <p>La capa surt estilitzada automàticament després del pipeline.</p>
+            </div>
+        </section>
+
+        <section id="bloc05_b3_1_qml" class="exercise-block subsection">
+            <div class="exercise-header">
+                <h3 class="exercise-title">5.B3.1 Guardar estil “golden” (QML)</h3>
+                <div class="exercise-meta">Subsecció del Bloc 05 · Estil base</div>
+            </div>
+            <div class="explanation">
+                <h4>Objectiu</h4>
+                <p>Guardar un QML que representi l’estàndard visual del curs.</p>
+                <h4>Què aprendràs</h4>
+                <ul>
+                    <li>Per què un QML és més reutilitzable que un estil intern.</li>
+                    <li>Com garantir consistència entre projectes.</li>
+                </ul>
+                <h4>Passos a QGIS</h4>
+                <ol>
+                    <li>Obre <strong>Propiedades → Simbología</strong>.</li>
+                    <li>Desa l’estil com a fitxer .qml al directori del curs.</li>
+                    <li>Verifica que el fitxer existeix i és accessible.</li>
+                </ol>
+                <h4>Què comprovar</h4>
+                <ul>
+                    <li>El fitxer .qml es pot aplicar a una capa nova.</li>
+                </ul>
+                <h4>Errors típics</h4>
+                <ul>
+                    <li>Desar l’estil només dins el projecte i perdre’l.</li>
+                </ul>
+                <h4>Resultat esperat</h4>
+                <p>Un QML estable que defineix l’estil oficial del curs.</p>
+            </div>
+        </section>
+
+        <section id="bloc05_b3_2_apply" class="exercise-block subsection">
+            <div class="exercise-header">
+                <h3 class="exercise-title">5.B3.2 Aplicar estil automàticament</h3>
+                <div class="exercise-meta">Subsecció del Bloc 05 · Verificació</div>
+            </div>
+            <div class="explanation">
+                <h4>Objectiu</h4>
+                <p>Comprovar que el pipeline aplica el QML de forma fiable.</p>
+                <h4>Què aprendràs</h4>
+                <ul>
+                    <li>Com validar l’aplicació d’estils sense tocar la GUI.</li>
+                    <li>Com detectar errors de camps inexistents.</li>
+                </ul>
+                <h4>Passos a QGIS</h4>
+                <ol>
+                    <li>Executa el pipeline i carrega <strong>precipitacio_olot</strong>.</li>
+                    <li>Confirma que la simbologia coincideix amb l’estil guardat.</li>
+                    <li>Verifica mida per <code class="inline">precip_mm</code>, color verd→vermell i etiqueta amb “mm”.</li>
+                </ol>
+                <h4>Què comprovar</h4>
+                <ul>
+                    <li>La capa apareix estilitzada sense passos manuals.</li>
+                </ul>
+                <h4>Errors típics</h4>
+                <ul>
+                    <li>Estil aplicat a una capa equivocada.</li>
+                </ul>
+                <h4>Resultat esperat</h4>
+                <p>L’estil s’aplica automàticament en cada execució.</p>
+            </div>
+        </section>
+
+        <section id="bloc05_b4_export" class="exercise-block subsection">
+            <div class="exercise-header">
+                <h3 class="exercise-title">5.B4 Export final: projecte + animació</h3>
+                <div class="exercise-meta">Subsecció del Bloc 05 · Resultat final</div>
+            </div>
+            <div class="explanation">
+                <h4>Objectiu</h4>
+                <p>Generar un projecte i una animació final per a entrega.</p>
+                <h4>Què aprendràs</h4>
+                <ul>
+                    <li>Com exportar el projecte amb rutes coherents.</li>
+                    <li>Com configurar una animació llegible.</li>
+                </ul>
+                <h4>Passos a QGIS</h4>
+                <ol>
+                    <li>Guarda el projecte en format <strong>.qgz</strong> dins <strong>resultats/</strong>.</li>
+                    <li>Revisa que el projecte s’obre en un altre ordinador amb el mateix Project Home.</li>
+                    <li>Exporta l’animació amb pas diari.</li>
+                </ol>
+                <h4>Què comprovar</h4>
+                <ul>
+                    <li>El projecte .qgz obre i mostra la capa amb estil correcte.</li>
+                </ul>
+                <h4>Errors típics</h4>
+                <ul>
+                    <li>Project Home mal definit → rutes trencades en altres PCs.</li>
+                    <li>Sortides que apunten a rutes absolutes.</li>
+                </ul>
+                <h4>Resultat esperat</h4>
+                <p>Projecte final i animació exportats de manera reproductible.</p>
+            </div>
+        </section>
+
+        <section id="bloc05_b4_1_qgz" class="exercise-block subsection">
+            <div class="exercise-header">
+                <h3 class="exercise-title">5.B4.1 Exportar projecte .qgz</h3>
+                <div class="exercise-meta">Subsecció del Bloc 05 · Projecte</div>
+            </div>
+            <div class="explanation">
+                <h4>Objectiu</h4>
+                <p>Guardar un projecte final que es pugui obrir en altres equips.</p>
+                <h4>Què aprendràs</h4>
+                <ul>
+                    <li>Com fer un entregable complet amb rutes relatives.</li>
+                </ul>
+                <h4>Passos a QGIS</h4>
+                <ol>
+                    <li>Ves a <strong>Proyecto → Guardar como...</strong>.</li>
+                    <li>Desa com a <strong>.qgz</strong> a <strong>resultats/</strong>.</li>
+                    <li>Reobre el projecte per validar rutes.</li>
+                </ol>
+                <h4>Què comprovar</h4>
+                <ul>
+                    <li>El projecte carrega <code class="inline">precipitacio_olot</code> sense errors.</li>
+                </ul>
+                <h4>Errors típics</h4>
+                <ul>
+                    <li>Rutes trencades en obrir el .qgz en un altre ordinador.</li>
+                </ul>
+                <h4>Resultat esperat</h4>
+                <p>Un projecte portable i reutilitzable.</p>
+            </div>
+        </section>
+
+        <section id="bloc05_b4_2_animacio" class="exercise-block subsection">
+            <div class="exercise-header">
+                <h3 class="exercise-title">5.B4.2 Exportar animació i controlar la velocitat</h3>
+                <div class="exercise-meta">Subsecció del Bloc 05 · Animació</div>
+            </div>
+            <div class="explanation">
+                <h4>Objectiu</h4>
+                <p>Exportar la seqüència temporal amb una velocitat llegible.</p>
+                <h4>Què aprendràs</h4>
+                <ul>
+                    <li>Diferència entre <strong>Paso</strong> i <strong>Frame rate (frames per second)</strong>.</li>
+                    <li>Com evitar animacions massa ràpides o massa lentes.</li>
+                </ul>
+                <h4>Passos a QGIS</h4>
+                <ol>
+                    <li>Obre el <strong>Controlador temporal</strong> i mantén <strong>Paso = 1</strong> i <strong>días</strong>.</li>
+                    <li>Prem la <strong>⚙️</strong> i ajusta <strong>Frame rate (frames per second)</strong>.</li>
+                    <li>Exporta l’animació a GIF o vídeo.</li>
+                </ol>
+                <h4>Què comprovar</h4>
+                <ul>
+                    <li>La seqüència és llegible i respecta el pas diari.</li>
+                </ul>
+                <h4>Errors típics</h4>
+                <ul>
+                    <li>Confondre resolució (<strong>Paso=1 día</strong>) amb velocitat (<strong>Frame rate</strong>).</li>
+                    <li>Frame rate massa alt → GIF massa ràpid.</li>
+                    <li>Resolució baixa → text il·legible.</li>
+                </ul>
+                <h4>Resultat esperat</h4>
+                <p>Una animació clara i usable com a resultat final.</p>
+            </div>
+        </section>
+
+        <section id="bloc05_b5_layout" class="exercise-block subsection">
+            <div class="exercise-header">
+                <h3 class="exercise-title">5.B5 Extra opcional: Layout final amb data i valor</h3>
+                <div class="exercise-meta">Subsecció del Bloc 05 · Avançat</div>
+            </div>
+            <div class="explanation">
+                <h4>Objectiu</h4>
+                <p>Preparar un layout final amb títol, data i valor per a presentació.</p>
+                <h4>Què aprendràs</h4>
+                <ul>
+                    <li>Com passar d’una animació a un producte de comunicació.</li>
+                </ul>
+                <h4>Passos a QGIS</h4>
+                <ol>
+                    <li>Ves a <strong>Proyecto → Nuevo diseño de impresión</strong>.</li>
+                    <li>Configura un títol i camps de data i valor.</li>
+                    <li>Exporta a PDF com a prova final.</li>
+                </ol>
+                <h4>Què comprovar</h4>
+                <ul>
+                    <li>La data i el valor apareixen correctament al layout.</li>
+                </ul>
+                <h4>Errors típics</h4>
+                <ul>
+                    <li>Confondre quina capa és entrada del layout.</li>
+                </ul>
+                <h4>Resultat esperat</h4>
+                <p>Un layout final preparat per imprimir o publicar.</p>
+            </div>
+        </section>
+
+        <section id="bloc05_resum_conceptual" class="exercise-block subsection">
+            <div class="exercise-header">
+                <h3 class="exercise-title">Resum conceptual del Bloc 05 Bonus</h3>
+                <div class="exercise-meta">Tancament didàctic</div>
+            </div>
+            <div class="explanation">
+                <ul>
+                    <li>El pipeline deixa de ser un conjunt de scripts i es converteix en una eina professional.</li>
+                    <li>L’usuari executa el flux des de la Caixa d’eines: <strong>Curs Precipitació → Pipeline complet</strong>.</li>
+                    <li>La simbologia “bonica per defecte” comunica intensitat amb mida, color i etiqueta.</li>
+                    <li>La velocitat de l’animació es controla amb la <strong>⚙️</strong> i <strong>Frame rate (frames per second)</strong>, no amb <strong>Paso</strong>.</li>
+                </ul>
+                <p>El resultat és un producte reutilitzable, coherent i transportable a altres equips sense perdre qualitat ni claredat visual.</p>
+            </div>
+        </section>
+
+        </div>
+
+        <!-- OLD BLOCK 05 START
         <section id="bloc05_qgis_ui_intro" class="exercise-block">
             <div class="exercise-header">
                 <h3 class="exercise-title">Bloc 05 — QGIS UI i estilització</h3>
@@ -786,3 +1272,4 @@ else:
         </div>
 
         </div>
+        OLD BLOCK 05 END -->

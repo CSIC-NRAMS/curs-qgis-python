@@ -206,6 +206,35 @@ print(f"OK -> creat {AEMET_PAS1_OUT}")</code></pre>
                 </div>
                 <div class="exercise-meta">Eina del Bloc 2 · Parseig de números i dates</div>
             </div>
+            <div class="explanation">
+                <h4>Objectiu</h4>
+                <p>Assegurar que <code class="inline">build_date</code> existeix abans del pas de dates.</p>
+                <h4>Què aprendràs</h4>
+                <ul>
+                    <li>Per què AEMET separa any/mes/dia.</li>
+                    <li>Com validar dates impossibles.</li>
+                    <li>Com reutilitzar la mateixa eina a més d’un bloc.</li>
+                </ul>
+                <h4>Passos a QGIS</h4>
+                <ol>
+                    <li>Obre <strong>tools/parse_utils.py</strong>.</li>
+                    <li>Enganxa el codi complet i desa’l.</li>
+                    <li>Reexecuta l’script si cal perquè es recarregui.</li>
+                </ol>
+                <h4>Què comprovar</h4>
+                <ul>
+                    <li>L’import de <code class="inline">build_date</code> funciona.</li>
+                </ul>
+                <h4>Errors típics</h4>
+                <ul>
+                    <li>Oblidar desar el fitxer abans d’executar ex03.</li>
+                    <li>Editar el fitxer equivocat fora de <strong>tools/</strong>.</li>
+                    <li>QGIS encara carrega una versió antiga del mòdul.</li>
+                </ul>
+                <div class="hint">
+                    <p><strong>Consell:</strong> si hi ha errors d’import, tanca i reobre QGIS.</p>
+                </div>
+            </div>
             <pre><code class="language-python">"""tools/parse_utils.py — utilitats de parseig.
 
 Fa: convertir textos a float i dates.
@@ -514,6 +543,22 @@ print(f"OK -> creat {AEMET_STD_OUT}")</code></pre>
                 <p><strong>Objectiu:</strong> deixar AEMET amb EXACTAMENT el mateix esquema que METEOCAT (mateixes columnes i noms). Això prepara el merge final.</p>
                 <p><strong>Estratègia:</strong> omplim <code class="inline">source</code> amb “AEMET” i fem el mapeig de camps al nostre model estàndard.</p>
                 <p>Adaptem l'esquema d'AEMET perquè sigui idèntic al de Meteocat, permetent la fusió posterior.</p>
+            </div>
+        </section>
+
+        <section id="bloc02_resum" class="exercise-block subsection">
+            <div class="exercise-header">
+                <h3 class="exercise-title">Resum del Bloc 02</h3>
+                <div class="exercise-meta">Tancament didàctic</div>
+            </div>
+            <div class="explanation">
+                <p>Hem transformat un fitxer AEMET en un dataset estàndard compatible amb Meteocat. Ja estem a punt per fusionar fonts.</p>
+                <ul>
+                    <li>Has despivotat dades mensuals a format diari.</li>
+                    <li>Has normalitzat dates i unitats de precipitació.</li>
+                    <li>Has creat <strong>aemet_std.csv</strong> amb el mateix esquema final.</li>
+                </ul>
+                <p><strong>Què ve després?</strong> Al Bloc 03 unirem Meteocat i AEMET en un sol CSV i el convertirem a capa SIG.</p>
             </div>
         </section>
 

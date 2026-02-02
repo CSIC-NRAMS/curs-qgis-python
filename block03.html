@@ -11,6 +11,8 @@
             </div>
         </section>
 
+        <div class="block-group" data-block="03">
+
         <section id="bloc03_00b_config_merge" class="exercise-block subsection">
             <div class="exercise-header">
                 <h3 class="exercise-title">3.0b Completem <strong>tools/config.py</strong> per al merge</h3>
@@ -53,8 +55,6 @@ GPKG_LAYER = "precipitacio_olot"</code></pre>
                 <p>Les constants de merge i export existeixen i els scripts del Bloc 3 poden importar-les.</p>
             </div>
         </section>
-
-        <div class="block-group" data-block="03">
 
         <!-- EX 01 MERGE -->
         <div id="ex01_merge" class="exercise-block">
@@ -106,6 +106,7 @@ print(f"OK -> creat {MERGED_STD_OUT}")</code></pre>
             <div class="explanation">
                 <h4>🔍 Anàlisi Tècnica</h4>
                 <p><strong>Exercici de síntesi:</strong> aquí no transformem dades noves, sinó que confiem que METEOCAT i AEMET ja tenen exactament el mateix esquema. Això demostra per què l’estandardització prèvia era tan important.</p>
+                <p><strong>Prerequisit clau:</strong> cal tenir <code class="inline">meteocat_std.csv</code>, <code class="inline">aemet_std.csv</code> i <code class="inline">STD_FIELDS</code> disponibles al <strong>config.py</strong>.</p>
                 <p><strong>Què fem?</strong> ajuntem (concatenem) els dos fitxers estandarditzats en un de sol i els ordenem per data.</p>
                 <p><strong>Per què ordenar?</strong> perquè és més fàcil revisar la sèrie temporal i detectar buits o inconsistències quan les files estan en ordre cronològic.</p>
                 <p>Llegim tots dos fitxers a memòria, els afegim a una única llista i utilitzem <code>list.sort</code> amb una funció lambda per ordenar per data.</p>
@@ -162,5 +163,21 @@ else:
                 <p>Utilitza l'API de QGIS per convertir el CSV en text pla a una base de dades espacial GeoPackage real, a punt per ser utilitzada en qualsevol SIG.</p>
             </div>
         </div>
+
+        <section id="bloc03_resum" class="exercise-block subsection">
+            <div class="exercise-header">
+                <h3 class="exercise-title">Resum del Bloc 03</h3>
+                <div class="exercise-meta">Tancament didàctic</div>
+            </div>
+            <div class="explanation">
+                <p>Hem unit les dues fonts en un sol fitxer i l’hem convertit en una capa SIG real, llesta per a anàlisi i mapes.</p>
+                <ul>
+                    <li>Has creat el CSV fusionat ordenat.</li>
+                    <li>Has exportat a GeoPackage i carregat la capa a QGIS.</li>
+                    <li>Ja tens una base sòlida per al bloc de risc.</li>
+                </ul>
+                <p><strong>Què ve després?</strong> Al Bloc 04 analitzarem dies d’alerta i generarem capes de risc.</p>
+            </div>
+        </section>
 
         </div>
