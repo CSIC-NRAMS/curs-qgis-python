@@ -1,0 +1,256 @@
+<section id="annexA_intro" class="exercise-block">
+    <div class="exercise-header">
+        <h3 class="exercise-title">Annex A — Codi del Pipeline (Opcional i Avançat)</h3>
+        <div class="exercise-meta">Introducció de l’Annex A</div>
+    </div>
+    <div class="explanation">
+        <h4>Objectiu</h4>
+        <p>Presentar una visió tranquil·la i professional de com s’implementa internament el pipeline com a <strong>QgsProcessingAlgorithm</strong>, sense que sigui necessari per completar el curs.</p>
+        <h4>Què aprendràs</h4>
+        <ul>
+            <li>Per què aquesta arquitectura és útil en entorns professionals.</li>
+            <li>Com es pot reaprofitar un pipeline sense tornar a escriure’l.</li>
+            <li>Com connecta aquest annex amb el Bloc 05.</li>
+        </ul>
+        <h4>Explicació conceptual</h4>
+        <p><strong>Nota important:</strong> aquest annex és avançat i opcional. No forma part del recorregut principal del curs i no cal seguir-lo per completar cap exercici. El pipeline ja funciona sense llegir-lo.</p>
+        <p>Aquest annex mostra una possible implementació del pipeline; no és l’única ni és necessari entendre-la per seguir el curs.</p>
+        <h4>Què NO és necessari entendre</h4>
+        <p>No cal entendre com està escrita la classe interna ni els mètodes concrets per utilitzar el pipeline.</p>
+        <h4>Errors típics</h4>
+        <ul>
+            <li>Confondre aquest annex amb una part obligatòria del curs.</li>
+            <li>Assumir que hi ha una única implementació correcta.</li>
+        </ul>
+        <h4>Resultat esperat</h4>
+        <p>Una comprensió conceptual del perquè el pipeline es pot encapsular com a eina professional.</p>
+    </div>
+</section>
+
+<div class="block-group" data-block="A">
+
+<section id="annexA_a1_visio" class="exercise-block subsection">
+    <div class="exercise-header">
+        <h3 class="exercise-title">A.1 — Visió general del pipeline</h3>
+        <div class="exercise-meta">Arquitectura conceptual</div>
+    </div>
+    <div class="explanation">
+        <h4>Objectiu</h4>
+        <p>Entendre el flux complet del pipeline sense entrar en classes o codi.</p>
+        <h4>Què aprendràs</h4>
+        <ul>
+            <li>Quines entrades necessita el pipeline.</li>
+            <li>Quines validacions fa abans d’executar.</li>
+            <li>Com es generen les sortides per fases.</li>
+        </ul>
+        <h4>Explicació conceptual</h4>
+        <p>El pipeline es pot veure com una seqüència: <strong>entrades → validacions → execució per fases → sortides</strong>. Cada fase té un objectiu clar i genera un resultat verificable.</p>
+        <h4>Què NO és necessari entendre</h4>
+        <p>No cal saber com es construeix internament cada fase per utilitzar el resultat final.</p>
+        <h4>Errors típics</h4>
+        <ul>
+            <li>Barrejar el codi del pipeline amb scripts docents del curs.</li>
+            <li>Copiar l’arquitectura sense documentar els paràmetres.</li>
+        </ul>
+        <h4>Resultat esperat</h4>
+        <p>Una idea clara del flux complet abans d’entrar en detalls tècnics.</p>
+    </div>
+</section>
+
+<section id="annexA_a2_algorithm" class="exercise-block subsection">
+    <div class="exercise-header">
+        <h3 class="exercise-title">A.2 — El QgsProcessingAlgorithm</h3>
+        <div class="exercise-meta">Peça central dins QGIS</div>
+    </div>
+    <div class="explanation">
+        <h4>Objectiu</h4>
+        <p>Comprendre què és un <code class="inline">QgsProcessingAlgorithm</code> i quin problema resol dins QGIS.</p>
+        <h4>Què aprendràs</h4>
+        <ul>
+            <li>Per què QGIS necessita algoritmes encapsulats.</li>
+            <li>Quin paper juga l’algorisme dins el curs.</li>
+            <li>Què significa “infraestructura” dins la caixa d’eines.</li>
+        </ul>
+        <h4>Explicació conceptual</h4>
+        <p>Un <code class="inline">QgsProcessingAlgorithm</code> és la manera oficial de convertir un flux en una eina de QGIS. No és una acció manual, sinó la infraestructura que permet l’execució estable i repetible.</p>
+        <p>Els seus components clau són: definició de paràmetres, execució del flux i comunicació amb l’usuari mitjançant missatges.</p>
+        <h4>Què NO és necessari entendre</h4>
+        <p>No cal conèixer mètodes interns o detalls d’implementació per executar l’eina.</p>
+        <h4>Errors típics</h4>
+        <ul>
+            <li>Confondre l’algorisme amb una eina GUI manual.</li>
+            <li>Modificar noms de capes o camps i trencar l’algorisme.</li>
+        </ul>
+        <h4>Resultat esperat</h4>
+        <p>Entendre que l’algorisme és l’esquelet que fa possible el pipeline professional.</p>
+    </div>
+</section>
+
+<section id="annexA_a3_params" class="exercise-block subsection">
+    <div class="exercise-header">
+        <h3 class="exercise-title">A.3 — Paràmetres i sortides del pipeline</h3>
+        <div class="exercise-meta">Entrades i resultats deterministes</div>
+    </div>
+    <div class="explanation">
+        <h4>Objectiu</h4>
+        <p>Entendre per què els paràmetres i les sortides són estrictes i deterministes.</p>
+        <h4>Què aprendràs</h4>
+        <ul>
+            <li>Quins paràmetres són obligatoris i per què.</li>
+            <li>Quins valors per defecte ajuden a evitar errors.</li>
+            <li>Per què les sortides tenen noms estables.</li>
+        </ul>
+        <h4>Explicació conceptual</h4>
+        <p>Un pipeline professional evita ambigüitats: els paràmetres són mínims però suficients, i les sortides són deterministes per garantir reutilització i execucions repetides sense confusió.</p>
+        <h4>Què NO és necessari entendre</h4>
+        <p>No cal saber com es valida cada paràmetre per beneficiar-se del pipeline.</p>
+        <h4>Errors típics</h4>
+        <ul>
+            <li>Modificar noms de capes o camps com <code class="inline">precipitacio_olot</code>, <code class="inline">precip_mm</code> o <code class="inline">date</code>.</li>
+            <li>Assumir que la sortida pot tenir noms diferents sense adaptar l’algorisme.</li>
+        </ul>
+        <h4>Resultat esperat</h4>
+        <p>Clarificar que paràmetres i sortides són la clau d’un pipeline automatitzable.</p>
+    </div>
+</section>
+
+<section id="annexA_a4_validacions" class="exercise-block subsection">
+    <div class="exercise-header">
+        <h3 class="exercise-title">A.4 — Validacions i control d’errors</h3>
+        <div class="exercise-meta">Robustesa professional</div>
+    </div>
+    <div class="explanation">
+        <h4>Objectiu</h4>
+        <p>Entendre per què un pipeline professional valida abans d’executar.</p>
+        <h4>Què aprendràs</h4>
+        <ul>
+            <li>Quines validacions mínimes són imprescindibles.</li>
+            <li>Com es comunica l’error a l’usuari.</li>
+            <li>Per què això estalvia temps en producció.</li>
+        </ul>
+        <h4>Explicació conceptual</h4>
+        <p>El pipeline comprova que hi hagi camps clau, formats coherents i rutes correctes abans d’executar. Els errors es comuniquen amb missatges clars (exemples conceptuals: “camp precip_mm inexistent”, “dates no vàlides”).</p>
+        <h4>Què NO és necessari entendre</h4>
+        <p>No cal memoritzar totes les validacions per utilitzar l’eina.</p>
+        <h4>Errors típics</h4>
+        <ul>
+            <li>Copiar codi sense entendre l’arquitectura de validació.</li>
+            <li>No documentar paràmetres quan es reutilitza el pipeline.</li>
+        </ul>
+        <h4>Resultat esperat</h4>
+        <p>Confiança en un pipeline que evita errors silenciosos.</p>
+    </div>
+</section>
+
+<section id="annexA_a5_provider" class="exercise-block subsection">
+    <div class="exercise-header">
+        <h3 class="exercise-title">A.5 — Provider del curs</h3>
+        <div class="exercise-meta">Visibilitat a la Caixa d’eines</div>
+    </div>
+    <div class="explanation">
+        <h4>Objectiu</h4>
+        <p>Entendre com el provider fa visible l’algorisme dins QGIS.</p>
+        <h4>Què aprendràs</h4>
+        <ul>
+            <li>Què és un Processing Provider.</li>
+            <li>Com QGIS el carrega en iniciar-se.</li>
+            <li>Com apareix l’entrada “Curs Precipitació → Pipeline complet”.</li>
+        </ul>
+        <h4>Explicació conceptual</h4>
+        <p>El provider és el “contenidor” que agrupa l’eina. No canvia el funcionament intern, però és imprescindible perquè l’algorisme sigui visible a la GUI.</p>
+        <h4>Què NO és necessari entendre</h4>
+        <p>No cal saber com s’inicialitza el provider per executar el pipeline.</p>
+        <h4>Errors típics</h4>
+        <ul>
+            <li>Confondre el provider amb el pipeline en si.</li>
+            <li>Canviar noms i després no trobar l’eina a la cerca.</li>
+        </ul>
+        <h4>Resultat esperat</h4>
+        <p>Entendre per què el pipeline és visible com una eina nativa.</p>
+    </div>
+</section>
+
+<section id="annexA_a6_estil_export" class="exercise-block subsection">
+    <div class="exercise-header">
+        <h3 class="exercise-title">A.6 — Estil, projecte i export com a part del pipeline</h3>
+        <div class="exercise-meta">Productes finals</div>
+    </div>
+    <div class="explanation">
+        <h4>Objectiu</h4>
+        <p>Entendre que el pipeline no només crea dades, sinó productes finals.</p>
+        <h4>Què aprendràs</h4>
+        <ul>
+            <li>Separació entre dades (GPKG), estil (QML) i projecte (.qgz).</li>
+            <li>Per què l’export d’animacions és part del flux professional.</li>
+            <li>Com això connecta amb el Bloc 04 i 05.</li>
+        </ul>
+        <h4>Explicació conceptual</h4>
+        <p>El pipeline encapsula scripts dels blocs previs i automatitza tant la generació de dades com la presentació final. Això garanteix coherència visual i reutilització.</p>
+        <h4>Què NO és necessari entendre</h4>
+        <p>No cal conèixer com s’aplica cada estil per validar el resultat.</p>
+        <h4>Errors típics</h4>
+        <ul>
+            <li>Barrejar dades finals amb sortides temporals.</li>
+            <li>Modificar capes o camps i perdre compatibilitat amb els estils.</li>
+        </ul>
+        <h4>Resultat esperat</h4>
+        <p>Un resultat professional i consistent, llest per publicar.</p>
+    </div>
+</section>
+
+<section id="annexA_a7_reutilitzacio" class="exercise-block subsection">
+    <div class="exercise-header">
+        <h3 class="exercise-title">A.7 — Reutilització i extensió</h3>
+        <div class="exercise-meta">Adaptacions i escalabilitat</div>
+    </div>
+    <div class="explanation">
+        <h4>Objectiu</h4>
+        <p>Veure com l’arquitectura es pot reutilitzar en altres contextos.</p>
+        <h4>Què aprendràs</h4>
+        <ul>
+            <li>Com adaptar el pipeline a altres municipis.</li>
+            <li>Com ampliar-lo a altres variables (temperatura, vent).</li>
+            <li>Quines parts són específiques del cas d’estudi.</li>
+        </ul>
+        <h4>Explicació conceptual</h4>
+        <p>La base del pipeline és general: entrades, validacions i sortides. El que canvia són les capes, els noms i els criteris específics del cas d’estudi.</p>
+        <h4>Què NO és necessari entendre</h4>
+        <p>No cal reescriure el pipeline per a cada municipi si mantens l’esquema.</p>
+        <h4>Errors típics</h4>
+        <ul>
+            <li>Modificar capes clau i trencar l’algorisme.</li>
+            <li>Barrejar scripts docents amb la versió professional.</li>
+        </ul>
+        <h4>Resultat esperat</h4>
+        <p>Un model reutilitzable i adaptable a altres projectes.</p>
+    </div>
+</section>
+
+<section id="annexA_a8_tancament" class="exercise-block subsection">
+    <div class="exercise-header">
+        <h3 class="exercise-title">A.8 — Tancament de l’Annex A</h3>
+        <div class="exercise-meta">Resum professional</div>
+    </div>
+    <div class="explanation">
+        <h4>Objectiu</h4>
+        <p>Tancar l’annex amb un resum clar i professional.</p>
+        <h4>Què aprendràs</h4>
+        <ul>
+            <li>Com connectar l’aprenentatge pràctic amb l’arquitectura interna.</li>
+            <li>Per què aquest annex és opcional però valuós.</li>
+        </ul>
+        <h4>Explicació conceptual</h4>
+        <p>Aquest annex complementa el curs: no és necessari per fer els exercicis, però sí per entendre com es construeixen eines reutilitzables en entorns professionals.</p>
+        <h4>Què NO és necessari entendre</h4>
+        <p>No cal dominar l’arquitectura interna per obtenir els resultats del curs.</p>
+        <h4>Errors típics</h4>
+        <ul>
+            <li>Pensar que el curs no està complet sense aquest annex.</li>
+            <li>Copiar codi sense entendre la lògica global.</li>
+        </ul>
+        <h4>Resultat esperat</h4>
+        <p>Amb aquest annex, el curs mostra no només com treballar amb dades temporals a QGIS, sinó també com construir eines reutilitzables.</p>
+    </div>
+</section>
+
+</div>

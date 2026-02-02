@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Info — Fonts i Reclassificacions</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+    <nav class="sidebar">
+        <div class="sidebar-header">
+            <a href="index.html" class="back-link">← Tornar al Curs</a>
+            <h2>Informació útil</h2>
+        </div>
+
+        <div class="nav-group">
+            <a class="nav-group-title" href="#info_fonts">Fonts de dades</a>
+            <a href="#info_fonts" class="nav-link">Fonts de descàrrega</a>
+            <a href="#info_reclass" class="nav-link">Reclassificacions</a>
+        </div>
+    </nav>
+
+    <main class="content">
+        <section id="info_fonts" class="exercise-block">
+            <div class="exercise-header">
+                <h3 class="exercise-title">Fonts de descàrrega de dades (QGIS)</h3>
+                <div class="exercise-meta">Recursos oficials per a les pràctiques</div>
+            </div>
+            <div class="explanation">
+                <p>Aquest apartat recopila les fonts oficials que utilitzarem per descarregar dades base i serveis web.</p>
+                <h4>Fonts disponibles</h4>
+                <ul>
+                    <li><strong>Cobertes del sòl de l’ICGC</strong>: <a href="https://www.icgc.cat/ca/Geoinformacio-i-mapes/Mapes/Mapa-de-cobertes-del-sol-de-Catalunya" target="_blank" rel="noopener">https://www.icgc.cat/ca/Geoinformacio-i-mapes/Mapes/Mapa-de-cobertes-del-sol-de-Catalunya</a></li>
+                    <li><strong>Serveis WMS ICGC</strong>: <a href="https://www.icgc.cat/ca/Geoinformacio-i-mapes/Geoinformacio-en-linia-Geoserveis" target="_blank" rel="noopener">https://www.icgc.cat/ca/Geoinformacio-i-mapes/Geoinformacio-en-linia-Geoserveis</a></li>
+                    <li><strong>WMS de mapes, elevacions i ombres (ICGC)</strong>: <a href="https://www.icgc.cat/ca/Geoinformacio-i-mapes/Geoinformacio-en-linia-Geoserveis/WMS-i-WCS-Elevacions/WMS-Mapes-delevacions-orientacio-i-ombres" target="_blank" rel="noopener">https://www.icgc.cat/ca/Geoinformacio-i-mapes/Geoinformacio-en-linia-Geoserveis/WMS-i-WCS-Elevacions/WMS-Mapes-delevacions-orientacio-i-ombres</a></li>
+                    <li><strong>USGS Earth Explorer</strong>: <a href="https://earthexplorer.usgs.gov/" target="_blank" rel="noopener">https://earthexplorer.usgs.gov/</a></li>
+                    <li><strong>Classificació i qualificació del sòl (SHAPE)</strong>: <a href="https://territori.gencat.cat/ca/06_territori_i_urbanisme/observatori_territori/mapa_urbanistic_de_catalunya/serveis-web-dades-obertes/descarrega-dades/format-shapefile-shp/" target="_blank" rel="noopener">https://territori.gencat.cat/ca/06_territori_i_urbanisme/observatori_territori/mapa_urbanistic_de_catalunya/serveis-web-dades-obertes/descarrega-dades/format-shapefile-shp/</a></li>
+                </ul>
+
+                <div class="data-files-list">
+                    <strong>Descarrega de fitxers del curs</strong>
+                    <ul>
+                        <li><a class="data-file-link" href="dades/entrada/Precipitació_Olot_AEMET.csv" download>Precipitació_Olot_AEMET.csv</a></li>
+                        <li><a class="data-file-link" href="dades/entrada/Precipitació_Olot_METEOCAT.csv" download>Precipitació_Olot_METEOCAT.csv</a></li>
+                        <li><a class="data-file-link" href="dades/entrada/landsat08_ndvi.zip" download>landsat08_ndvi.zip</a></li>
+                        <li><a class="data-file-link" href="dades/entrada/reclass_cobertes.txt" download>reclass_cobertes.txt</a></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="info_reclass" class="exercise-block">
+            <div class="exercise-header">
+                <h3 class="exercise-title">Reclassificacions</h3>
+                <div class="exercise-meta">Taules de valors per als mapes de risc</div>
+            </div>
+            <div class="explanation">
+                <p>Les reclassificacions següents s’utilitzen per transformar variables en valors normalitzats de risc.</p>
+
+                <h4>Distància respecte a les carreteres</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rang (m)</th>
+                            <th>Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>0 - 100</td><td>1.00</td></tr>
+                        <tr><td>100 - 500</td><td>0.80</td></tr>
+                        <tr><td>500 - 1.000</td><td>0.60</td></tr>
+                        <tr><td>1.000 - 3.000</td><td>0.30</td></tr>
+                        <tr><td>3.000 - 6.500</td><td>0.10</td></tr>
+                    </tbody>
+                </table>
+
+                <h4>Coberta del sòl segons inflamabilitat</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Categoria</th>
+                            <th>Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Massa forestal</td><td>0.75</td></tr>
+                        <tr><td>Conreus</td><td>0.50</td></tr>
+                        <tr><td>Zones antropitzades</td><td>0.10</td></tr>
+                        <tr><td>Masses d’aigua</td><td>0.00</td></tr>
+                        <tr><td>Vegetació baixa</td><td>1.00</td></tr>
+                    </tbody>
+                </table>
+
+                <h4>Orientació (resum general)</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rang (°)</th>
+                            <th>Orientació</th>
+                            <th>Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>0 - 112.5</td><td>Nord, nordest i est</td><td>1.00</td></tr>
+                        <tr><td>112.5 - 292.5</td><td>Sud, sudest, sudoest i oest</td><td>0.50</td></tr>
+                        <tr><td>292.5 - 360</td><td>Nordoest i nord</td><td>0.00</td></tr>
+                    </tbody>
+                </table>
+
+                <h4>Orientació (detall per sectors)</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rang (°)</th>
+                            <th>Orientació</th>
+                            <th>Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>&lt; 22,5</td><td>Nord</td><td>0.15</td></tr>
+                        <tr><td>22,5 - 67,5</td><td>Nordest</td><td>0.25</td></tr>
+                        <tr><td>67,5 - 112,5</td><td>Est</td><td>0.65</td></tr>
+                        <tr><td>112,5 - 157,5</td><td>Sudest</td><td>0.85</td></tr>
+                        <tr><td>157,5 - 202,5</td><td>Sud</td><td>1.00</td></tr>
+                        <tr><td>202,5 - 247,5</td><td>Sudoest</td><td>0.85</td></tr>
+                        <tr><td>247,5 - 292,5</td><td>Oest</td><td>0.65</td></tr>
+                        <tr><td>292,5 - 337,5</td><td>Noroest</td><td>0.25</td></tr>
+                        <tr><td>&gt; 337,5</td><td>Nord</td><td>0.15</td></tr>
+                    </tbody>
+                </table>
+
+                <h4>Temperatura mitjana anual</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rang (°C)</th>
+                            <th>Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>8 - 10</td><td>0.15</td></tr>
+                        <tr><td>10 - 12</td><td>0.30</td></tr>
+                        <tr><td>12 - 14</td><td>0.45</td></tr>
+                        <tr><td>14 - 16</td><td>0.60</td></tr>
+                    </tbody>
+                </table>
+
+                <h4>NDVI</h4>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rang</th>
+                            <th>Valor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>0</td><td>0.00</td></tr>
+                        <tr><td>0 - 0.15</td><td>0.20</td></tr>
+                        <tr><td>0.15 - 0.30</td><td>1.00</td></tr>
+                        <tr><td>0.30 - 0.45</td><td>0.80</td></tr>
+                        <tr><td>0.45 - 0.60</td><td>0.40</td></tr>
+                        <tr><td>&gt; 0.60</td><td>0.20</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+</body>
+</html>
