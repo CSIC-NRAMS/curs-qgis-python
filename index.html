@@ -12,6 +12,7 @@
 <body>
 
     <!-- Sidebar Navigation -->
+    <!-- Guia de navegacio: llista tots els exercicis i salta a cada bloc. -->
     <nav class="sidebar">
         <div class="sidebar-header">
             <a href="index.html" class="back-link">← Tornar al Curs</a>
@@ -90,7 +91,7 @@
         </div>
     </nav>
 
-    <!-- Main Content -->
+    <!-- Main Content: el contingut es carrega per blocs (include). -->
         <main class="content">
             <section id="intro" class="exercise-block">
                 <div class="exercise-header">
@@ -156,6 +157,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
     
+        <!-- JS intern: carrega blocs, afegeix botons i millora la navegacio. -->
         <script>
             async function loadIncludes() {
                 const targets = Array.from(document.querySelectorAll('[data-include]'));
@@ -220,14 +222,7 @@
             }
 
             // ---------- 1) Injectar botó "Copiar" ----------
-            document.querySelectorAll('.exercise-block').forEach(block => {
-                const codeEl = block.querySelector('pre code');
-                const headerRow = block.querySelector('.header-row');
-                if (!codeEl || !headerRow) return;
-
-                // Evitem duplicats si es torna a executar
-                if (headerRow.querySelector('.copy-btn')) return;
-
+            const makeCopyBtn = (codeEl) => {
                 const copyBtn = document.createElement('button');
                 copyBtn.className = 'copy-btn';
                 copyBtn.type = 'button';
@@ -244,7 +239,28 @@
                     }
                 });
 
-                headerRow.appendChild(copyBtn);
+                return copyBtn;
+            };
+
+            document.querySelectorAll('.exercise-block pre code').forEach(codeEl => {
+                const block = codeEl.closest('.exercise-block');
+                const pre = codeEl.closest('pre');
+                if (!block || !pre) return;
+
+                const headerRow = block.querySelector('.header-row');
+                if (headerRow && block.classList.contains('script-block')) {
+                    if (headerRow.querySelector('.copy-btn')) return;
+                    headerRow.appendChild(makeCopyBtn(codeEl));
+                    return;
+                }
+
+                const prev = pre.previousElementSibling;
+                if (prev && prev.classList.contains('code-toolbar')) return;
+
+                const toolbar = document.createElement('div');
+                toolbar.className = 'code-toolbar';
+                toolbar.appendChild(makeCopyBtn(codeEl));
+                pre.parentElement.insertBefore(toolbar, pre);
             });
 
             // ---------- 2) Smooth scroll “dins” del contenidor .content ----------

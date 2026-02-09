@@ -65,6 +65,14 @@ GPKG_LAYER = "precipitacio_olot"</code></pre>
                 </div>
                 <div class="exercise-meta">Fase: Unificació de fonts</div>
             </div>
+                <!-- Fa: uneix dos CSV estandarditzats i els ordena per data. -->
+                <!-- Llegeix: STD_OUT i AEMET_STD_OUT -->
+                <!-- Escriu: MERGED_STD_OUT -->
+                <!-- OK esperat: missatge d'OK i preview del fitxer fusionat. -->
+                <!-- Afegim totes les files del Meteocat a una llista comuna. -->
+                <!-- Afegim totes les files d'AEMET a la mateixa llista. -->
+                <!-- (Primer cop: lambda) Una lambda es una funcio curta per definir claus d'ordenacio. -->
+                <!-- Escrivim totes les files fusionades amb l'esquema estandard. -->
             <pre><code class="language-python">import os
 import sys
 
@@ -122,6 +130,14 @@ print(f"OK -> creat {MERGED_STD_OUT}")</code></pre>
                 </div>
                 <div class="exercise-meta">Fase: Exportació a GeoPackage</div>
             </div>
+                <!-- Fa: carrega el CSV com a capa i el desa en GPKG. -->
+                <!-- Llegeix: MERGED_STD_OUT -->
+                <!-- Escriu: GPKG_OUT (capa GPKG_LAYER) -->
+                <!-- OK esperat: missatge d'OK i capa afegida al projecte. -->
+                <!-- (Primer cop: URI) Aquesta cadena indica a QGIS com interpretar el CSV. -->
+                <!-- Creem una capa temporal de punts a partir del CSV. -->
+                <!-- Afegim la capa al projecte per visualitzar-la. -->
+                <!-- Escrivim la capa a un GeoPackage (format SIG professional). -->
             <pre><code class="language-python">import os
 import sys
 

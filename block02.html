@@ -75,6 +75,12 @@ AEMET_STD_OUT = as_posix(Path(RESULTATS_DIR) / "aemet_std.csv")</code></pre>
                 </div>
                 <div class="exercise-meta">Fase: Exploració AEMET</div>
             </div>
+                <!-- Fa: mostra capçaleres i 5 files. -->
+                <!-- Llegeix: AEMET_INPUT -->
+                <!-- Escriu: res (nomes consola) -->
+                <!-- OK esperat: missatge d'OK i preview a la consola. -->
+                <!-- Afegim l'arrel del projecte al sys.path per poder importar tools/. -->
+                <!-- Llegim i mostrem un preview sense modificar cap fitxer. -->
             <pre><code class="language-python">import os
 import sys
 
@@ -104,6 +110,13 @@ print("OK -> Previsualització AEMET feta.")</code></pre>
                 </div>
                 <div class="exercise-meta">Fase: Transformació Wide to Long</div>
             </div>
+                <!-- Fa: converteix columnes P1..P31 en files diaries. -->
+                <!-- Llegeix: AEMET_INPUT -->
+                <!-- Escriu: AEMET_PAS1_OUT (aemet_pas1_long.csv) -->
+                <!-- OK esperat: missatge d'OK i preview del pas 1. -->
+                <!-- (Ja explicat abans) Preparem l'import del paquet tools. -->
+                <!-- Detectem totes les columnes P* (dies del mes) del CSV original. -->
+                <!-- Per cada fila mensual, creem una fila per cada dia amb valor. -->
             <pre><code class="language-python">import os
 import sys
 
@@ -235,6 +248,10 @@ print(f"OK -> creat {AEMET_PAS1_OUT}")</code></pre>
                     <p><strong>Consell:</strong> si hi ha errors d’import, tanca i reobre QGIS.</p>
                 </div>
             </div>
+                <!-- Aquest mòdul centralitza conversions perquè no repetim codi als exercicis. -->
+                <!-- (Ja explicat abans: funcio) -->
+                <!-- Acceptem diversos formats per reduir errors quan els CSV no son homogenis. -->
+                <!-- Tornem None si la data es impossible (ex. 30/02). -->
             <pre><code class="language-python">"""tools/parse_utils.py — utilitats de parseig.
 
 Fa: convertir textos a float i dates.
@@ -297,6 +314,11 @@ def build_date(year, month, day) -> Optional[date]:
                 </div>
                 <div class="exercise-meta">Fase: Reconstrucció de dates</div>
             </div>
+                <!-- Fa: crea el camp date a partir d'any/mes/dia. -->
+                <!-- Llegeix: AEMET_PAS1_OUT (aemet_pas1_long.csv) -->
+                <!-- Escriu: AEMET_PAS2_OUT (aemet_pas2_dates.csv) -->
+                <!-- OK esperat: missatge d'OK i preview del pas 2. -->
+                <!-- Unim any/mes/dia en una data ISO; descartem dates impossibles. -->
             <pre><code class="language-python">import os
 import sys
 
@@ -351,6 +373,11 @@ print(f"OK -> creat {AEMET_PAS2_OUT}")</code></pre>
                 </div>
                 <div class="exercise-meta">Fase: Conversió d'unitats</div>
             </div>
+                <!-- Fa: passa de decimals en decimes a mm reals. -->
+                <!-- Llegeix: AEMET_PAS2_OUT (aemet_pas2_dates.csv) -->
+                <!-- Escriu: AEMET_PAS3_OUT (aemet_pas3_precip.csv) -->
+                <!-- OK esperat: missatge d'OK i preview del pas 3. -->
+                <!-- Convertim P_TENTHS (decimes de mm) a mm, descartant valors invalids. -->
             <pre><code class="language-python">import os
 import sys
 
@@ -414,6 +441,11 @@ print(f"OK -> creat {AEMET_PAS3_OUT}")</code></pre>
                 </div>
                 <div class="exercise-meta">Fase: Reprojecció AEMET</div>
             </div>
+                <!-- Fa: crea lon/lat a partir de coordenades UTM. -->
+                <!-- Llegeix: AEMET_PAS3_OUT (aemet_pas3_precip.csv) -->
+                <!-- Escriu: AEMET_PAS4_OUT (aemet_pas4_coords.csv) -->
+                <!-- OK esperat: missatge d'OK i preview del pas 4. -->
+                <!-- Les columnes LONGITUD/LATITUD son UTM en metres, no graus. -->
             <pre><code class="language-python">import os
 import sys
 
@@ -487,6 +519,11 @@ print(f"OK -> creat {AEMET_PAS4_OUT}")</code></pre>
                 </div>
                 <div class="exercise-meta">Fase: Mapeig final AEMET</div>
             </div>
+                <!-- Fa: mapeja camps al format estandard del curs. -->
+                <!-- Llegeix: AEMET_PAS4_OUT (aemet_pas4_coords.csv) -->
+                <!-- Escriu: AEMET_STD_OUT (aemet_std.csv) -->
+                <!-- OK esperat: missatge d'OK i preview del fitxer final. -->
+                <!-- Mapejem camps d'AEMET al mateix esquema que Meteocat. -->
             <pre><code class="language-python">import os
 import sys
 

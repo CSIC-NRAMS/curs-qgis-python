@@ -55,6 +55,7 @@
                     </div>
                     <div class="exercise-meta">Exercici (script) del Bloc 0 · Primer “Hola món”</div>
                 </div>
+                    <!-- (Primer cop: print) print envia text a la consola de QGIS. -->
                 <pre><code class="language-python">"""Exercici 0.1 — Hola món (script mínim)."""
 
 print("Hola món!")</code></pre>
@@ -127,6 +128,11 @@ print("Project Home:", home)</code></pre>
                     </div>
                     <div class="exercise-meta">Exercici (script) del Bloc 0 · Practicar fonaments bàsics</div>
                 </div>
+                    <!-- (Primer cop: variable) Una variable guarda un valor i li posem un nom. -->
+                    <!-- (Primer cop: llista/diccionari/tupla) Són contenidors per guardar més d'un valor. -->
+                    <!-- (Primer cop: funcio) Una funcio es un bloc reutilitzable que pots cridar per nom. -->
+                    <!-- Definim funcions per separar la logica en peces petites i clares. -->
+                    <!-- (Primer cop: try/except) Ens permet capturar errors sense aturar el programa. -->
                 <pre><code class="language-python">"""Exercici 0.2 — Python bàsic a QGIS (ràpid i didàctic).
 
 Objectiu:
@@ -260,6 +266,9 @@ print("OK -> Exercici 0.2 completat.")</code></pre>
                     </div>
                     <div class="exercise-meta">Exercici (script) del Bloc 0 · Imports i paquet tools</div>
                 </div>
+                    <!-- (Primer cop: mòdul) Un modul es un fitxer .py que podem importar des d'altres scripts. -->
+                    <!-- (Primer cop: Path) Path ens ajuda a construir rutes de forma segura. -->
+                    <!-- Fem un separador visual per llegir millor la sortida a consola. -->
                 <pre><code class="language-python">"""Exercici 0.3 — Funcions + mòduls: per què existeix tools.
 
 Objectiu:
@@ -375,6 +384,10 @@ print("OK -> Exercici 0.3 completat.")</code></pre>
                     </div>
                     <div class="exercise-meta">Exercici (script) del Bloc 0 · Crear el config mínim</div>
                 </div>
+                    <!-- Aquest fitxer centralitza rutes i noms per evitar valors duplicats als scripts. -->
+                    <!-- (Primer cop: Project Home) QGIS te un directori arrel del projecte per rutes relatives. -->
+                    <!-- Fem servir barres / per evitar problemes entre Windows i altres sistemes. -->
+                    <!-- (Primer cop: constants) Una constant es una variable que no hauria de canviar. -->
                 <pre><code class="language-python">"""Configuració mínima del curs (rutes base)."""
 
 from pathlib import Path
@@ -431,6 +444,7 @@ AEMET_INPUT = as_posix(Path(ENTRADA_DIR) / "Precipitacio_Olot_AEMET.csv")</code>
                     </div>
                     <div class="exercise-meta">Exercici (script) del Bloc 0 · Validar rutes base</div>
                 </div>
+                    <!-- (Primer cop: import) Importar vol dir portar codi d'un altre fitxer. -->
                 <pre><code class="language-python">"""Exercici 0.4 — Test de config mínim viable.
 
 Objectiu:
@@ -507,6 +521,13 @@ print("OK -> Config mínim validat.")</code></pre>
                     </div>
                     <div class="exercise-meta">Exercici (script) del Bloc 0 · Crear utilitats CSV</div>
                 </div>
+                    <!-- Aquest mòdul reuneix funcions petites i reutilitzables per treballar amb CSV. -->
+                    <!-- (Ja explicat abans: mòdul) -->
+                    <!-- (Ja explicat abans: Path) -->
+                    <!-- (Primer cop: context manager) Permet obrir/tancar el fitxer automàticament amb "with". -->
+                    <!-- Escriure CSV amb capçaleres assegura un esquema consistent per a cada pas. -->
+                    <!-- Validem l'existència del fitxer per donar un missatge clar si falta. -->
+                    <!-- Llegim només unes quantes files per no carregar-ho tot a memòria. -->
                 <pre><code class="language-python">"""Utilitats mínimes per previsualitzar CSV (sense dependències externes)."""
 
 import csv
@@ -694,6 +715,8 @@ def preview_csv(path: Union[str, Path], max_rows: int = 5, title: Optional[str] 
                     </div>
                     <div class="exercise-meta">Exercici (script) del Bloc 0 · Preview de 5 files</div>
                 </div>
+                    <!-- (Ja explicat abans: import) Reutilitzem rutes i utilitats del paquet tools. -->
+                    <!-- Fem una llista d'inputs que falten per donar un avis clar. -->
                 <pre><code class="language-python">"""Exercici 0.5 — Preview de dades (5 files).
 
 Objectiu:

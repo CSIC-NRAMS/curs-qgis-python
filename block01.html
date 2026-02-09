@@ -256,6 +256,8 @@ STD_FIELDS = [
                     <p><strong>Consell:</strong> no editem el CSV a mà; només el mirem per entendre’l. Després automatitzem tot el procés.</p>
                 </div>
             </div>
+            <!-- Afegim l'arrel del projecte al sys.path per poder importar tools/. -->
+            <!-- Llegim i mostrem un preview sense modificar cap fitxer. -->
             <pre><code class="language-python">"""Ex01 — Preview del CSV Meteocat.
 
 Fa: mostra capçaleres i 5 files.
@@ -350,6 +352,13 @@ print("OK -> Mostrades capçaleres i 5 files del CSV.")</code></pre>
                     <p><strong>Consell:</strong> aquesta eina és reutilitzable. Si funciona aquí, funcionarà a tot el curs.</p>
                 </div>
             </div>
+            <!-- Aquest mòdul reuneix funcions petites i reutilitzables per treballar amb CSV. -->
+            <!-- (Ja explicat abans: mòdul) -->
+            <!-- (Ja explicat abans: Path) -->
+            <!-- (Primer cop: context manager) Permet obrir/tancar el fitxer automàticament amb "with". -->
+            <!-- Escriure CSV amb capçaleres assegura un esquema consistent per a cada pas. -->
+            <!-- Validem l'existència del fitxer per donar un missatge clar si falta. -->
+            <!-- Llegim només unes quantes files per no carregar-ho tot a memòria. -->
             <pre><code class="language-python">"""Utilitats CSV per al curs (lectura, escriptura i preview)."""
 
 import csv
@@ -509,6 +518,9 @@ def preview_csv(path: Union[str, Path], max_rows: int = 5, title: Optional[str] 
                     <p><strong>Consell:</strong> aquest pas és com fer un “retall” net del dataset per treballar amb menys soroll.</p>
                 </div>
             </div>
+            <!-- (Ja explicat abans) Preparem l'import del paquet tools. -->
+            <!-- Ens assegurem que la carpeta de sortida existeix. -->
+            <!-- Recorrem cada fila i creem una nova fila amb nomes les columnes clau. -->
             <pre><code class="language-python">"""Ex02 — Selecció de columnes clau.
 
 Fa: crea un CSV més petit amb camps essencials.
@@ -614,6 +626,10 @@ print(f"Files processades: {files}")</code></pre>
                     <p><strong>Consell:</strong> quan un CSV té milers de files, la conversió manual és inviable; per això automatitzem.</p>
                 </div>
             </div>
+            <!-- Aquest mòdul centralitza conversions perquè no repetim codi als exercicis. -->
+            <!-- (Ja explicat abans: funcio) -->
+            <!-- Acceptem diversos formats per reduir errors quan els CSV no son homogenis. -->
+            <!-- Tornem None si la data es impossible (ex. 30/02). -->
             <pre><code class="language-python">"""tools/parse_utils.py — utilitats de parseig.
 
 Fa: convertir textos a float i dates.
@@ -742,6 +758,7 @@ def build_date(year, month, day) -> Optional[date]:
                     <p><strong>Consell:</strong> si no normalitzem ara, les mitjanes i mapes fallaran més endavant.</p>
                 </div>
             </div>
+            <!-- Convertim textos a numeros reals quan es pot. -->
             <pre><code class="language-python">"""Ex03 — Neteja de números.
 
 Fa: converteix X/Y/PPT a float.
@@ -862,6 +879,7 @@ print(f"OK -> creat {PAS2A_OUT}")</code></pre>
                     <p><strong>Consell:</strong> si el nombre de descartades és enorme, revisa el pas anterior.</p>
                 </div>
             </div>
+            <!-- Rebutgem files sense coordenades, perque no es poden mapar. -->
             <pre><code class="language-python">"""Ex04 — Filtre de coordenades buides.
 
 Fa: elimina files sense X o Y.
@@ -981,6 +999,7 @@ print(f"Files saltades (X o Y buits): {files_saltades}")</code></pre>
                     <p><strong>Consell:</strong> un format únic és clau per ordenar i unir sèries temporals.</p>
                 </div>
             </div>
+            <!-- Convertim dates a format ISO i descartem les invalides. -->
             <pre><code class="language-python">"""Ex05 — Normalització de dates.
 
 Fa: converteix DATA a format ISO.
@@ -1096,6 +1115,10 @@ print(f"Files saltades (data invàlida): {files_saltades}")</code></pre>
                     <p><strong>Consell:</strong> quan una funció és estable, la reutilitzem a altres blocs sense reescriure res.</p>
                 </div>
             </div>
+            <!-- Aquest mòdul depen de PyQGIS, per tant nomes funciona dins QGIS. -->
+            <!-- Comprovem que PyQGIS esta disponible i expliquem l'error si no ho esta. -->
+            <!-- (Primer cop: CRS) Un CRS defineix com s'interpreten les coordenades. -->
+            <!-- Rebem X/Y en metres i retornem lon/lat en graus. -->
             <pre><code class="language-python">"""tools/qgis_utils.py — utilitats PyQGIS mínimes.
 
 Fa: transforma UTM31 a WGS84.
@@ -1207,6 +1230,8 @@ def transform_utm_to_lonlat(x, y, xform):
                     <p><strong>Consell:</strong> si els punts apareixen “fora del mapa”, el CRS és el primer sospitós.</p>
                 </div>
             </div>
+            <!-- Preparem el transformador de coordenades (UTM -> lon/lat). -->
+            <!-- Convertim X/Y a floats i calculem lon/lat; si falla, descartem la fila. -->
             <pre><code class="language-python">"""Ex06 — Transformació CRS UTM → WGS84.
 
 Fa: afegeix lon/lat a partir d'X/Y UTM.
@@ -1335,6 +1360,7 @@ print(f"OK -> creat {PAS4_OUT}")</code></pre>
                     <p><strong>Consell:</strong> aquest CSV és la “clau” per unir fonts després.</p>
                 </div>
             </div>
+            <!-- Mapejem camps del Meteocat al model estandard del curs. -->
             <pre><code class="language-python">"""Ex07 — Estandardització final.
 
 Fa: mapeja camps al format estàndard.
